@@ -4,26 +4,54 @@ import MetaData from './Layout/MetaData'
 import Product from './Product/Product'
 import Loader from './Layout/Loader'
 import axios from 'axios'
+// import Stack from '@mui/material/Stack'
+import Box from '@mui/material/Box';
+import Slider from '@mui/material/Slider';
+import Stack from '@mui/material/Stack'
+import Pagination from '@mui/material/Pagination'
 const Home = () => {
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState(true)
+    const [price, setPrice] = useState([1, 1000]);
+    const [productsCount, setProductsCount] = useState(0)
+    const [resPerPage, setResPerPage] = useState(0)
+    const [filteredProductsCount, setFilteredProductsCount] = useState(0)
+    const [currentPage, setCurrentPage] = useState(1)
     let { keyword } = useParams();
     // console.log(products)
-    const getProducts = async (keyword = '') => {
+    const getProducts = async (keyword = '', price, page = 1) => {
 
-        let link = `http://localhost:4001/api/v1/products?keyword=${keyword}`
+         let link = `http://localhost:4001/api/v1/products?keyword=${keyword}&price[gte]=${price[0]}&price[lte]=${price[1]}&page=${page}`
 
         let res = await axios.get(link)
         console.log(res.data.products)
         setProducts(res.data.products)
+        setProductsCount(res.data.productsCount)
+        setFilteredProductsCount(res.data.filteredProductsCount)
+        setResPerPage(res.data.resPerPage)
         setLoading(false)
     }
     // getProducts()
     // console.log(products)
 
+        let count = productsCount;
+
+    if (keyword) {
+        count = filteredProductsCount
+    }
+
+    const handleChange = (event, newValue) => {
+        setPrice(newValue);
+    };
+
+    function valuetext(price) {
+        return `P${price.toString()}`;
+    }
+
+
     useEffect(() => {
-        getProducts(keyword)
-    }, [keyword]);
+        getProducts(keyword, price, currentPage)
+    }, [keyword, price, currentPage]);
     return (
         <>
             <MetaData title={'shop Here'} />
@@ -41,7 +69,7 @@ const Home = () => {
                         <div className="row">
                             {keyword ? (
                                 <>
-                                    {/* <div className="col-6 col-md-3 mt-5 mb-5">
+                                    <div className="col-6 col-md-3 mt-5 mb-5">
                                   
 
                                         <Box sx={{ width: 150 }}>
@@ -65,7 +93,7 @@ const Home = () => {
 
 
                                     
-                                </div> */}
+                                </div>
 
                                     <div className="col-6 col-md-9">
                                         <div className="row">
@@ -82,6 +110,28 @@ const Home = () => {
                             )}
 
                         </div>
+                        {resPerPage < count && (
+                            <div className="d-flex justify-content-center mt-5">
+                                <Stack spacing={2}>
+                                    <Pagination
+                                        count={Math.ceil(count / resPerPage)}
+                                        page={currentPage}
+                                        onChange={(event, value) => setCurrentPage(value)}
+
+                                        color="primary"
+                                        variant="outlined"
+                                        shape="rounded"
+                                        showFirstButton
+                                        showLastButton
+                                        size="large"
+                                        sx={{
+                                            backgroundColor: 'white',
+
+                                        }}
+                                    />
+                                </Stack>
+                            </div>
+                        )}
                     </section>
                 </div>)}
         </>
