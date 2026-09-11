@@ -6,9 +6,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import { getToken } from '../../Utils/helpers'
 
-
-
-
 const UpdatePassword = () => {
    
     const [oldPassword, setOldPassword] = useState('')
