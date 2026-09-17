@@ -5,10 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 
 
 const Cart = ({ addItemToCart, removeItemFromCart, cartItems }) => {
-
     const navigate = useNavigate()
-
-
     const increaseQty = (id, quantity, stock) => {
         const newQty = quantity + 1;
         if (newQty > stock) return;
