@@ -21,6 +21,12 @@ import Profile from './Components/User/Profile';
 import UpdateProfile from './Components/User/UpdateProfile';
 import UpdatePassword from './Components/User/UpdatePassword';
 import Cart from './Components/Cart/Cart';
+import Shipping from './Components/Cart/Shipping';
+import ConfirmOrder from './Components/Cart/ConfirmOrder';
+import Payment from './Components/Cart/Payment';
+import OrderSuccess from './Components/Cart/OrderSuccess';
+import ListOrders from './Components/Order/ListOrders';
+import OrderDetails from './Components/Order/OrderDetails';
 
 function App() {
 
@@ -100,7 +106,7 @@ function App() {
     <>
       
       <Router>
-        <Header />
+        {/* <Header /> */}
         <Header cartItems={state.cartItems} />
         <Routes>
           <Route path="/" element={<Home />} exact="true" />
@@ -113,7 +119,22 @@ function App() {
           <Route path="/me" element={<Profile />} exact="true" />
           <Route path="/me/update" element={<UpdateProfile />} exact="true" />
           <Route path="/password/update" element={<UpdatePassword />} />
-           <Route path="/cart" element={<Cart cartItems={state.cartItems} addItemToCart={addItemToCart} removeItemFromCart={removeItemFromCart} />} exact="true" />
+          <Route path="/cart" element={<Cart cartItems={state.cartItems} addItemToCart={addItemToCart} removeItemFromCart={removeItemFromCart} />} exact="true" />
+          <Route path="/shipping" element={<Shipping shipping={state.shippingInfo} saveShippingInfo={saveShippingInfo} />} />
+          <Route path="/confirm" element={<ConfirmOrder cartItems={state.cartItems} shippingInfo={state.shippingInfo} />} />
+          <Route path="/payment" element={<Payment cartItems={state.cartItems} shippingInfo={state.shippingInfo} />} />
+          <Route path="/success" element={<OrderSuccess />} />
+          <Route path="/orders/me" element={<ListOrders />} />
+          <Route path="/order/:id" element={<OrderDetails />} />
+
+          {/* <Route
+            path="/admin/orders"
+            element={<OrdersList />}
+
+          />
+          <Route
+            path="/admin/order/:id"
+            element={<ProcessOrder />} /> */}
         </Routes>
       </Router>
       <Footer />
