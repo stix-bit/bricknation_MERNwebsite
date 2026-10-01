@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import MetaData from '../Layout/MetaData'
 
 const OrderSuccess = () => {
-    sessionStorage.clear();
+    // sessionStorage.clear();
     // localStorage.clear();
     // sessionStorage.removeItem()
     localStorage.removeItem('cartItems');

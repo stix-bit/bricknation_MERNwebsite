@@ -70,7 +70,6 @@ const Header = ({cartItems}) => {
 
                     <Link to="/cart" style={{ textDecoration: 'none' }} >
                         <span className="ml-1" id="cart_count">{cartItems ? cartItems.length : null}</span>
-                        <span className="ml-1" id="cart_count">2</span>
                     </Link>
                     {/* <span className="ml-1" id="cart_count">{cartItems ? cartItems.length : null}</span>  */}
                 </div>
