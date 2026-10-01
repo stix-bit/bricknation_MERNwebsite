@@ -61,7 +61,7 @@ const ListOrders = () => {
             headerAlign: 'right'
         },
         {
-             field: 'amount',
+            field: 'amount',
             headerName: 'Amount',
             width: 120,
             align: 'right',
@@ -102,10 +102,15 @@ const ListOrders = () => {
         status: order.orderStatus || ''
     }));
 
+
+
     return (
         <>
             <MetaData title={'My Orders'} />
             <h1 className="my-5">My Orders</h1>
+
+
+
 
             {loading ? <Loader /> : (
                 <div style={{ width: '100%' }}>
@@ -125,4 +130,4 @@ const ListOrders = () => {
     )
 }
 
-export default ListOrders   
+export default ListOrders
