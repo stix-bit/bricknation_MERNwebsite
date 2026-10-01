@@ -1,99 +1,96 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
+import 'react-toastify/dist/ReactToastify.css';
+
 import MetaData from '../Layout/MetaData'
 import Loader from '../Layout/Loader'
 import Sidebar from './SideBar'
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { DataGrid, } from '@mui/x-data-grid'
-import { getToken } from '../../Utils/helpers'
-import axios from 'axios'
 
-const OrdersList = () => {
-    let navigate = useNavigate();
+import axios from 'axios';
+import { getToken, errMsg, successMsg } from '../../Utils/helpers';
+import { DataGrid, } from '@mui/x-data-grid'
+
+const UsersList = () => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
-    const [allOrders, setAllOrders] = useState([])
-    const [isDeleted, setIsDeleted] = useState(false)
-    const errMsg = (message = '') => toast.error(message, {
-        position: 'bottom-right'
-    });
-    const successMsg = (message = '') => toast.success(message, {
-        position: 'bottom-right'
-    });
-
-    const listOrders = async () => {
-        try {
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${getToken()}`
-                }
-            }
-            const { data } = await axios.get(`${import.meta.env.VITE_API}/admin/orders`, config)
-            setAllOrders(data.orders)
-            setLoading(false)
-        } catch (error) {
-            setError(error.response.data.message)
+    const [allUsers, setAllUsers] = useState([])
+    const [isDeleted, setIsDeleted] = useState('')
+    let navigate = useNavigate();
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getToken()}`
         }
     }
-    const deleteOrder = async (id) => {
+    const listUsers = async () => {
         try {
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${getToken()}`
-                }
-            }
-            const { data } = await axios.delete(`${import.meta.env.VITE_API}/admin/order/${id}`, config)
+
+            const { data } = await axios.get(`${import.meta.env.VITE_API}/admin/users`, config)
+            setAllUsers(data.users)
+            setLoading(false)
+
+        } catch (error) {
+            setError(error.response.data.message)
+
+        }
+    }
+    const deleteUser = async (id) => {
+        try {
+            const { data } = await axios.delete(`${import.meta.env.VITE_API}/admin/user/${id}`, config)
             setIsDeleted(data.success)
             setLoading(false)
+
         } catch (error) {
             setError(error.response.data.message)
 
         }
     }
+
     useEffect(() => {
-        listOrders()
+        listUsers();
         if (error) {
-            errMsg(error)
+            errMsg(error);
             setError('')
         }
         if (isDeleted) {
-            successMsg('Order deleted successfully');
-            navigate('/admin/orders');
+            successMsg('User deleted successfully');
+            navigate('/admin/users');
+
         }
-    }, [error, isDeleted])
-    const deleteOrderHandler = (id) => {
-        deleteOrder(id)
+
+    }, [error, isDeleted,])
+
+
+    const deleteUserHandler = (id) => {
+        deleteUser(id)
     }
 
     const columns = [
         {
             field: 'id',
-            headerName: 'Order ID',
+            headerName: 'User ID',
             flex: 1,
             renderCell: (params) => <span style={{ wordBreak: 'break-all' }}>{params.value}</span>
         },
         {
-            field: 'numofItems',
-            headerName: 'Number of Items',
+            field: 'name',
+            headerName: 'Name',
 
             width: 130,
             align: 'right',
             headerAlign: 'right'
         },
         {
-            field: 'amount',
-            headerName: 'Amount',
+            field: 'email',
+            headerName: 'Email',
             width: 120,
             align: 'right',
             headerAlign: 'right'
         },
         {
-            field: 'status',
-            headerName: 'Status',
+            field: 'role',
+            headerName: 'Role',
             width: 120,
             align: 'right',
             headerAlign: 'right'
@@ -109,33 +106,34 @@ const OrdersList = () => {
 
                 <>
                     {console.log(params)}
-                    <Link to={`/admin/order/${params.id}`} className="btn btn-primary py-1 px-2">
-                        <i className="fa fa-eye"></i>
+                    <Link to={`/admin/user/${params.id}`} className="btn btn-primary py-1 px-2">
+                        <i className="fa fa-pencil"></i>
                     </Link>
-                    <button className="btn btn-danger py-1 px-2 ml-2" onClick={() => deleteOrderHandler(params.id)}>
+                    <button className="btn btn-danger py-1 px-2 ml-2" onClick={() => deleteUserHandler(params.id)}>
                         <i className="fa fa-trash"></i>
                     </button>
                 </>
             )
         }
     ];
-    const rows = allOrders.map(order => ({
-        id: order._id,
-        numofItems: order.orderItems.length,
-        amount: `$${order.totalPrice}`,
-        status: order.orderStatus,
+    const rows = allUsers.map(user => ({
+        id: user._id,
+        name: user.name,
+
+        email: user.email,
+        role: user.role,
     }));
 
     return (
         <>
-            <MetaData title={'All Orders'} />
+            <MetaData title={'All Users'} />
             <div className="row">
                 <div className="col-12 col-md-2">
                     <Sidebar />
                 </div>
                 <div className="col-12 col-md-10">
                     <>
-                        <h1 className="my-5">All Orders</h1>
+                        <h1 className="my-5">All Users</h1>
                         {loading ? <Loader /> : (
                             <div style={{ width: '100%' }}>
                                 <DataGrid
@@ -157,4 +155,4 @@ const OrdersList = () => {
     )
 }
 
-export default OrdersList
+export default UsersList
