@@ -9,32 +9,38 @@ import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
 import Stack from '@mui/material/Stack'
 import Pagination from '@mui/material/Pagination'
+import { useDispatch, useSelector } from 'react-redux'
+import { getProducts } from '../actions/productActions'
+
 const Home = () => {
-    const [products, setProducts] = useState([])
-    const [loading, setLoading] = useState(true)
+    // const [products, setProducts] = useState([])
+    // const [loading, setLoading] = useState(true)
+    // const [productsCount, setProductsCount] = useState(0)
+    // const [resPerPage, setResPerPage] = useState(0)
+    // const [filteredProductsCount, setFilteredProductsCount] = useState(0)
     const [price, setPrice] = useState([1, 1000]);
-    const [productsCount, setProductsCount] = useState(0)
-    const [resPerPage, setResPerPage] = useState(0)
-    const [filteredProductsCount, setFilteredProductsCount] = useState(0)
     const [currentPage, setCurrentPage] = useState(1)
     let { keyword } = useParams();
+
+    const dispatch = useDispatch();
+    const { loading, products, error, productsCount, resPerPage, filteredProductsCount } = useSelector(state => state.products);
+
+    let count = productsCount;
     // console.log(products)
-    const getProducts = async (keyword = '', price, page = 1) => {
+    // const getProducts = async (keyword = '', price, page = 1) => {
 
-         let link = `http://localhost:4001/api/v1/products?keyword=${keyword}&price[gte]=${price[0]}&price[lte]=${price[1]}&page=${page}`
+    //      let link = `http://localhost:4001/api/v1/products?keyword=${keyword}&price[gte]=${price[0]}&price[lte]=${price[1]}&page=${page}`
 
-        let res = await axios.get(link)
-        console.log(res.data.products)
-        setProducts(res.data.products)
-        setProductsCount(res.data.productsCount)
-        setFilteredProductsCount(res.data.filteredProductsCount)
-        setResPerPage(res.data.resPerPage)
-        setLoading(false)
-    }
+    //     let res = await axios.get(link)
+    //     console.log(res.data.products)
+    //     setProducts(res.data.products)
+    //     setProductsCount(res.data.productsCount)
+    //     setFilteredProductsCount(res.data.filteredProductsCount)
+    //     setResPerPage(res.data.resPerPage)
+    //     setLoading(false)
+    // }
     // getProducts()
     // console.log(products)
-
-        let count = productsCount;
 
     if (keyword) {
         count = filteredProductsCount
@@ -50,8 +56,10 @@ const Home = () => {
 
 
     useEffect(() => {
-        getProducts(keyword, price, currentPage)
-    }, [keyword, price, currentPage]);
+        dispatch(getProducts(currentPage, keyword, price,))
+    }, [currentPage, keyword, price,]);
+
+    
     return (
         <>
             <MetaData title={'shop Here'} />

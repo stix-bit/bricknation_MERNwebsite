@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 // import reactLogo from './assets/react.svg'
 // import viteLogo from './assets/vite.svg'
 // import heroImg from './assets/hero.png'
@@ -40,8 +40,16 @@ import UsersList from './Components/Admin/UsersList';
 import UpdateUser from './Components/Admin/UpdateUser';
 import ProtectedRoute from './Components/Route/ProtectedRoute';
 import ProductReviews from './Components/Admin/ProductReviews';
+import { useDispatch } from 'react-redux';
+import { loadUser } from './actions/userActions';
 
 function App() {
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(loadUser())
+  }, [dispatch])
+
 
     const [state, setState] = useState({
     cartItems: localStorage.getItem('cartItems')

@@ -3,21 +3,35 @@ import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Search from './Search'
-import { getUser, logout } from '../../Utils/helpers'
-const Header = ({cartItems}) => {
-    const [user, setUser] = useState({})
-    const navigate = useNavigate()
-    const logoutHandler = () => {
-        logout(navigate('/'));
+// import { getUser, logout } from '../../Utils/helpers'
+import { useDispatch, useSelector } from 'react-redux'
+import { logout } from '../../actions/userActions'
 
+const Header = ({cartItems}) => {
+    const dispatch = useDispatch();
+    const { user, loading } = useSelector(state => state.auth)
+    // const [user, setUser] = useState({})
+    const navigate = useNavigate()
+
+    // const logoutHandler = () => {
+    //     logout(navigate('/'));
+
+    //     toast.success('log out', {
+    //         position: 'bottom-right'
+    //     });
+    // }
+
+    const logoutHandler = () => {
+        dispatch(logout());
         toast.success('log out', {
             position: 'bottom-right'
         });
     }
 
-    useEffect(() => {
-        setUser(getUser())
-    }, []);
+    // useEffect(() => {
+    //     setUser(getUser())
+    // }, []);
+    
     return (
 
 
@@ -41,7 +55,7 @@ const Header = ({cartItems}) => {
                 </div> */}
                  <div className="col-12 col-md-3 mt-4 mt-md-0 text-center">
 
-                    {user ? (<div className="ml-4 dropdown d-inline">
+                    {user && user._id ? (<div className="ml-4 dropdown d-inline">
                         <Link to="#!" className="btn dropdown-toggle text-white mr-4" type="button" id="dropDownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <figure className="avatar avatar-nav">
                                 <img

@@ -14,7 +14,7 @@ class APIFeatures {
                 $options: 'i'
             }
         } : {}
-        console.log(this.query, this.queryStr);
+        // console.log(this.query, this.queryStr);
         this.query = this.query.find({ ...keyword });
         return this;
     }
@@ -46,7 +46,7 @@ class APIFeatures {
             delete queryCopy['price[lte]'];
         }
 
-        console.log(queryCopy);
+        // console.log(queryCopy);
 
         this.query = this.query.find(priceFilter);
         return this;

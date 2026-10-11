@@ -2,36 +2,41 @@ const User = require('../models/user');
 const crypto = require('crypto')
 const cloudinary = require('cloudinary')
 const sendEmail = require('../utils/sendEmail')
+const sendToken = require('../utils/jwtToken');
 
 exports.registerUser = async (req, res, next) => {
-    console.log(req.body)
-    const result = await cloudinary.v2.uploader.upload(req.body.avatar, {
-        folder: 'avatars',
-        width: 150,
-        crop: "scale"
-    }, (err, res) => {
-        console.log(err, res);
-    });
-    const { name, email, password, } = req.body;
-    const user = await User.create({
+    try {
+      let avatar = {
+        public_id: 'avatars/default',
+        url: '/images/default_avatar.png'
+      }
+  
+      if (req.body.avatar) {
+        const result = await cloudinary.v2.uploader.upload(req.body.avatar, {
+          folder: 'avatars',
+          width: 150,
+          crop: 'scale'
+        })
+        avatar = {
+          public_id: result.public_id,
+          url: result.secure_url
+        }
+      }
+  
+      const { name, email, password } = req.body
+      const user = await User.create({
         name,
         email,
         password,
-        avatar: {
-            public_id: result.public_id,
-            url: result.secure_url
-        },
-    })
-    //test token
-    const token = user.getJwtToken();
-
-    return res.status(201).json({
-        success: true,
-        user,
-        token
-    })
-    // sendToken(user, 200, res)
-}
+        avatar
+      })
+  
+      const token = user.getJwtToken()
+      return res.status(201).json({ success: true, user, token })
+    } catch (error) {
+      return res.status(500).json({ message: error.message })
+    }
+  }
 
 exports.loginUser = async (req, res, next) => {
     console.log(req.body)
@@ -42,7 +47,6 @@ exports.loginUser = async (req, res, next) => {
         return res.status(400).json({ error: 'Please enter email & password' })
     }
 
-
     // Finding user in database
 
     let user = await User.findOne({ email }).select('+password')
@@ -50,23 +54,24 @@ exports.loginUser = async (req, res, next) => {
         return res.status(401).json({ message: 'Invalid Email or Password' })
     }
 
-
     // Checks if password is correct or not
     const isPasswordMatched = await user.comparePassword(password);
-
 
     if (!isPasswordMatched) {
         return res.status(401).json({ message: 'Invalid Email or Password' })
     }
     const token = user.getJwtToken();
 
-    res.status(201).json({
-        success: true,
-        token,
-        user
-    });
+    // res.status(201).json({
+    //     success: true,
+    //     token,
+    //     user
+    // });
     //  user = await User.findOne({ email })
     // sendToken(user, 200, res)
+
+    user = await User.findOne({ email })
+    sendToken(user, 200, res)
 }
 
 exports.forgotPassword = async (req, res, next) => {
@@ -157,7 +162,9 @@ exports.updateProfile = async (req, res, next) => {
         let user = await User.findById(req.user.id)
         // console.log(user)
         const image_id = user.avatar.public_id;
-        const res = await cloudinary.v2.uploader.destroy(image_id);
+        if (user.avatar && user.avatar.public_id && user.avatar.public_id !== 'avatars/default') {
+            await cloudinary.v2.uploader.destroy(user.avatar.public_id)
+        }
         // console.log("Res", res)
         const result = await cloudinary.v2.uploader.upload(req.body.avatar, {
             folder: 'avatars',
@@ -222,7 +229,9 @@ exports.deleteUser = async (req, res, next) => {
 
     // Remove avatar from cloudinary
     const image_id = user.avatar.public_id;
-    await cloudinary.v2.uploader.destroy(image_id);
+    if (user.avatar && user.avatar.public_id && user.avatar.public_id !== 'avatars/default') {
+        await cloudinary.v2.uploader.destroy(user.avatar.public_id)
+    }
     await User.findByIdAndDelete(req.params.id);
     return res.status(200).json({
         success: true,
@@ -258,5 +267,17 @@ exports.updateUser = async (req, res, next) => {
 
     return res.status(200).json({
         success: true
+    })
+}
+
+exports.logout = async (req, res, next) => {
+    res.cookie('token', null, {
+        expires: new Date(Date.now()),
+        httpOnly: true
+    })
+    
+    return res.status(200).json({
+        success: true,
+        message: 'Logged out'
     })
 }
