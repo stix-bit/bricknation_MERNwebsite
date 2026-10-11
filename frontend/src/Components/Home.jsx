@@ -18,7 +18,7 @@ const Home = () => {
     // const [productsCount, setProductsCount] = useState(0)
     // const [resPerPage, setResPerPage] = useState(0)
     // const [filteredProductsCount, setFilteredProductsCount] = useState(0)
-    const [price, setPrice] = useState([1, 1000]);
+    const [price, setPrice] = useState([0, 100000]);
     const [currentPage, setCurrentPage] = useState(1)
     let { keyword } = useParams();
 
@@ -88,7 +88,7 @@ const Home = () => {
                                                 valueLabelDisplay="on"
                                                 getAriaValueText={valuetext}
                                                 min={1}
-                                                max={1000}
+                                                max={100000}
 
                                             />
                                         </Box>

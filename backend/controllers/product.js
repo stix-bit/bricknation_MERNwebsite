@@ -85,9 +85,11 @@ exports.getProducts = async (req, res) => {
    // const products = await Product.find()
     const apiFeatures = new APIFeatures(Product.find(), req.query).search().filter()
 
+    const filteredProductsCount = await Product.countDocuments(apiFeatures.query.getFilter());
+
+    apiFeatures.query = apiFeatures.query.sort({ createdAt: -1 });
     apiFeatures.pagination(resPerPage);
     const products = await apiFeatures.query;
-    let filteredProductsCount = products.length;
 
     if (!products)
         return res.status(400).json({ message: 'error loading products' })

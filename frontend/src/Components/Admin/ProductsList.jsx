@@ -30,7 +30,10 @@ const ProductsList = () => {
                 }
             }
 
-            const { data } = await axios.get(`${import.meta.env.VITE_API}/admin/products`, config)
+            const { data } = await axios.get(`${import.meta.env.VITE_API}/admin/products`, {
+                ...config,
+                withCredentials: true
+            })
             console.log(data)
             setProducts(data.products)
             setLoading(false)
@@ -73,7 +76,10 @@ const ProductsList = () => {
                     'Authorization': `Bearer ${getToken()}`
                 }
             }
-            const { data } = await axios.delete(`${import.meta.env.VITE_API}/admin/product/${id}`, config)
+            const { data } = await axios.delete(`${import.meta.env.VITE_API}/admin/product/${id}`, {
+                ...config,
+                withCredentials: true
+            })
 
             setIsDeleted(data.success)
             setLoading(false)
