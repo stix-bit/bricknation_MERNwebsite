@@ -11,7 +11,3 @@
 
 CONSTANTS -> REDUCERS -> ACTIONS -> STORE -> COMPONENTS (REACT STEP BY STEP)
 
-cart redux
-user profile redux
-orders redux (user)
-orders redux (admin)
