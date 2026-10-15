@@ -11,16 +11,18 @@ import ListReviews from '../Review/ListReviews';
 import { useDispatch, useSelector } from 'react-redux'
 import { getProductDetails, clearErrors, } from '../../actions/productActions'
 
-const ProductDetails = ({ addItemToCart, cartItems, }) => {
+import { addItemToCart } from '../../actions/cartActions'
+const ProductDetails = () => {
     // const [product, setProduct] = useState({})
     const { loading, error, product } = useSelector(state => state.productDetails);
+    const { user } = useSelector(state => state.auth)
     const [quantity, setQuantity] = useState(1)
     let { id } = useParams()
     const [rating, setRating] = useState(0)
     const [comment, setComment] = useState('')
     const [errorReview, setErrorReview] = useState('');
     const [success, setSuccess] = useState('')
-    const [user, setUser] = useState(getUser())
+    // const [user, setUser] = useState(getUser())
     const dispatch = useDispatch()
 
     // const productDetails = async (id) => {
@@ -49,7 +51,7 @@ const ProductDetails = ({ addItemToCart, cartItems, }) => {
     }
 
     const addToCart = async () => {
-        await addItemToCart(id, quantity);
+        await dispatch(addItemToCart(id, quantity));
     }
 
 
@@ -117,9 +119,9 @@ const ProductDetails = ({ addItemToCart, cartItems, }) => {
     }, [id,]);
 
 
-    useEffect(() => {
-        localStorage.setItem('cartItems', JSON.stringify(cartItems));
-    }, [cartItems]);
+    // useEffect(() => {
+    //     localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    // }, [cartItems]);
 
     return (
         <>

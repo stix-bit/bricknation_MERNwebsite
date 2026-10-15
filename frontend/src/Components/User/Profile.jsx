@@ -5,30 +5,33 @@ import MetaData from '../Layout/MetaData'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+// import { getToken } from '../../Utils/helpers';
+import { useSelector } from 'react-redux'
 
 const Profile = () => {
-    const [loading, setLoading] = useState(true)
-    const [user, setUser] = useState({})
+    const { user, loading } = useSelector(state => state.auth)
+    // const [loading, setLoading] = useState(true)
+    // const [user, setUser] = useState({})
 
-    const getProfile = async () => {
-        try {
-            const { data } = await axios.get(`${import.meta.env.VITE_API}/me`, {
-                withCredentials: true,
-            })
-            setUser(data.user)
-        } catch (error) {
-            console.log(error)
-            toast.error('Unable to load your profile', {
-                position: 'bottom-center'
-            })
-        } finally {
-            setLoading(false)
-        }
-    }
+    // const getProfile = async () => {
+    //     try {
+    //         const { data } = await axios.get(`${import.meta.env.VITE_API}/me`, {
+    //             withCredentials: true,
+    //         })
+    //         setUser(data.user)
+    //     } catch (error) {
+    //         console.log(error)
+    //         toast.error('Unable to load your profile', {
+    //             position: 'bottom-center'
+    //         })
+    //     } finally {
+    //         setLoading(false)
+    //     }
+    // }
 
-    useEffect(() => {
-        getProfile()
-    }, [])
+    // useEffect(() => {
+    //     getProfile()
+    // }, [])
 
     return (
         <>
