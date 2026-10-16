@@ -1,26 +1,24 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom';
 
 import MetaData from '../Layout/MetaData'
 import Loader from '../Layout/Loader'
 import Sidebar from './SideBar'
-import { getToken } from '../../Utils/helpers';
-import axios from 'axios'
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ProductSalesChart from './ProductSalesChart';
 import UserSalesChart from './UserSalesChart';
 import MonthlySalesChart from './MonthlySalesChart';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAdminProducts, clearErrors } from '../../actions/productActions';
+import { allOrders } from '../../actions/orderActions';
 
 
 const Dashboard = () => {
-    // const [products, setProducts] = useState([])
-    const [error, setError] = useState('')
-    // const [users, setUsers] = useState([])
-    // const [orders, setOrders] = useState([])
-    const [loading, setLoading] = useState(true)
-    const [totalAmount, setTotalAmount] = useState([])
-    let outOfStock = 0;
+    const dispatch = useDispatch()
+    const { loading: productsLoading, products = [], error: productsError } = useSelector(state => state.products)
+    const { loading: ordersLoading, orders = [], error: ordersError } = useSelector(state => state.allOrders)
+    const loading = productsLoading || ordersLoading
     // products.forEach(product => {
     //     if (product.stock === 0) {
     //         outOfStock += 1;
@@ -47,6 +45,19 @@ const Dashboard = () => {
     //     // allOrders()
     //     // allUsers()
     // }, [])
+
+    useEffect(() => {
+        dispatch(getAdminProducts())
+        dispatch(allOrders())
+    }, [dispatch])
+
+    useEffect(() => {
+        const error = productsError || ordersError
+        if (error) {
+            toast.error(error, { position: 'bottom-right' })
+            dispatch(clearErrors())
+        }
+    }, [dispatch, productsError, ordersError])
 
     return (
         <>
@@ -77,7 +88,7 @@ const Dashboard = () => {
                                 <div className="col-xl-3 col-sm-6 mb-3">
                                     <div className="card text-white bg-success o-hidden h-100">
                                         <div className="card-body">
-                                            <div className="text-center card-font-size">Products<br /> <b>{products && products.length}</b></div>
+                                            <div className="text-center card-font-size">Products<br /> <b>{products.length}</b></div>
                                         </div>
 
                                         <Link className="card-footer text-white clearfix small z-1" to="/admin/products">
@@ -91,9 +102,9 @@ const Dashboard = () => {
                                 <div className="col-xl-3 col-sm-6 mb-3">
                                     <div className="card text-white bg-danger o-hidden h-100">
 
-                                        {/* <div className="card-body">
-                                            <div className="text-center card-font-size">Orders<br /> <b>{orders && orders.length}</b></div>
-                                        </div> */}
+                                        <div className="card-body">
+                                            <div className="text-center card-font-size">Orders<br /> <b>{orders.length}</b></div>
+                                        </div>
 
                                         <Link className="card-footer text-white clearfix small z-1" to="/admin/orders">
                                             <span className="float-left">View Details</span>
