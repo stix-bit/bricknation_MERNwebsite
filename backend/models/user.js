@@ -43,6 +43,20 @@ const userSchema = new mongoose.Schema({
     resetPasswordToken: String,
     resetPasswordExpire: Date
 })
+
+userSchema.pre('findOneAndDelete', async function () {
+    const userId = this.getQuery()._id
+    const Review = require('./review')
+    const Order = require('./order')
+    const Blueprint = require('./blueprint')
+
+    await Promise.all([
+        Review.deleteMany({ user_id: userId }),
+        Order.deleteMany({ user: userId }),
+        Blueprint.deleteMany({ user_id: userId })
+    ])
+})
+
 userSchema.pre('save', async function () {
     if (!this.isModified('password')) {
         return;

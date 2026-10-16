@@ -1,95 +1,135 @@
-import React, { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Link } from 'react-router-dom'
 
 
 import MetaData from '../Layout/MetaData'
 import Loader from '../Layout/Loader'
 import Sidebar from './SideBar'
-import { getToken } from '../../Utils/helpers';
-import axios from 'axios'
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { DataGrid, } from '@mui/x-data-grid'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+    getAdminProducts,
+    deleteProduct,
+    clearErrors,
+} from '../../actions/productActions'
+import { DELETE_PRODUCT_RESET } from '../../constants/productConstants'
 
 const ProductsList = () => {
-    const [products, setProducts] = useState([])
-    const [error, setError] = useState('')
-    const [deleteError, setDeleteError] = useState('')
+    // const [products, setProducts] = useState([])
+    // const [error, setError] = useState('')
+    // const [deleteError, setDeleteError] = useState('')
+    const dispatch = useDispatch();
+    const { loading, error, products } = useSelector(state => state.products)
+    const { error: deleteError, isDeleted } = useSelector(state => state.product)
 
-    const [loading, setLoading] = useState(true)
-    const [isDeleted, setIsDeleted] = useState(false)
+    // const [loading, setLoading] = useState(true)
+    // const [isDeleted, setIsDeleted] = useState(false)
 
-    let navigate = useNavigate()
-    const getAdminProducts = async () => {
-        try {
+    // const getAdminProducts = async () => {
+    //     try {
 
-            const config = {
-                headers: {
+    //         const config = {
+    //             headers: {
 
-                    'Authorization': `Bearer ${getToken()}`
-                }
-            }
+    //                 'Authorization': `Bearer ${getToken()}`
+    //             }
+    //         }
 
-            const { data } = await axios.get(`${import.meta.env.VITE_API}/admin/products`, {
-                ...config,
-                withCredentials: true
-            })
-            console.log(data)
-            setProducts(data.products)
-            setLoading(false)
-        } catch (error) {
+    //         const { data } = await axios.get(`${import.meta.env.VITE_API}/admin/products`, {
+    //             ...config,
+    //             withCredentials: true
+    //         })
+    //         console.log(data)
+    //         setProducts(data.products)
+    //         setLoading(false)
+    //     } catch (error) {
 
-            setError(error.response.data.message)
+    //         setError(error.response.data.message)
 
-        }
-    }
+    //     }
+    // }
     useEffect(() => {
-        getAdminProducts()
-
         if (error) {
             toast.error(error, {
                 position: 'bottom-right'
             });
+            dispatch(clearErrors())
         }
 
         if (deleteError) {
             toast.error(deleteError, {
                 position: 'bottom-right'
             });
+            dispatch(clearErrors())
         }
 
         if (isDeleted) {
             toast.success('Product deleted successfully', {
                 position: 'bottom-right'
             })
-            navigate('/admin/products');
-
+            dispatch(getAdminProducts())
+            dispatch({ type: DELETE_PRODUCT_RESET })
         }
 
-    }, [error, deleteError, isDeleted,])
+    }, [dispatch, error, deleteError, isDeleted])
 
-    const deleteProduct = async (id) => {
-        try {
-            const config = {
-                headers: {
+    useEffect(() => {
+        dispatch(getAdminProducts())
+    }, [dispatch])
 
-                    'Authorization': `Bearer ${getToken()}`
-                }
-            }
-            const { data } = await axios.delete(`${import.meta.env.VITE_API}/admin/product/${id}`, {
-                ...config,
-                withCredentials: true
-            })
+    // const deleteProduct = async (id) => {
+    //     try {
+    //         const config = {
+    //             headers: {
 
-            setIsDeleted(data.success)
-            setLoading(false)
-        } catch (error) {
-            setDeleteError(error.response.data.message)
+    //                 'Authorization': `Bearer ${getToken()}`
+    //             }
+    //         }
+    //         const { data } = await axios.delete(`${import.meta.env.VITE_API}/admin/product/${id}`, {
+    //             ...config,
+    //             withCredentials: true
+    //         })
 
-        }
-    }
-    const deleteProductHandler = (id) => {
-        deleteProduct(id)
+    //         setIsDeleted(data.success)
+    //         setLoading(false)
+    //     } catch (error) {
+    //         setDeleteError(error.response.data.message)
+
+    //     }
+    // }
+
+    const deleteProductHandler = (id, name) => {
+        toast(({ closeToast }) => (
+            <div>
+                <p className="mb-2">Delete <strong>{name}</strong>?</p>
+                <div className="d-flex justify-content-end gap-2">
+                    <button
+                        type="button"
+                        className="btn btn-danger btn-sm"
+                        onClick={() => {
+                            closeToast()
+                            dispatch(deleteProduct(id))
+                        }}
+                    >
+                        Delete
+                    </button>
+                    <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={closeToast}
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        ), {
+            autoClose: false,
+            closeOnClick: false,
+            closeButton: false,
+            position: 'bottom-right'
+        })
     }
 
     const columns = [
@@ -130,11 +170,10 @@ const ProductsList = () => {
             filterable: false,
             renderCell: (params) => (
                 <>
-                    {console.log(params)}
                     <Link to={`/admin/product/${params.id}`} className="btn btn-primary py-1 px-2">
                         <i className="fa fa-pencil"></i>
                     </Link>
-                    <button className="btn btn-danger py-1 px-2 ml-2" onClick={() => deleteProductHandler(params.id)}>
+                    <button className="btn btn-danger py-1 px-2 ml-2" onClick={() => deleteProductHandler(params.id, params.row.name)}>
                         <i className="fa fa-trash"></i>
                     </button>
                 </>

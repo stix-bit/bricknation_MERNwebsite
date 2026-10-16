@@ -34,26 +34,10 @@ const productSchema = new mongoose.Schema({
             },
         }
     ],
-    category: {
-        type: String,
-        required: [true, 'Please select category for this product'],
-        enum: {
-            values: [
-                'Electronics',
-                'Cameras',
-                'Laptops',
-                'Accessories',
-                'Headphones',
-                'Food',
-                "Books",
-                'Clothes/Shoes',
-                'Beauty/Health',
-                'Sports',
-                'Outdoor',
-                'Home'
-            ],
-            message: 'Please select correct category for product'
-        }
+    category_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
+        required: [true, 'Please select category for this product']
     },
     seller: {
         type: String,
@@ -65,38 +49,9 @@ const productSchema = new mongoose.Schema({
         maxLength: [5, 'Product name cannot exceed 5 characters'],
         default: 0
     },
-    user: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'User',
-    },
     numOfReviews: {
         type: Number,
         default: 0
-    },
-    reviews: [
-        {
-            user: {
-                type: mongoose.Schema.ObjectId,
-                ref: 'User',
-                required: true
-            },
-            name: {
-                type: String,
-                required: true
-            },
-            rating: {
-                type: Number,
-                required: true
-            },
-            comment: {
-                type: String,
-                required: true
-            }
-        }
-    ],
-    user: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'User',
     },
     createdAt: {
         type: Date,
@@ -104,6 +59,27 @@ const productSchema = new mongoose.Schema({
     }
 })
 
+productSchema.virtual('reviews', {
+    ref: 'Review',
+    localField: '_id',
+    foreignField: 'product_id'
+})
 
+productSchema.set('toJSON', { virtuals: true })
+productSchema.set('toObject', { virtuals: true })
+
+productSchema.pre('findOneAndDelete', async function () {
+    const productId = this.getQuery()._id
+    const Review = require('./review')
+    const Blueprint = require('./blueprint')
+
+    await Promise.all([
+        Review.deleteMany({ product_id: productId }),
+        Blueprint.updateMany(
+            { extracted_materials: productId },
+            { $pull: { extracted_materials: productId } }
+        )
+    ])
+})
 
 module.exports = mongoose.model('Product', productSchema);

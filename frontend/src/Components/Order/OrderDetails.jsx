@@ -7,39 +7,42 @@ import axios from 'axios'
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { getToken } from '../../Utils/helpers'
+// import { getToken } from '../../Utils/helpers'
+import { useDispatch, useSelector } from 'react-redux'
+import { getOrderDetails, clearErrors } from '../../actions/orderActions'
 
 const OrderDetails = () => {
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState('')
-    const [order, setOrder] = useState({})
-
+    // const [loading, setLoading] = useState(true)
+    // const [error, setError] = useState('')
+    // const [order, setOrder] = useState({})
+    const dispatch = useDispatch();
+    const { loading, error, order = {} } = useSelector(state => state.orderDetails)
     const { shippingInfo, orderItems, paymentInfo, user, totalPrice, orderStatus } = order
     let { id } = useParams();
 
-    const getOrderDetails = async (id) => {
-        try {
+    // const getOrderDetails = async (id) => {
+    //     try {
 
-            const config = {
-                headers: {
-                    'Authorization': `Bearer ${getToken()}`
-                }
-            }
+    //         const config = {
+    //             headers: {
+    //                 'Authorization': `Bearer ${getToken()}`
+    //             }
+    //         }
 
-            const { data } = await axios.get(`${import.meta.env.VITE_API}/order/${id}`, config)
-            console.log(data)
-            setOrder(data.order)
+    //         const { data } = await axios.get(`${import.meta.env.VITE_API}/order/${id}`, config)
+    //         console.log(data)
+    //         setOrder(data.order)
 
-            setLoading(false)
+    //         setLoading(false)
 
 
-        } catch (error) {
-            setError(error.response.data.message)
-        }
-    }
+    //     } catch (error) {
+    //         setError(error.response.data.message)
+    //     }
+    // }
 
     useEffect(() => {
-        getOrderDetails(id)
+        dispatch(getOrderDetails(id))
 
         if (error) {
             toast.error(error, {

@@ -16,7 +16,7 @@ const NewProduct = () => {
     const [name, setName] = useState('');
     const [price, setPrice] = useState(0);
     const [description, setDescription] = useState('');
-    const [category, setCategory] = useState('');
+    const [category, setCategory] = useState('Materials');
     const [stock, setStock] = useState(0);
     const [seller, setSeller] = useState('');
     const [images, setImages] = useState([]);
@@ -24,21 +24,15 @@ const NewProduct = () => {
     // const [error, setError] = useState('')
     // const [loading, setLoading] = useState(true)
     // const [success, setSuccess] = useState('')
-    const [product, setProduct] = useState({})
+    // const [product, setProduct] = useState({})
 
     const categories = [
-        'Electronics',
-        'Cameras',
-        'Laptops',
-        'Accessories',
-        'Headphones',
-        'Food',
-        "Books",
-        'Clothes/Shoes',
-        'Beauty/Health',
-        'Sports',
-        'Outdoor',
-        'Home'
+        'Materials',
+        'Tools',
+        'Equipment',
+        'Design',
+        'Consumables',
+        'Electrical'
     ]
 
     let navigate = useNavigate()

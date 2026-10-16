@@ -48,10 +48,7 @@ program execution (errors).  10pts
 project contribution 10pts
 
 ADDITIONAL:
-cart redux
-user profile redux
-orders redux (user)
-orders redux (admin)
+
 
 ADDITIONAL/OPTIONAL:
 1. Don't forget to DISABLE products instead of Delete products - add a feature to delete just in case
@@ -63,4 +60,5 @@ ADDITIONAL/OPTIONAL:
     your own profile and will log the user out after confirming
 7. Make registers send you to the login page and not home page
 8. Make reviews restricted to only people that bought the products
+9. Make admin reviews, search the customer's user id and then view all of their comments on different products, and on the product details page make admins be able to have an delete comment function that is like the ... to edit
 9. Add payment gateway using XENDIT Test Mode

@@ -42,6 +42,7 @@ import ProtectedRoute from './Components/Route/ProtectedRoute';
 import ProductReviews from './Components/Admin/ProductReviews';
 import { useDispatch } from 'react-redux';
 import { loadUser } from './actions/userActions';
+import UpdateProduct from './Components/Admin/UpdateProduct';
 
 function App() {
   const dispatch = useDispatch()
@@ -183,6 +184,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+          
+          <Route
+            path="/admin/product/:id"
+
+            element={<ProtectedRoute isAdmin={true}>
+              <UpdateProduct />
+            </ProtectedRoute>} />
+
 
           <Route
             path="/admin/orders"
