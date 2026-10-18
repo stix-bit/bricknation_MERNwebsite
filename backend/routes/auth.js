@@ -5,6 +5,7 @@ const upload = require("../utils/multer");
 const {
     registerUser,
     loginUser,
+    firebaseLogin,
     forgotPassword,
     resetPassword,
     getUserProfile,
@@ -21,6 +22,7 @@ const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth')
 
 router.post('/register', upload.single("avatar"), registerUser);
 router.post('/login', loginUser);
+router.post('/firebase-login', firebaseLogin);
 router.post('/password/forgot', forgotPassword);
 router.put('/password/reset/:token', resetPassword);
 router.get('/me', isAuthenticatedUser, getUserProfile)

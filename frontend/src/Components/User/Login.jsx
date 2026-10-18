@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Link, useNavigate, useLocation, useParams } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 
 import Loader from '../Layout/Loader'
 import MetaData from '../Layout/MetaData';
@@ -8,7 +8,11 @@ import 'react-toastify/dist/ReactToastify.css';
 // import axios from 'axios';
 // import { getUser, authenticate } from '../../Utils/helpers';
 import { useDispatch, useSelector } from 'react-redux'
-import { login, clearErrors } from '../../actions/userActions'
+import { login, firebaseLogin, clearErrors } from '../../actions/userActions'
+import {
+    signInWithFacebook,
+    signInWithGoogle,
+} from '../../Utils/firebaseAuth'
 
 const Login = () => {
     const { isAuthenticated, error, loading, } = useSelector(state => state.auth)
@@ -22,6 +26,20 @@ const Login = () => {
     const submitHandler = (e) => {
         e.preventDefault();
         dispatch(login(email, password))
+    }
+
+    const socialLoginHandler = async (providerLogin) => {
+        try {
+            const result = await providerLogin()
+            const idToken = await result.user.getIdToken()
+            dispatch(firebaseLogin(idToken))
+        } catch (error) {
+            if (error.code !== 'auth/popup-closed-by-user') {
+                toast.error(error.message || 'Social login failed', {
+                    position: 'bottom-right',
+                })
+            }
+        }
     }
 
     // const login = async (email, password) => {
@@ -58,8 +76,7 @@ const Login = () => {
         else if (isAuthenticated)
             navigate('/')
         if (error) {
-            // alert.error(error);
-            console.log(error)
+            toast.error(error, { position: 'bottom-right' })
             dispatch(clearErrors());
         }
     }, [error, isAuthenticated, dispatch, navigate, redirect])
@@ -106,6 +123,22 @@ const Login = () => {
                                     className="btn btn-block py-3"
                                 >
                                     LOGIN
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="btn btn-danger btn-block py-3 mt-3"
+                                    onClick={() => socialLoginHandler(signInWithGoogle)}
+                                >
+                                    CONTINUE WITH GOOGLE
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="btn btn-primary btn-block py-3 mt-2"
+                                    onClick={() => socialLoginHandler(signInWithFacebook)}
+                                >
+                                    CONTINUE WITH FACEBOOK
                                 </button>
 
                                 <Link to="/register" className="float-right mt-3">New User?</Link>

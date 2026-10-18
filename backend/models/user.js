@@ -18,9 +18,18 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, 'Please enter your password'],
         minlength: [6, 'Your password must be longer than 6 characters'],
         select: false
+    },
+    firebaseUid: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
+    authProvider: {
+        type: String,
+        enum: ['password', 'google.com', 'facebook.com'],
+        default: 'password'
     },
     avatar: {
         public_id: {
@@ -58,7 +67,7 @@ userSchema.pre('findOneAndDelete', async function () {
 })
 
 userSchema.pre('save', async function () {
-    if (!this.isModified('password')) {
+    if (!this.isModified('password') || !this.password) {
         return;
     }
     this.password = await bcrypt.hash(this.password, 10)
@@ -71,6 +80,10 @@ userSchema.methods.getJwtToken = function () {
 }
 
 userSchema.methods.comparePassword = async function (enteredPassword) {
+    if (!this.password) {
+        return false
+    }
+
     return await bcrypt.compare(enteredPassword, this.password)
 }
 

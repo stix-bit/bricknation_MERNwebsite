@@ -2,12 +2,14 @@ const dns = require('dns');
 
 dns.setServers(['8.8.8.8', '8.8.4.4']);
 
+const dotenv = require('dotenv');
+dotenv.config({ path: './config/.env' })
+
 const app = require('./app');
 const connectDatabase = require('./config/database')
 const cloudinary = require('cloudinary');
 
-const dotenv = require('dotenv');
-dotenv.config({ path: './config/.env' })
+
 
 connectDatabase();
 cloudinary.config({

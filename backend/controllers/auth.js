@@ -24,6 +24,13 @@ exports.registerUser = async (req, res, next) => {
       }
   
       const { name, email, password } = req.body
+      if (!password) {
+        return res.status(400).json({
+          success: false,
+          message: 'Password is required for normal registration'
+        })
+      }
+
       const user = await User.create({
         name,
         email,
@@ -37,6 +44,77 @@ exports.registerUser = async (req, res, next) => {
       return res.status(500).json({ message: error.message })
     }
   }
+
+exports.firebaseLogin = async (req, res) => {
+    const { idToken } = req.body
+
+    if (!idToken) {
+        return res.status(400).json({
+            success: false,
+            message: 'Firebase ID token is required'
+        })
+    }
+
+    try {
+        const firebaseAdmin = require('../config/firebaseAdmin')
+        const decodedToken = await firebaseAdmin.auth.verifyIdToken(idToken)
+        const email = decodedToken.email
+
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                message: 'This social account does not provide an email address'
+            })
+        }
+
+        const provider = decodedToken.firebase?.sign_in_provider
+        if (!['google.com', 'facebook.com'].includes(provider)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Only Google and Facebook accounts are supported'
+            })
+        }
+
+        let user = await User.findOne({ email })
+        const profile = {
+            name: decodedToken.name || email.split('@')[0],
+            firebaseUid: decodedToken.uid,
+            authProvider: provider,
+            ...(decodedToken.picture && {
+                avatar: {
+                    public_id: 'avatars/default',
+                    url: decodedToken.picture
+                }
+            })
+        }
+
+        if (!user) {
+            user = await User.create({
+                email,
+                ...profile
+            })
+        } else {
+            user = await User.findByIdAndUpdate(user._id, profile, {
+                new: true,
+                runValidators: true
+            })
+        }
+
+        return sendToken(user, 200, res)
+    } catch (error) {
+        console.error('Firebase login failed:', {
+            code: error.code,
+            message: error.message
+        })
+
+        return res.status(401).json({
+            success: false,
+            message: process.env.NODE_ENV === 'DEVELOPMENT'
+                ? error.message
+                : 'Invalid or expired Firebase token'
+        })
+    }
+}
 
 exports.loginUser = async (req, res, next) => {
     console.log(req.body)

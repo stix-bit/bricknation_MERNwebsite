@@ -38,7 +38,7 @@ quiz 3
  # pagination on products list on homepage. 10pts
 infinite scroll on products list on homepage. 15pts
 
-quiz 4 
+quiz 4 -> ✅
 facebook or gmail login 15pts react-facebook-login or similar packages.
 facebook or gmail login using firebase|supabase|clerk 15pts
 
