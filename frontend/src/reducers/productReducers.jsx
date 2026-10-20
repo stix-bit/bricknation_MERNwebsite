@@ -9,6 +9,14 @@ import {
     NEW_PRODUCT_SUCCESS,
     NEW_PRODUCT_RESET,
     NEW_PRODUCT_FAIL,
+    NEW_REVIEW_REQUEST,
+    NEW_REVIEW_SUCCESS,
+    NEW_REVIEW_FAIL,
+    NEW_REVIEW_RESET,
+    MY_REVIEW_REQUEST,
+    MY_REVIEW_SUCCESS,
+    MY_REVIEW_FAIL,
+    REVIEW_RESET,
     ADMIN_PRODUCTS_REQUEST,
     ADMIN_PRODUCTS_SUCCESS,
     ADMIN_PRODUCTS_FAIL,
@@ -20,6 +28,16 @@ import {
     DELETE_PRODUCT_SUCCESS,
     DELETE_PRODUCT_FAIL,
     DELETE_PRODUCT_RESET,
+    BULK_DELETE_PRODUCTS_REQUEST,
+    BULK_DELETE_PRODUCTS_SUCCESS,
+    BULK_DELETE_PRODUCTS_FAIL,
+    BULK_ARCHIVE_PRODUCTS_REQUEST,
+    BULK_ARCHIVE_PRODUCTS_SUCCESS,
+    BULK_ARCHIVE_PRODUCTS_FAIL,
+    BULK_UNARCHIVE_PRODUCTS_REQUEST,
+    BULK_UNARCHIVE_PRODUCTS_SUCCESS,
+    BULK_UNARCHIVE_PRODUCTS_FAIL,
+    BULK_PRODUCTS_RESET,
     CLEAR_ERRORS
 } from '../constants/productConstants'
 
@@ -141,13 +159,17 @@ export const productReducer = (state = {}, action) => {
     switch (action.type) {
 
         case DELETE_PRODUCT_REQUEST:
+        case BULK_DELETE_PRODUCTS_REQUEST:
+        case BULK_ARCHIVE_PRODUCTS_REQUEST:
+        case BULK_UNARCHIVE_PRODUCTS_REQUEST:
         case UPDATE_PRODUCT_REQUEST:
             return {
                 ...state,
                 loading: true,
                 error: null,
                 isUpdated: false,
-                isDeleted: false
+                isDeleted: false,
+                isBulkActionComplete: false
             }
 
         case DELETE_PRODUCT_SUCCESS:
@@ -155,6 +177,17 @@ export const productReducer = (state = {}, action) => {
                 ...state,
                 loading: false,
                 isDeleted: action.payload,
+                error: null
+            }
+
+        case BULK_DELETE_PRODUCTS_SUCCESS:
+        case BULK_ARCHIVE_PRODUCTS_SUCCESS:
+        case BULK_UNARCHIVE_PRODUCTS_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                isBulkActionComplete: true,
+                affectedCount: action.payload,
                 error: null
             }
 
@@ -168,12 +201,22 @@ export const productReducer = (state = {}, action) => {
 
 
         case DELETE_PRODUCT_FAIL:
+        case BULK_DELETE_PRODUCTS_FAIL:
+        case BULK_ARCHIVE_PRODUCTS_FAIL:
+        case BULK_UNARCHIVE_PRODUCTS_FAIL:
         case UPDATE_PRODUCT_FAIL:
             return {
                 ...state,
                 loading: false,
                 error: action.payload,
                 isUpdated: false
+            }
+
+        case BULK_PRODUCTS_RESET:
+            return {
+                ...state,
+                isBulkActionComplete: false,
+                affectedCount: 0
             }
 
         case DELETE_PRODUCT_RESET:
@@ -201,23 +244,50 @@ export const newReviewReducer = (state = {}, action) => {
         case NEW_REVIEW_REQUEST:
             return {
                 ...state,
-                loading: true
+                loading: true,
+                error: null,
+                success: false
             }
         case NEW_REVIEW_SUCCESS:
             return {
                 ...state,
                 loading: false,
-                success: action.payload
+                success: true,
+                message: action.payload.message,
+                error: null
             }
         case NEW_REVIEW_FAIL:
             return {
                 ...state,
+                loading: false,
+                success: false,
+                error: action.payload
+            }
+        case MY_REVIEW_REQUEST:
+            return {
+                ...state,
+                loading: true,
+                error: null
+            }
+        case MY_REVIEW_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                canReview: action.payload.canReview,
+                review: action.payload.review
+            }
+        case MY_REVIEW_FAIL:
+            return {
+                ...state,
+                loading: false,
                 error: action.payload
             }
         case NEW_REVIEW_RESET:
+        case REVIEW_RESET:
             return {
                 ...state,
-                success: false
+                success: false,
+                error: null
             }
         case CLEAR_ERRORS:
             return {

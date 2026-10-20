@@ -46,9 +46,30 @@ class APIFeatures {
             delete queryCopy['price[lte]'];
         }
 
+        if (queryCopy.category) {
+            queryCopy.category_id = Array.isArray(queryCopy.category)
+                ? { $in: queryCopy.category }
+                : queryCopy.category;
+            delete queryCopy.category;
+        }
+
+        if (queryCopy['rating[gte]']) {
+            queryCopy.ratings = { $gte: Number(queryCopy['rating[gte]']) };
+            delete queryCopy['rating[gte]'];
+        }
+
+        if (queryCopy['numOfReviews[gte]']) {
+            queryCopy.numOfReviews = { $gte: Number(queryCopy['numOfReviews[gte]']) };
+            delete queryCopy['numOfReviews[gte]'];
+        }
+
+        delete queryCopy['price[gte]'];
+        delete queryCopy['price[lte]'];
+        delete queryCopy.isArchived;
+
         // console.log(queryCopy);
 
-        this.query = this.query.find(priceFilter);
+        this.query = this.query.find({ ...priceFilter, ...queryCopy });
         return this;
     }
 

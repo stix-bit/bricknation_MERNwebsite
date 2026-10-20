@@ -3,6 +3,12 @@ import {
     ALL_PRODUCTS_REQUEST,
     ALL_PRODUCTS_SUCCESS,
     ALL_PRODUCTS_FAIL,
+    NEW_REVIEW_REQUEST,
+    NEW_REVIEW_SUCCESS,
+    NEW_REVIEW_FAIL,
+    MY_REVIEW_REQUEST,
+    MY_REVIEW_SUCCESS,
+    MY_REVIEW_FAIL,
     PRODUCT_DETAILS_REQUEST,
     PRODUCT_DETAILS_SUCCESS,
     PRODUCT_DETAILS_FAIL,
@@ -18,20 +24,45 @@ import {
     DELETE_PRODUCT_REQUEST,
     DELETE_PRODUCT_SUCCESS,
     DELETE_PRODUCT_FAIL,
+    BULK_DELETE_PRODUCTS_REQUEST,
+    BULK_DELETE_PRODUCTS_SUCCESS,
+    BULK_DELETE_PRODUCTS_FAIL,
+    BULK_ARCHIVE_PRODUCTS_REQUEST,
+    BULK_ARCHIVE_PRODUCTS_SUCCESS,
+    BULK_ARCHIVE_PRODUCTS_FAIL,
+    BULK_UNARCHIVE_PRODUCTS_REQUEST,
+    BULK_UNARCHIVE_PRODUCTS_SUCCESS,
+    BULK_UNARCHIVE_PRODUCTS_FAIL,
     CLEAR_ERRORS
 } from '../constants/productConstants';
 
-export const getProducts = (currentPage = 1, keyword = '', price, category = '') => async (dispatch) => {
+export const getProducts = (
+    currentPage = 1,
+    keyword = '',
+    price = [0, 100000],
+    category = '',
+    rating = '',
+    reviews = ''
+) => async (dispatch) => {
     try {
         dispatch({
             type: ALL_PRODUCTS_REQUEST
         })
 
-        let link = `${import.meta.env.VITE_API}/products?page=${currentPage}&keyword=${keyword}&price[lte]=${price[1]}&price[gte]=${price[0]}`
-
-        if (category) {
-            link = `${import.meta.env.VITE_API}/products?keyword=${keyword}&page=${currentPage}&price[lte]=${price[1]}&price[gte]=${price[0]}&category=${category}`
+        const params = new URLSearchParams({
+            page: currentPage.toString(),
+            keyword,
+            'price[lte]': price[1].toString(),
+            'price[gte]': price[0].toString()
+        })
+        if (Array.isArray(category)) {
+            category.forEach(categoryId => params.append('category', categoryId))
+        } else if (category) {
+            params.set('category', category)
         }
+        if (rating) params.set('rating[gte]', rating.toString())
+        if (reviews) params.set('numOfReviews[gte]', reviews.toString())
+        const link = `${import.meta.env.VITE_API}/products?${params.toString()}`
         const { data } = await axios.get(link)
         console.log(data)
         dispatch({
@@ -145,24 +176,84 @@ export const deleteProduct = (id) => async (dispatch) => {
     }
 }
 
+export const bulkDeleteProducts = (ids) => async (dispatch) => {
+    try {
+        dispatch({ type: BULK_DELETE_PRODUCTS_REQUEST })
+        const { data } = await axios.delete(`${import.meta.env.VITE_API}/admin/products/bulk`, {
+            data: { ids },
+            withCredentials: true
+        })
+        dispatch({ type: BULK_DELETE_PRODUCTS_SUCCESS, payload: data.deletedCount })
+    } catch (error) {
+        dispatch({
+            type: BULK_DELETE_PRODUCTS_FAIL,
+            payload: error.response?.data?.message || error.message || 'Unable to delete products'
+        })
+    }
+}
+
+export const bulkArchiveProducts = (ids) => async (dispatch) => {
+    try {
+        dispatch({ type: BULK_ARCHIVE_PRODUCTS_REQUEST })
+        const { data } = await axios.patch(`${import.meta.env.VITE_API}/admin/products/bulk/archive`, { ids }, {
+            withCredentials: true
+        })
+        dispatch({ type: BULK_ARCHIVE_PRODUCTS_SUCCESS, payload: data.archivedCount })
+    } catch (error) {
+        dispatch({
+            type: BULK_ARCHIVE_PRODUCTS_FAIL,
+            payload: error.response?.data?.message || error.message || 'Unable to archive products'
+        })
+    }
+}
+
+export const bulkUnarchiveProducts = (ids) => async (dispatch) => {
+    try {
+        dispatch({ type: BULK_UNARCHIVE_PRODUCTS_REQUEST })
+        const { data } = await axios.patch(`${import.meta.env.VITE_API}/admin/products/bulk/unarchive`, { ids }, {
+            withCredentials: true
+        })
+        dispatch({ type: BULK_UNARCHIVE_PRODUCTS_SUCCESS, payload: data.unarchivedCount })
+    } catch (error) {
+        dispatch({
+            type: BULK_UNARCHIVE_PRODUCTS_FAIL,
+            payload: error.response?.data?.message || error.message || 'Unable to unarchive products'
+        })
+    }
+}
+
 export const newReview = (reviewData) => async (dispatch) => {
     try {
         dispatch({ type: NEW_REVIEW_REQUEST })
-        const config = {
-            headers: {
-                'Content-Type': 'application/json'
-            },
+        const { data } = await axios.put(`${import.meta.env.VITE_API}/review`, reviewData, {
+            headers: { 'Content-Type': 'application/json' },
             withCredentials: true
-        }
-        const { data } = await axios.put(`${import.meta.env.VITE_API}/review`, reviewData, config)
+        })
         dispatch({
             type: NEW_REVIEW_SUCCESS,
-            payload: data.success
+            payload: data
         })
+        return true
     } catch (error) {
         dispatch({
             type: NEW_REVIEW_FAIL,
-            payload: error.response.data.message
+            payload: error.response?.data?.message || error.message || 'Unable to save review'
+        })
+        return false
+    }
+}
+
+export const getMyProductReview = (productId) => async (dispatch) => {
+    try {
+        dispatch({ type: MY_REVIEW_REQUEST })
+        const { data } = await axios.get(`${import.meta.env.VITE_API}/review?productId=${productId}`, {
+            withCredentials: true
+        })
+        dispatch({ type: MY_REVIEW_SUCCESS, payload: data })
+    } catch (error) {
+        dispatch({
+            type: MY_REVIEW_FAIL,
+            payload: error.response?.data?.message || error.message || 'Unable to load review status'
         })
     }
 }

@@ -2,6 +2,7 @@ const Product = require('../models/product')
 const Order = require('../models/order')
 const Category = require('../models/category')
 const Review = require('../models/review')
+const Blueprint = require('../models/blueprint')
 const mongoose = require('mongoose')
 const cloudinary = require('cloudinary')
 const APIFeatures = require('../utils/apiFeatures')
@@ -88,9 +89,9 @@ exports.newProduct = async (req, res, next) => {
 }
 
 exports.getSingleProduct = async (req, res, next) => {
-    const product = await Product.findById(req.params.id)
+    const product = await Product.findOne({ _id: req.params.id, isArchived: { $ne: true } })
         .populate('category_id')
-        .populate({ path: 'reviews', populate: { path: 'user_id', select: 'name' } })
+        .populate({ path: 'reviews', populate: { path: 'user_id', select: 'name avatar' } })
     if (!product) {
         return res.status(404).json({
             success: false,
@@ -101,7 +102,8 @@ exports.getSingleProduct = async (req, res, next) => {
     productResponse.reviews = productResponse.reviews.map(review => ({
         ...review,
         user: review.user_id?._id,
-        name: review.user_id?.name
+        name: review.user_id?.name,
+        avatar: review.user_id?.avatar
     }))
     return res.status(200).json({
         success: true,
@@ -112,10 +114,10 @@ exports.getSingleProduct = async (req, res, next) => {
 exports.getProducts = async (req, res) => {
 
     const resPerPage = 4;
-    const productsCount = await Product.countDocuments();
+    const productsCount = await Product.countDocuments({ isArchived: { $ne: true } });
 
    // const products = await Product.find()
-    const apiFeatures = new APIFeatures(Product.find(), req.query).search().filter()
+    const apiFeatures = new APIFeatures(Product.find({ isArchived: { $ne: true } }), req.query).search().filter()
 
     const filteredProductsCount = await Product.countDocuments(apiFeatures.query.getFilter());
 
@@ -239,16 +241,105 @@ exports.deleteProduct = async (req, res, next) => {
     })
 }
 
+function getProductIds(req, res) {
+    const { ids } = req.body || {}
+    if (!Array.isArray(ids) || ids.length === 0 || ids.some(id => !mongoose.isValidObjectId(id))) {
+        res.status(400).json({
+            success: false,
+            message: 'Please provide a non-empty array of valid product IDs'
+        })
+        return null
+    }
+    return [...new Set(ids.map(id => id.toString()))]
+}
+
+exports.bulkDeleteProducts = async (req, res, next) => {
+    try {
+        const ids = getProductIds(req, res)
+        if (!ids) return
+
+        await Promise.all([
+            Review.deleteMany({ product_id: { $in: ids } }),
+            Blueprint.updateMany(
+                { extracted_materials: { $in: ids } },
+                { $pull: { extracted_materials: { $in: ids } } }
+            )
+        ])
+        const result = await Product.deleteMany({ _id: { $in: ids } })
+
+        return res.status(200).json({
+            success: true,
+            deletedCount: result.deletedCount
+        })
+    } catch (error) {
+        return next(error)
+    }
+}
+
+exports.bulkArchiveProducts = async (req, res, next) => {
+    try {
+        const ids = getProductIds(req, res)
+        if (!ids) return
+
+        const result = await Product.updateMany(
+            { _id: { $in: ids }, isArchived: { $ne: true } },
+            { $set: { isArchived: true } }
+        )
+
+        return res.status(200).json({
+            success: true,
+            archivedCount: result.modifiedCount
+        })
+    } catch (error) {
+        return next(error)
+    }
+}
+
+exports.bulkUnarchiveProducts = async (req, res, next) => {
+    try {
+        const ids = getProductIds(req, res)
+        if (!ids) return
+
+        const result = await Product.updateMany(
+            { _id: { $in: ids }, isArchived: true },
+            { $set: { isArchived: false } }
+        )
+
+        return res.status(200).json({
+            success: true,
+            unarchivedCount: result.modifiedCount
+        })
+    } catch (error) {
+        return next(error)
+    }
+}
+
 exports.createProductReview = async (req, res, next) => {
     const { rating, comment, productId } = req.body;
+    const numericRating = Number(rating)
+    if (!Number.isInteger(numericRating) || numericRating < 1 || numericRating > 5 || !comment?.trim()) {
+        return res.status(400).json({ success: false, message: 'Please provide a rating from 1 to 5 and a review' })
+    }
     const product = await Product.findById(productId);
     if (!product) {
         return res.status(404).json({ success: false, message: 'Product not found' })
     }
 
+    const hasPurchased = await Order.exists({
+        user: req.user._id,
+        orderStatus: 'Delivered',
+        'orderItems.product': product._id
+    })
+    if (!hasPurchased) {
+        return res.status(403).json({
+            success: false,
+            message: 'You can review a product only after purchasing and receiving it'
+        })
+    }
+
     await Review.findOneAndUpdate(
         { user_id: req.user._id, product_id: productId },
-        { rating: Number(rating), comment },
+        { rating: numericRating, comment: comment.trim() },
         { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
     )
     const stats = await Review.aggregate([
@@ -260,20 +351,52 @@ exports.createProductReview = async (req, res, next) => {
         numOfReviews: stats[0]?.count || 0
     })
     return res.status(200).json({
-        success: true
+        success: true,
+        message: 'Review saved successfully'
     })
+}
+
+exports.getMyProductReview = async (req, res, next) => {
+    try {
+        const product = await Product.findById(req.query.productId).select('_id')
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Product not found' })
+        }
+
+        const hasPurchased = await Order.exists({
+            user: req.user._id,
+            orderStatus: 'Delivered',
+            'orderItems.product': product._id
+        })
+        if (!hasPurchased) {
+            return res.status(200).json({ success: true, canReview: false, review: null })
+        }
+
+        const review = await Review.findOne({
+            user_id: req.user._id,
+            product_id: product._id
+        })
+        return res.status(200).json({
+            success: true,
+            canReview: true,
+            review
+        })
+    } catch (error) {
+        return next(error)
+    }
 }
 
 exports.getProductReviews = async (req, res, next) => {
     const reviews = await Review.find({ product_id: req.query.id })
-        .populate('user_id', 'name')
+        .populate('user_id', 'name avatar')
         .sort({ createdAt: -1 })
     res.status(200).json({
         success: true,
         reviews: reviews.map(review => ({
             ...review.toObject(),
             user: review.user_id?._id,
-            name: review.user_id?.name
+            name: review.user_id?.name,
+            avatar: review.user_id?.avatar
         }))
     })
 }

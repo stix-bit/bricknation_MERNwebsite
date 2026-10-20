@@ -59,7 +59,7 @@ const reducer = combineReducers({
     myOrders: myOrdersReducer,
     orderDetails: orderDetailsReducer,
     product: productReducer,
-    // newReview: newReviewReducer,
+    newReview: newReviewReducer,
     allOrders: allOrdersReducer,
     order: orderReducer,
     // allUsers: allUsersReducer,

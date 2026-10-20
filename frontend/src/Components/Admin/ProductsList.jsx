@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 
@@ -11,10 +11,12 @@ import { DataGrid, } from '@mui/x-data-grid'
 import { useDispatch, useSelector } from 'react-redux'
 import {
     getAdminProducts,
-    deleteProduct,
+    bulkDeleteProducts,
+    bulkArchiveProducts,
+    bulkUnarchiveProducts,
     clearErrors,
 } from '../../actions/productActions'
-import { DELETE_PRODUCT_RESET } from '../../constants/productConstants'
+import { BULK_PRODUCTS_RESET } from '../../constants/productConstants'
 
 const ProductsList = () => {
     // const [products, setProducts] = useState([])
@@ -22,7 +24,11 @@ const ProductsList = () => {
     // const [deleteError, setDeleteError] = useState('')
     const dispatch = useDispatch();
     const { loading, error, products } = useSelector(state => state.products)
-    const { error: deleteError, isDeleted } = useSelector(state => state.product)
+    const { error: deleteError, isBulkActionComplete, affectedCount, loading: actionLoading } = useSelector(state => state.product)
+    const [selectedIds, setSelectedIds] = useState([])
+    const selectedProducts = products.filter(product => selectedIds.includes(product._id))
+    const hasActiveSelection = selectedProducts.some(product => !product.isArchived)
+    const hasArchivedSelection = selectedProducts.some(product => product.isArchived)
 
     // const [loading, setLoading] = useState(true)
     // const [isDeleted, setIsDeleted] = useState(false)
@@ -65,15 +71,15 @@ const ProductsList = () => {
             dispatch(clearErrors())
         }
 
-        if (isDeleted) {
-            toast.success('Product deleted successfully', {
+        if (isBulkActionComplete) {
+            toast.success(`${affectedCount} product${affectedCount === 1 ? '' : 's'} processed successfully`, {
                 position: 'bottom-right'
             })
             dispatch(getAdminProducts())
-            dispatch({ type: DELETE_PRODUCT_RESET })
+            dispatch({ type: BULK_PRODUCTS_RESET })
         }
 
-    }, [dispatch, error, deleteError, isDeleted])
+    }, [dispatch, error, deleteError, isBulkActionComplete, affectedCount])
 
     useEffect(() => {
         dispatch(getAdminProducts())
@@ -100,20 +106,30 @@ const ProductsList = () => {
     //     }
     // }
 
-    const deleteProductHandler = (id, name) => {
+    const bulkActionHandler = (action) => {
+        const actionName = action === 'delete'
+            ? 'permanently delete'
+            : action === 'archive' ? 'archive' : 'unarchive'
         toast(({ closeToast }) => (
             <div>
-                <p className="mb-2">Delete <strong>{name}</strong>?</p>
+                <p className="mb-2">{actionName} <strong>{selectedIds.length} selected product{selectedIds.length === 1 ? '' : 's'}</strong>?</p>
                 <div className="d-flex justify-content-end gap-2">
                     <button
                         type="button"
                         className="btn btn-danger btn-sm"
                         onClick={() => {
                             closeToast()
-                            dispatch(deleteProduct(id))
+                            setSelectedIds([])
+                            dispatch(
+                                action === 'delete'
+                                    ? bulkDeleteProducts(selectedIds)
+                                    : action === 'archive'
+                                        ? bulkArchiveProducts(selectedIds)
+                                        : bulkUnarchiveProducts(selectedIds)
+                            )
                         }}
                     >
-                        Delete
+                        {action === 'delete' ? 'Delete' : action === 'archive' ? 'Archive' : 'Unarchive'}
                     </button>
                     <button
                         type="button"
@@ -161,21 +177,52 @@ const ProductsList = () => {
             align: 'right',
             headerAlign: 'right'
         },
+        {
+            field: 'isArchived',
+            headerName: 'Status',
+            width: 120,
+            renderCell: (params) => params.value ? 'Archived' : 'Active'
+        },
 
         {
             field: 'actions',
             headerName: 'Actions',
-            width: 120,
+            width: 360,
             sortable: false,
             filterable: false,
+            renderHeader: () => (
+                <div className="d-flex gap-1">
+                    <button
+                        type="button"
+                        className="btn btn-warning btn-sm"
+                        disabled={!hasActiveSelection || actionLoading}
+                        onClick={() => bulkActionHandler('archive')}
+                    >
+                        Archive
+                    </button>
+                    <button
+                        type="button"
+                        className="btn btn-success btn-sm"
+                        disabled={!hasArchivedSelection || actionLoading}
+                        onClick={() => bulkActionHandler('unarchive')}
+                    >
+                        Unarchive
+                    </button>
+                    <button
+                        type="button"
+                        className="btn btn-danger btn-sm"
+                        disabled={!selectedIds.length || actionLoading}
+                        onClick={() => bulkActionHandler('delete')}
+                    >
+                        Delete
+                    </button>
+                </div>
+            ),
             renderCell: (params) => (
                 <>
                     <Link to={`/admin/product/${params.id}`} className="btn btn-primary py-1 px-2">
                         <i className="fa fa-pencil"></i>
                     </Link>
-                    <button className="btn btn-danger py-1 px-2 ml-2" onClick={() => deleteProductHandler(params.id, params.row.name)}>
-                        <i className="fa fa-trash"></i>
-                    </button>
                 </>
             )
         }
@@ -186,6 +233,7 @@ const ProductsList = () => {
         name: product.name,
         price: `$${product.price}`,
         stock: product.stock,
+        isArchived: product.isArchived,
     }));
 
     return (
@@ -199,7 +247,6 @@ const ProductsList = () => {
                 <div className="col-12 col-md-10">
                     <>
                         <h1 className="my-5">All Products</h1>
-
                         {loading ? <Loader /> : (
                             <div style={{ width: '100%' }}>
                                 <DataGrid
@@ -208,7 +255,10 @@ const ProductsList = () => {
 
                                     pageSize={5}
                                     rowsPerPageOptions={[5, 10, 25]}
-                                    disableSelectionOnClick
+                                    checkboxSelection
+                                    disableRowSelectionOnClick
+                                    rowSelectionModel={{ type: 'include', ids: new Set(selectedIds) }}
+                                    onRowSelectionModelChange={(newSelection) => setSelectedIds(Array.from(newSelection.ids || newSelection))}
                                     getRowId={(row) => row.id}
                                     showToolbar
                                 />

@@ -57,7 +57,7 @@ const Header = () => {
                  <div className="col-12 col-md-3 mt-4 mt-md-0 text-center">
 
                     {user && user._id ? (<div className="ml-4 dropdown d-inline">
-                        <Link to="#!" className="btn dropdown-toggle text-white mr-4" type="button" id="dropDownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <Link to="#!" className="btn dropdown-toggle text-black mr-4" type="button" id="dropDownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <figure className="avatar avatar-nav">
                                 <img
                                     src={user.avatar && user.avatar.url}

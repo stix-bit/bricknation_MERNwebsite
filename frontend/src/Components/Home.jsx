@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import MetaData from './Layout/MetaData'
 import Product from './Product/Product'
 import Loader from './Layout/Loader'
-import axios from 'axios'
 // import Stack from '@mui/material/Stack'
-import Box from '@mui/material/Box';
-import Slider from '@mui/material/Slider';
 import Stack from '@mui/material/Stack'
 import Pagination from '@mui/material/Pagination'
+import Paper from '@mui/material/Paper'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
 import { useDispatch, useSelector } from 'react-redux'
 import { getProducts } from '../actions/productActions'
 
@@ -19,11 +19,18 @@ const Home = () => {
     // const [resPerPage, setResPerPage] = useState(0)
     // const [filteredProductsCount, setFilteredProductsCount] = useState(0)
     const [price, setPrice] = useState([0, 100000]);
+    const [priceInput, setPriceInput] = useState([0, 100000]);
+    const [priceError, setPriceError] = useState('');
+    const [category, setCategory] = useState([]);
+    const [rating, setRating] = useState('');
+    const [reviews, setReviews] = useState('');
+    const [categories, setCategories] = useState([]);
+    const [openFilter, setOpenFilter] = useState('');
     const [currentPage, setCurrentPage] = useState(1)
     let { keyword } = useParams();
 
     const dispatch = useDispatch();
-    const { loading, products, error, productsCount, resPerPage, filteredProductsCount } = useSelector(state => state.products);
+    const { loading, products, productsCount, resPerPage, filteredProductsCount } = useSelector(state => state.products);
 
     let count = productsCount;
     // console.log(products)
@@ -46,27 +53,75 @@ const Home = () => {
         count = filteredProductsCount
     }
 
-    const handleChange = (event, newValue) => {
-        setPrice(newValue);
-    };
-
-    function valuetext(price) {
-        return `P${price.toString()}`;
+    const handlePriceChange = (index, value) => {
+        const numericValue = value === '' ? '' : Number(value)
+        const nextPrice = [...priceInput]
+        nextPrice[index] = numericValue
+        setPriceInput(nextPrice)
+        setPriceError(
+            nextPrice[0] !== '' &&
+            nextPrice[1] !== '' &&
+            nextPrice[0] > nextPrice[1]
+                ? 'Minimum price cannot be greater than maximum price.'
+                : ''
+        )
+        setCurrentPage(1);
     }
 
+    const applyPriceFilter = () => {
+        if (
+            priceInput[0] === '' ||
+            priceInput[1] === '' ||
+            priceInput[0] < 0 ||
+            priceInput[1] < 0 ||
+            priceInput[0] > priceInput[1]
+        ) {
+            setPriceError('Enter a valid price range where minimum is not greater than maximum.')
+            return
+        }
+        setPrice([...priceInput])
+        setPriceError('')
+        setCurrentPage(1)
+    }
 
     useEffect(() => {
-        dispatch(getProducts(currentPage, keyword, price,))
-    }, [currentPage, keyword, price,]);
+        let isMounted = true
+        fetch(`${import.meta.env.VITE_API}/categories`)
+            .then(response => {
+                if (!response.ok) throw new Error('Unable to load categories')
+                return response.json()
+            })
+            .then(data => {
+                if (isMounted) setCategories(data.categories || [])
+            })
+            .catch(error => console.error(error))
+        return () => {
+            isMounted = false
+        }
+    }, [])
+
+    useEffect(() => {
+        dispatch(getProducts(currentPage, keyword, price, category, rating, reviews))
+    }, [currentPage, keyword, price, category, rating, reviews, dispatch]);
+
+    const resetFilters = () => {
+        setPrice([0, 100000])
+        setPriceInput([0, 100000])
+        setPriceError('')
+        setCategory([])
+        setRating('')
+        setReviews('')
+        setCurrentPage(1)
+    }
 
     
     return (
         <>
             <MetaData title={'shop Here'} />
             {loading ? <Loader /> :
-                (<div className="container container-fluid">
+                (<div className="container-fluid px-4">
                     <h1 id="products_heading">Latest Products</h1>
-                    <section id="products" className="container mt-5">
+                    <section id="products" className="container-fluid mt-4">
                         {/* <div className="row">
                         {products && products.map(product => (
                             <Product key={product._id} product={product} />
@@ -77,30 +132,152 @@ const Home = () => {
                         <div className="row">
                             {keyword ? (
                                 <>
-                                    <div className="col-6 col-md-3 mt-5 mb-5">
-                                  
-
-                                        <Box sx={{ width: 150 }}>
-                                            <Slider
-                                                getAriaLabel={() => 'Price Filter'}
-                                                value={price}
-                                                onChange={handleChange}
-                                                valueLabelDisplay="on"
-                                                getAriaValueText={valuetext}
-                                                min={1}
-                                                max={100000}
-
-                                            />
-                                        </Box>
-                                        <div className="mt-5">
-                                            <h4 className="mb-3">
-                                                Categories
-                                            </h4>
-
+                                <div className="col-12 col-md-3 mt-5 mb-5">
+                                    <Paper elevation={2} sx={{ p: 3, textAlign: 'left', backgroundColor: '#f8f9fa' }}>
+                                        <Typography variant="h5" component="h2" sx={{ mb: 3, fontWeight: 600 }}>
+                                            Filters
+                                        </Typography>
+                                        <div>
+                                            <label className="form-label fw-bold">Price Range</label>
+                                            <div className="row g-2">
+                                                <div className="col-6">
+                                                    <label htmlFor="minimum_price" className="form-label small">Minimum</label>
+                                                    <input
+                                                        id="minimum_price"
+                                                        type="number"
+                                                        className={`form-control ${priceError ? 'is-invalid' : ''}`}
+                                                        min="0"
+                                                        value={priceInput[0]}
+                                                        onChange={(event) => handlePriceChange(0, event.target.value)}
+                                                        aria-describedby={priceError ? 'price_filter_error' : undefined}
+                                                    />
+                                                </div>
+                                                <div className="col-6">
+                                                    <label htmlFor="maximum_price" className="form-label small">Maximum</label>
+                                                    <input
+                                                        id="maximum_price"
+                                                        type="number"
+                                                        className={`form-control ${priceError ? 'is-invalid' : ''}`}
+                                                        min="0"
+                                                        value={priceInput[1]}
+                                                        onChange={(event) => handlePriceChange(1, event.target.value)}
+                                                        aria-describedby={priceError ? 'price_filter_error' : undefined}
+                                                    />
+                                                </div>
+                                            </div>
+                                            {priceError && (
+                                                <div id="price_filter_error" className="invalid-feedback d-block">
+                                                    {priceError}
+                                                </div>
+                                            )}
+                                            <Button type="button" variant="contained" fullWidth sx={{ mt: 2 }} onClick={applyPriceFilter}>
+                                                Apply price range
+                                            </Button>
                                         </div>
-
-
-                                    
+                                        <div className="mt-4">
+                                            <button type="button" className="btn btn-outline-secondary w-100 text-start" onClick={() => setOpenFilter(openFilter === 'category' ? '' : 'category')}>
+                                                Category <span className="float-end">{openFilter === 'category' ? '▲' : '▼'}</span>
+                                            </button>
+                                            {openFilter === 'category' && (
+                                                <div className="border rounded p-2 mt-1 bg-white text-start">
+                                                    <label className="d-flex align-items-center py-1">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="flex-shrink-0 me-3"
+                                                            style={{ marginRight: '12px' }}
+                                                            checked={category.length === 0}
+                                                            onChange={() => {
+                                                                setCategory([])
+                                                                setCurrentPage(1)
+                                                            }}
+                                                        />
+                                                    <span className="flex-grow-1">All categories</span>
+                                                    </label>
+                                                    {categories.map(item => (
+                                                        <label key={item._id} className="d-flex align-items-center py-1">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="flex-shrink-0 me-3"
+                                                                style={{ marginRight: '12px' }}
+                                                                checked={category.includes(item._id)}
+                                                                onChange={() => {
+                                                                    setCategory(category.includes(item._id)
+                                                                        ? category.filter(categoryId => categoryId !== item._id)
+                                                                        : [...category, item._id])
+                                                                    setCurrentPage(1)
+                                                                }}
+                                                            />
+                                                            <span className="flex-grow-1">{item.name}</span>
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="mt-4">
+                                            <button type="button" className="btn btn-outline-secondary w-100 text-start" onClick={() => setOpenFilter(openFilter === 'rating' ? '' : 'rating')}>
+                                                Rating <span className="float-end">{openFilter === 'rating' ? '▲' : '▼'}</span>
+                                            </button>
+                                            {openFilter === 'rating' && (
+                                                <div className="border rounded p-2 mt-1 bg-white text-start">
+                                                    {[
+                                                        ['', 'Any rating'],
+                                                        ['5', '5 stars'],
+                                                        ['4', '4 stars and up'],
+                                                        ['3', '3 stars and up'],
+                                                        ['2', '2 stars and up'],
+                                                        ['1', '1 star and up']
+                                                    ].map(([value, label]) => (
+                                                        <label key={label} className="d-flex align-items-center py-1">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="flex-shrink-0 me-3"
+                                                                style={{ marginRight: '12px' }}
+                                                                checked={rating === value}
+                                                                onChange={() => {
+                                                                    setRating(rating === value ? '' : value)
+                                                                    setCurrentPage(1)
+                                                                }}
+                                                            />
+                                                            <span className="flex-grow-1">{label}</span>
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="mt-4">
+                                            <button type="button" className="btn btn-outline-secondary w-100 text-start" onClick={() => setOpenFilter(openFilter === 'reviews' ? '' : 'reviews')}>
+                                                Number of reviews <span className="float-end">{openFilter === 'reviews' ? '▲' : '▼'}</span>
+                                            </button>
+                                            {openFilter === 'reviews' && (
+                                                <div className="border rounded p-2 mt-1 bg-white text-start">
+                                                    {[
+                                                        ['', 'Any number of reviews'],
+                                                        ['5', '5 reviews and up'],
+                                                        ['10', '10 reviews and up'],
+                                                        ['25', '25 reviews and up'],
+                                                        ['50', '50 reviews and up']
+                                                    ].map(([value, label]) => (
+                                                        <label key={label} className="d-flex align-items-center py-1">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="flex-shrink-0 me-3"
+                                                                style={{ marginRight: '12px' }}
+                                                                checked={reviews === value}
+                                                                onChange={() => {
+                                                                    setReviews(reviews === value ? '' : value)
+                                                                    setCurrentPage(1)
+                                                                }}
+                                                            />
+                                                            <span className="flex-grow-1">{label}</span>
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <Button type="button" variant="outlined" fullWidth sx={{ mt: 3 }} onClick={resetFilters}>
+                                            Clear filters
+                                        </Button>
+                                    </Paper>
                                 </div>
 
                                     <div className="col-6 col-md-9">

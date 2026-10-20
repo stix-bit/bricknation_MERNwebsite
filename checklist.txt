@@ -2,18 +2,18 @@ ITCP318 Integrative Programming and Technology  1st Term 2026
 
 ✅
 
-MP1 20pts
+MP1 20pts ✅
 Product CRUD datatables. upload multiple photos. bulk delete using checkboxes 20pts 
 
-mp2 filter functions 20pts
+mp2 filter functions 20pts ✅
 price filter 5pts
 category filter 5pts 
 ratings filter 5pts
 review filter 5pts
 
 mp3 review ratings 20pts 
-users who availed of the product/service can write a review and rate the product 10pts
-users can update their own review/rating. 5pts
+users who availed of the product/service can write a review and rate the product 10pts✅
+users can update their own review/rating. 5pts✅
 admin can delete a review 5pts.
 
 term test lab 30pts
@@ -24,7 +24,7 @@ attach a pdf receipt on the email 10pts
 
 unit 1 20pts 
 filter/mask bad words from reviews. bad-words package 10pts
-form validation on product and user forms. (product crud, user login, update profile) YUP formik React Hook Form 10pts
+form validation on product and user forms. (product crud, user login, update profile) YUP formik React Hook FCorm 10pts
 
 unit 2 20pts
  # user interface design css 10pts 

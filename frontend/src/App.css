@@ -29,7 +29,12 @@ body {
 nav {
   background-color: #f1f3f5;
   border-bottom: 3px solid #d90429;
-  padding: 1rem 1rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.navbar-brand img {
+  max-height: 58px;
+  width: auto;
 }
 
 #search_btn {
@@ -44,7 +49,7 @@ nav {
 }
 
 #search_field {
-  height: 2.4rem;
+  height: 2rem;
   padding: 1rem;
 }
 
@@ -74,6 +79,10 @@ nav {
 /* Home page */
 #products_heading {
   margin-top: 1.8rem;
+}
+
+#products {
+  padding: 0 1rem 2rem;
 }
 
 .card {
@@ -358,6 +367,8 @@ footer {
   margin-right: 0.6rem;
   height: 2.2rem;
   width: 2.2rem;
+  border: 2px solid #d90429;
+  padding: 2px;
 }
 
 /* Checkout Steps */
