@@ -88,7 +88,7 @@ const ProductDetails = () => {
                         </Button>
                         <Typography sx={{ mt: 2 }}>
                             Status: <span id="stock_status" className={product.stock > 0 ? 'greenColor' : 'redColor'}>
-                                {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                                {product.stock > 0 ? `In Stock (${product.stock})` : 'Out of Stock (0)'}
                             </span>
                         </Typography>
                         <Divider sx={{ my: 2 }} />
@@ -99,7 +99,8 @@ const ProductDetails = () => {
 
                         {!user && <Alert severity="info" sx={{ mt: 3 }}>Log in and purchase this product to review it.</Alert>}
                         {user && canReview && (
-                            <Button id="review_btn" variant="outlined" color="primary" sx={{ mt: 2, borderRadius: 5 }}
+                            <Button id="review_btn" variant="contained" color="primary"
+                                sx={{ mt: 2, borderRadius: 5, color: '#ffffff', '&:hover': { color: '#ffffff' } }}
                                 onClick={openReviewDialog}>
                                 {review ? 'Update Your Review' : 'Submit Your Review'}
                             </Button>

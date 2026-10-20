@@ -117,7 +117,6 @@ exports.firebaseLogin = async (req, res) => {
 }
 
 exports.loginUser = async (req, res, next) => {
-    console.log(req.body)
     const { email, password } = req.body;
 
     // Checks if email and password is entered by user
@@ -132,12 +131,41 @@ exports.loginUser = async (req, res, next) => {
         return res.status(401).json({ message: 'Invalid Email or Password' })
     }
 
+    const now = Date.now()
+    if (user.loginLockedUntil && user.loginLockedUntil.getTime() > now) {
+        const secondsRemaining = Math.ceil((user.loginLockedUntil.getTime() - now) / 1000)
+        return res.status(429).json({
+            message: `Too many failed login attempts. Try again in ${secondsRemaining} seconds.`
+        })
+    }
+
+    if (user.loginLockedUntil && user.loginLockedUntil.getTime() <= now) {
+        user.failedLoginAttempts = 0
+        user.loginLockedUntil = null
+    }
+
     // Checks if password is correct or not
     const isPasswordMatched = await user.comparePassword(password);
 
     if (!isPasswordMatched) {
-        return res.status(401).json({ message: 'Invalid Email or Password' })
+        user.failedLoginAttempts += 1
+        if (user.failedLoginAttempts >= 5) {
+            user.loginLockedUntil = new Date(now + 60 * 1000)
+            await user.save({ validateBeforeSave: false })
+            return res.status(429).json({
+                message: 'Too many failed login attempts. Login is temporarily locked for 1 minute.'
+            })
+        }
+        await user.save({ validateBeforeSave: false })
+        return res.status(401).json({
+            message: `Invalid Email or Password. ${5 - user.failedLoginAttempts} attempts remaining.`
+        })
     }
+
+    user.failedLoginAttempts = 0
+    user.loginLockedUntil = null
+    await user.save({ validateBeforeSave: false })
+
     const token = user.getJwtToken();
 
     // res.status(201).json({

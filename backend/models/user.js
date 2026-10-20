@@ -50,7 +50,15 @@ const userSchema = new mongoose.Schema({
         default: Date.now
     },
     resetPasswordToken: String,
-    resetPasswordExpire: Date
+    resetPasswordExpire: Date,
+    failedLoginAttempts: {
+        type: Number,
+        default: 0
+    },
+    loginLockedUntil: {
+        type: Date,
+        default: null
+    }
 })
 
 userSchema.pre('findOneAndDelete', async function () {
