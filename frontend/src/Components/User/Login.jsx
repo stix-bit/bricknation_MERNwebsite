@@ -87,9 +87,9 @@ const Login = () => {
                 <>
                     <MetaData title={'Login'} />
 
-                    <div className="row wrapper">
-                        <div className="col-10 col-lg-5">
-                            <form className="shadow-lg"
+                    <main className="login-page">
+                        <div className="login-card">
+                            <form
                                 onSubmit={submitHandler}
                             >
                                 <h1 className="mb-3">Login</h1>
@@ -144,7 +144,7 @@ const Login = () => {
                                 <Link to="/register" className="float-right mt-3">New User?</Link>
                             </form>
                         </div>
-                    </div>
+                    </main>
 
 
                 </>
