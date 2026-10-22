@@ -119,8 +119,31 @@ const Home = () => {
         <>
             <MetaData title={'shop Here'} />
             {loading ? <Loader /> :
-                (<div className="container-fluid px-4">
-                    <h1 id="products_heading">Latest Products</h1>
+                (<div className="storefront">
+                    <section className="hero-banner">
+                        <div className="hero-copy">
+                            <span className="eyebrow">BUILD SOMETHING BOLD</span>
+                            <h1>Bring your<br /><strong>imagination</strong> to life.</h1>
+                            <center>
+                            <p>Discover bricks, sets and collectibles made for builders who never stop creating.</p>
+                            </center>
+                            <a className="hero-cta" href="#products_heading">Shop the collection <span>→</span></a>
+                        </div>
+                        <div className="hero-art">
+                            <span className="sun-shape"></span>
+                            <img src="./images/download.jpg" alt="Creative BrickNation character" />
+                        </div>
+                    </section>
+                    <section className="feature-strip">
+                        <div><span className="feature-icon">✦</span><strong>Endless creativity</strong><small>Ideas for every builder</small></div>
+                        <div><span className="feature-icon">✓</span><strong>Quality guaranteed</strong><small>Made to last and love</small></div>
+                        <div><span className="feature-icon">↗</span><strong>Fast delivery</strong><small>Build sooner, smile sooner</small></div>
+                    </section>
+                    <div className="container-fluid px-4">
+                    <div className="section-heading">
+                        <div><span className="eyebrow">OUR COLLECTION</span><h2 id="products_heading">Latest products</h2></div>
+                        <span className="heading-accent">BRICKNATION / 01</span>
+                    </div>
                     <section id="products" className="container-fluid mt-4">
                         {/* <div className="row">
                         {products && products.map(product => (
@@ -133,7 +156,7 @@ const Home = () => {
                             {keyword ? (
                                 <>
                                 <div className="col-12 col-md-3 mt-5 mb-5">
-                                    <Paper elevation={2} sx={{ p: 3, textAlign: 'left', backgroundColor: '#f8f9fa' }}>
+                                    <Paper className="filter-panel" elevation={0} sx={{ p: 3, textAlign: 'left' }}>
                                         <Typography variant="h5" component="h2" sx={{ mb: 3, fontWeight: 600 }}>
                                             Filters
                                         </Typography>
@@ -318,6 +341,7 @@ const Home = () => {
                             </div>
                         )}
                     </section>
+                    </div>
                 </div>)}
         </>
 

@@ -1,12 +1,12 @@
-import React from 'react'
-
 const Footer = () => {
     return (
         <>
             <footer className="py-1">
-                <p className="text-center mt-1">
-                    BrickNation - 2026-2028, All Rights Reserved
-                </p>
+                <div className="footer-inner">
+                    <span className="footer-brand">BRICK<span>NATION</span></span>
+                    <p>BrickNation - 2026-2028, All Rights Reserved</p>
+                    <span className="footer-mark">BUILD. PLAY. REPEAT.</span>
+                </div>
             </footer>
         </>
 
