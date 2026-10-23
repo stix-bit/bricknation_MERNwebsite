@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import MetaData from '../Layout/MetaData'
 import Sidebar from './SideBar'
@@ -9,16 +9,26 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch, useSelector } from 'react-redux'
 import { newProduct, clearErrors } from '../../actions/productActions'
 import { NEW_PRODUCT_RESET } from '../../constants/productConstants'
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
+import {
+    Box,
+    Button,
+    Container,
+    FormControl,
+    FormHelperText,
+    InputLabel,
+    MenuItem,
+    Paper,
+    Select,
+    Stack,
+    TextField,
+    Typography
+} from '@mui/material'
 
 const NewProduct = () => {
     const dispatch = useDispatch()
-    const { loading, error, success } = useSelector(state => state.newProduct)
-    const [name, setName] = useState('');
-    const [price, setPrice] = useState(0);
-    const [description, setDescription] = useState('');
-    const [category, setCategory] = useState('Materials');
-    const [stock, setStock] = useState(0);
-    const [seller, setSeller] = useState('');
+    const { error, success } = useSelector(state => state.newProduct)
     const [images, setImages] = useState([]);
     const [imagesPreview, setImagesPreview] = useState([])
     // const [error, setError] = useState('')
@@ -36,17 +46,28 @@ const NewProduct = () => {
     ]
 
     let navigate = useNavigate()
+    const formik = useFormik({
+        initialValues: { name: '', price: 0, description: '', category: 'Materials', stock: 0, seller: '' },
+        validationSchema: Yup.object({
+            name: Yup.string().trim().required('Product name is required'),
+            price: Yup.number().min(0).required('Price is required'),
+            description: Yup.string().trim().required('Description is required'),
+            category: Yup.string().required('Category is required'),
+            stock: Yup.number().integer().min(0).required('Stock is required'),
+            seller: Yup.string().trim().required('Seller name is required')
+        }),
+        onSubmit: values => submitHandler(values)
+    })
 
-    const submitHandler = (e) => {
-        e.preventDefault();
+    const submitHandler = (values) => {
 
         const formData = new FormData();
-        formData.set('name', name);
-        formData.set('price', price);
-        formData.set('description', description);
-        formData.set('category', category);
-        formData.set('stock', stock);
-        formData.set('seller', seller);
+        formData.set('name', values.name);
+        formData.set('price', values.price);
+        formData.set('description', values.description);
+        formData.set('category', values.category);
+        formData.set('stock', values.stock);
+        formData.set('seller', values.seller);
 
         images.forEach(image => {
             formData.append('images', image)
@@ -130,117 +151,131 @@ const NewProduct = () => {
     }, [error, dispatch, navigate, success])
 
 
+    const fieldError = field => formik.touched[field] && formik.errors[field]
+
     return (
         <>
-            <MetaData title={'New Product'} />
-            <div className="row">
-                <div className="col-12 col-md-2">
+            <MetaData title="New Product" />
+            <Box sx={{ display: 'flex', minHeight: '100%' }}>
+                <Box sx={{ width: { xs: '100%', md: 240 }, flexShrink: 0 }}>
                     <Sidebar />
-                </div>
+                </Box>
+                <Container maxWidth="lg" sx={{ py: { xs: 3, md: 6 }, flex: 1 }}>
+                    <Paper
+                        component="form"
+                        onSubmit={formik.handleSubmit}
+                        noValidate
+                        encType="multipart/form-data"
+                        elevation={3}
+                        sx={{ p: { xs: 2.5, sm: 4 }, borderRadius: 3 }}
+                    >
+                        <Typography variant="h4" component="h1" fontWeight={700} gutterBottom>
+                            New Product
+                        </Typography>
+                        <Typography color="text.secondary" sx={{ mb: 3 }}>
+                            Add product information and upload product images below.
+                        </Typography>
 
-                <div className="col-12 col-md-10">
-                    <>
-                        <div className="wrapper my-5">
-                            <form className="shadow-lg" onSubmit={submitHandler} encType='multipart/form-data'>
-                                <h1 className="mb-4">New Product</h1>
-
-                                <div className="form-group">
-                                    <label htmlFor="name_field">Name</label>
-                                    <input
-                                        type="text"
-                                        id="name_field"
-                                        className="form-control"
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label htmlFor="price_field">Price</label>
-                                    <input
-                                        type="text"
-                                        id="price_field"
-                                        className="form-control"
-                                        value={price}
-                                        onChange={(e) => setPrice(e.target.value)}
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label htmlFor="description_field">Description</label>
-                                    <textarea className="form-control" id="description_field" rows="8" value={description} onChange={(e) => setDescription(e.target.value)}></textarea>
-                                </div>
-
-                                <div className="form-group">
-                                    <label htmlFor="category_field">Category</label>
-                                    <select className="form-control" id="category_field" value={category} onChange={(e) => setCategory(e.target.value)}>
-                                        {categories.map(category => (
-                                            <option key={category} value={category} >{category}</option>
-                                        ))}
-
-                                    </select>
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="stock_field">Stock</label>
-                                    <input
-                                        type="number"
-                                        id="stock_field"
-                                        className="form-control"
-                                        value={stock}
-                                        onChange={(e) => setStock(e.target.value)}
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label htmlFor="seller_field">Seller Name</label>
-                                    <input
-                                        type="text"
-                                        id="seller_field"
-                                        className="form-control"
-                                        value={seller}
-                                        onChange={(e) => setSeller(e.target.value)}
-                                    />
-                                </div>
-
-                                <div className='form-group'>
-                                    <label>Images</label>
-
-                                    <div className='custom-file'>
-                                        <input
-                                            type='file'
-                                            name='images'
-                                            className='custom-file-input'
-                                            id='customFile'
-                                            onChange={onChange}
-                                            multiple
-                                        />
-                                        <label className='custom-file-label' htmlFor='customFile'>
-                                            Choose Images
-                                        </label>
-                                    </div>
-
-                                    {imagesPreview.map(img => (
-                                        <img src={img} key={img} alt="Images Preview" className="mt-3 mr-2" width="55" height="52" />
-                                    ))}
-
-                                </div>
-
-
-                                <button
-                                    id="login_button"
-                                    type="submit"
-                                    className="btn btn-block py-3"
-                                // disabled={loading ? true : false}
+                        <Stack spacing={2.5}>
+                            <TextField
+                                id="name_field"
+                                label="Product name"
+                                {...formik.getFieldProps('name')}
+                                error={Boolean(fieldError('name'))}
+                                helperText={fieldError('name') || ' '}
+                                fullWidth
+                            />
+                            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                                <TextField
+                                    id="price_field"
+                                    label="Price"
+                                    type="number"
+                                    {...formik.getFieldProps('price')}
+                                    error={Boolean(fieldError('price'))}
+                                    helperText={fieldError('price') || ' '}
+                                    inputProps={{ min: 0, step: '0.01' }}
+                                    fullWidth
+                                />
+                                <TextField
+                                    id="stock_field"
+                                    label="Stock"
+                                    type="number"
+                                    {...formik.getFieldProps('stock')}
+                                    error={Boolean(fieldError('stock'))}
+                                    helperText={fieldError('stock') || ' '}
+                                    inputProps={{ min: 0, step: '1' }}
+                                    fullWidth
+                                />
+                            </Stack>
+                            <TextField
+                                id="seller_field"
+                                label="Seller name"
+                                {...formik.getFieldProps('seller')}
+                                error={Boolean(fieldError('seller'))}
+                                helperText={fieldError('seller') || ' '}
+                                fullWidth
+                            />
+                            <FormControl fullWidth error={Boolean(fieldError('category'))}>
+                                <InputLabel id="category-label">Category</InputLabel>
+                                <Select
+                                    labelId="category-label"
+                                    id="category_field"
+                                    label="Category"
+                                    {...formik.getFieldProps('category')}
                                 >
-                                    CREATE
-                                </button>
+                                    {categories.map(category => (
+                                        <MenuItem key={category} value={category}>{category}</MenuItem>
+                                    ))}
+                                </Select>
+                                <FormHelperText>{fieldError('category') || ' '}</FormHelperText>
+                            </FormControl>
+                            <TextField
+                                id="description_field"
+                                label="Description"
+                                {...formik.getFieldProps('description')}
+                                error={Boolean(fieldError('description'))}
+                                helperText={fieldError('description') || ' '}
+                                multiline
+                                minRows={6}
+                                fullWidth
+                            />
 
-                            </form>
-                        </div>
-                    </>
-                </div>
-            </div>
+                            <Box>
+                                <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+                                    Product images
+                                </Typography>
+                                <Button variant="outlined" component="label">
+                                    Choose images
+                                    <input
+                                        hidden
+                                        type="file"
+                                        name="images"
+                                        id="images_field"
+                                        accept="image/*"
+                                        onChange={onChange}
+                                        multiple
+                                    />
+                                </Button>
+                                <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mt: 2 }}>
+                                    {imagesPreview.map(img => (
+                                        <Box
+                                            component="img"
+                                            src={img}
+                                            key={img}
+                                            alt="Product preview"
+                                            sx={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 1 }}
+                                        />
+                                    ))}
+                                </Stack>
+                            </Box>
 
+                            <Button type="submit" variant="contained" size="large" fullWidth>
+                                Create product
+                            </Button>
+                        </Stack>
+                    </Paper>
+                </Container>
+            </Box>
         </>
     )
 }

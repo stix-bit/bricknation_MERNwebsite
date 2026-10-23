@@ -15,6 +15,8 @@ const {
     deleteUser,
     getUserDetails,
     updateUser,
+    softDeleteUser,
+    restoreUser,
     logout
 } = require('../controllers/auth');
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth')
@@ -30,6 +32,8 @@ router.put('/me/update', isAuthenticatedUser, upload.single("avatar"), updatePro
 router.put('/password/update', isAuthenticatedUser, updatePassword)
 router.get('/logout', isAuthenticatedUser, logout)
 router.get('/admin/users', isAuthenticatedUser, authorizeRoles('admin'), allUsers)
+router.patch('/admin/user/:id/soft-delete', isAuthenticatedUser, authorizeRoles('admin'), softDeleteUser)
+router.patch('/admin/user/:id/restore', isAuthenticatedUser, authorizeRoles('admin'), restoreUser)
 router.route('/admin/user/:id').get(isAuthenticatedUser, authorizeRoles('admin'), getUserDetails).delete(isAuthenticatedUser, authorizeRoles('admin'), deleteUser).put(isAuthenticatedUser, authorizeRoles('admin'), updateUser)
 
 module.exports = router;

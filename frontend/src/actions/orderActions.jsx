@@ -42,11 +42,13 @@ export const createOrder = (order) => async (dispatch) => {
             type: CREATE_ORDER_SUCCESS,
             payload: data
         })
+        return data
     } catch (error) {
         dispatch({
             type: CREATE_ORDER_FAIL,
-            payload: error.response.data.message
+            payload: error.response?.data?.message || error.message || 'Unable to create order'
         })
+        return error.response?.data?.message || error.message || 'Unable to create order'
     }
 
 }

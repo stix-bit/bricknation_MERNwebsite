@@ -65,6 +65,43 @@ nav {
 .avatar-nav { width: 30px; height: 30px; margin: 0 .35rem 0 0; display: inline-block; }
 .avatar-nav img { width: 100%; height: 100%; object-fit: cover; }
 
+.product-carousel .carousel-control-next {
+  right: .75rem;
+  width: 3.25rem;
+  height: 3.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: var(--red);
+  opacity: 1;
+  box-shadow: 0 4px 12px rgba(23, 21, 27, .3);
+}
+.product-carousel .carousel-control-next:hover,
+.product-carousel .carousel-control-next:focus-visible {
+  background: var(--red-dark);
+  opacity: 1;
+}
+.product-carousel .carousel-control-prev {
+  left: .75rem;
+  width: 3.25rem;
+  height: 3.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: var(--red);
+  opacity: 1;
+  box-shadow: 0 4px 12px rgba(23, 21, 27, .3);
+}
+.product-carousel .carousel-control-prev:hover,
+.product-carousel .carousel-control-prev:focus-visible {
+  background: var(--red-dark);
+  opacity: 1;
+}
+.product-carousel .carousel-control-prev span:not(.carousel-control-prev-icon),
+.product-carousel .carousel-control-next span:not(.carousel-control-next-icon) {
+  display: none;
+}
+
 .storefront { background: var(--cream); }
 .hero-banner { min-height: 430px; margin: 0 4.5vw; border-radius: 0 0 10px 10px; overflow: hidden; display: flex; position: relative; background: var(--red); color: #fff; }
 .hero-banner::before { content: ''; position: absolute; inset: 0 0 0 52%; background: var(--yellow); clip-path: polygon(25% 0, 100% 0, 100% 100%, 0 100%); }
@@ -84,6 +121,53 @@ nav {
 .feature-strip strong { font-size: .9rem; }
 .feature-strip small { color: var(--muted); font-size: .75rem; }
 .container-fluid.px-4 { padding: 0 4.5rem !important; }
+.sidebar-wrapper { padding: 1rem 0; }
+.sidebar-wrapper #sidebar {
+  padding: 1.25rem .85rem;
+  background: #fff;
+  border: 1px solid #eee7df;
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(45, 24, 10, .05);
+}
+.sidebar-wrapper #sidebar .components {
+  display: flex;
+  flex-direction: column;
+  gap: .55rem;
+  margin: 0;
+}
+.sidebar-wrapper #sidebar .components > li { width: 100%; }
+.sidebar-wrapper #sidebar a {
+  display: flex;
+  align-items: center;
+  min-height: 2.8rem;
+  gap: .75rem;
+  padding: .7rem .85rem;
+  border-radius: 5px;
+  color: var(--ink);
+  text-decoration: none;
+  transition: background-color .2s ease, color .2s ease;
+}
+.sidebar-wrapper #sidebar a:hover,
+.sidebar-wrapper #sidebar a:focus-visible {
+  background: #fff4e6;
+  color: var(--red);
+}
+.sidebar-wrapper #sidebar a .fa {
+  width: 1.1rem;
+  text-align: center;
+  color: var(--red);
+}
+.sidebar-wrapper #sidebar #productSubmenu {
+  margin: .35rem 0 .1rem 1.1rem;
+  padding-left: .75rem;
+  border-left: 2px solid #f4d36a;
+}
+.sidebar-wrapper #sidebar #productSubmenu li + li { margin-top: .25rem; }
+.sidebar-wrapper #sidebar #productSubmenu a {
+  min-height: 2.35rem;
+  padding: .5rem .7rem;
+  font-size: .9rem;
+}
 .section-heading { display: flex; align-items: end; justify-content: space-between; padding: 4rem 0 1rem; }
 .section-heading h2 { margin: .45rem 0 0; font-size: 2rem; text-transform: uppercase; letter-spacing: -.05em; }
 .heading-accent { color: var(--red); font-size: .7rem; font-weight: 700; letter-spacing: .12em; }
@@ -195,6 +279,45 @@ footer { margin-top: 5rem; color: #fff; background: var(--ink); width: 100%; }
 
 #login_button:hover {
   background: var(--red-dark);
+}
+
+.sales-chart-card {
+  background: #fff;
+  border: 1px solid #eee7df;
+  border-radius: 8px;
+  box-shadow: 0 4px 18px rgba(45, 24, 10, .04);
+}
+
+.sales-chart-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.sales-chart-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: .75rem;
+}
+
+.sales-chart-filters label {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.sales-chart-filters .form-control {
+  min-width: 150px;
+  margin-top: .25rem;
+}
+
+.sales-chart-wrap {
+  width: 100%;
+  min-height: 360px;
 }
 
 @media (max-width: 768px) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from "react-router-dom";
 import MetaData from '../Layout/MetaData'
 import Sidebar from './SideBar'
@@ -6,16 +6,27 @@ import Sidebar from './SideBar'
 import { errMsg, successMsg, getToken } from '../../Utils/helpers';
 
 import axios from 'axios';
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
 
 const UpdateUser = () => {
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [role, setRole] = useState('')
-    const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
     const [user, setUser] = useState(true)
     const [isUpdated, setIsUpdated] = useState(false)
     let navigate = useNavigate();
+    const formik = useFormik({
+        enableReinitialize: true,
+        initialValues: { name, email, role },
+        validationSchema: Yup.object({
+            name: Yup.string().trim().required('Name is required'),
+            email: Yup.string().email('Enter a valid email').required('Email is required'),
+            role: Yup.string().oneOf(['user', 'admin']).required('Role is required')
+        }),
+        onSubmit: values => updateUser(user._id, values)
+    })
 
     const { id } = useParams();
     const config = {
@@ -29,7 +40,6 @@ const UpdateUser = () => {
         try {
             const { data } = await axios.get(`${import.meta.env.VITE_API}/admin/user/${id}`, config)
             setUser(data.user)
-            setLoading(false)
 
         } catch (error) {
             setError(error.response.data.message)
@@ -40,13 +50,13 @@ const UpdateUser = () => {
         try {
             const { data } = await axios.put(`${import.meta.env.VITE_API}/admin/user/${id}`, userData, config)
             setIsUpdated(data.success)
-            setLoading(false)
 
         } catch (error) {
             setError(error.response.data.message)
         }
     }
 
+    /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
     useEffect(() => {
         // console.log(user && user._id !== userId);
         if (user && user._id !== id) {
@@ -66,15 +76,7 @@ const UpdateUser = () => {
 
         }
     }, [error, isUpdated, id, user])
-    const submitHandler = (e) => {
-        e.preventDefault();
-        const formData = new FormData();
-        formData.set('name', name);
-        formData.set('email', email);
-        formData.set('role', role);
-        updateUser(user._id, formData)
-    }
-
+    /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
     return (
         <>
             <MetaData title={`Update User`} />
@@ -85,7 +87,7 @@ const UpdateUser = () => {
                 <div className="col-12 col-md-10">
                     <div className="row wrapper">
                         <div className="col-10 col-lg-5">
-                            <form className="shadow-lg" onSubmit={submitHandler}>
+                            <form className="shadow-lg" onSubmit={formik.handleSubmit} noValidate>
                                 <h1 className="mt-2 mb-5">Update User</h1>
                                 <div className="form-group">
                                     <label htmlFor="name_field">Name</label>
@@ -94,9 +96,9 @@ const UpdateUser = () => {
                                         id="name_field"
                                         className="form-control"
                                         name='name'
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
+                                        {...formik.getFieldProps('name')}
                                     />
+                                    {formik.touched.name && formik.errors.name && <small className="text-danger">{formik.errors.name}</small>}
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="email_field">Email</label>
@@ -105,9 +107,9 @@ const UpdateUser = () => {
                                         id="email_field"
                                         className="form-control"
                                         name='email'
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        {...formik.getFieldProps('email')}
                                     />
+                                    {formik.touched.email && formik.errors.email && <small className="text-danger">{formik.errors.email}</small>}
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="role_field">Role</label>
@@ -115,8 +117,7 @@ const UpdateUser = () => {
                                         id="role_field"
                                         className="form-control"
                                         name='role'
-                                        value={role}
-                                        onChange={(e) => setRole(e.target.value)}
+                                        {...formik.getFieldProps('role')}
                                     >
                                         <option value="user">user</option>
                                         <option value="admin">admin</option>

@@ -1,5 +1,7 @@
 const Order = require('../models/order');
 const Product = require('../models/product');
+const mongoose = require('mongoose');
+const { sendOrderEmail } = require('../utils/orderEmail');
 
 
 
@@ -16,22 +18,65 @@ exports.newOrder = async (req, res, next) => {
 
     } = req.body;
 
-    const order = await Order.create({
-        orderItems,
-        shippingInfo,
-        itemsPrice,
-        taxPrice,
-        shippingPrice,
-        totalPrice,
-        paymentInfo,
-        paidAt: Date.now(),
-        user: req.user._id
-    })
+    const session = await mongoose.startSession()
 
-    res.status(200).json({
-        success: true,
-        order
-    })
+    try {
+        session.startTransaction()
+
+        for (const item of orderItems) {
+            const product = await Product.findOneAndUpdate(
+                { _id: item.product, stock: { $gte: item.quantity }, isArchived: { $ne: true } },
+                { $inc: { stock: -item.quantity } },
+                { new: true, session }
+            )
+
+            if (!product) {
+                const error = new Error(`Insufficient stock or unavailable product: ${item.name}`)
+                error.statusCode = 400
+                throw error
+            }
+        }
+
+        const [order] = await Order.create([{
+            orderItems,
+            shippingInfo,
+            itemsPrice,
+            taxPrice,
+            shippingPrice,
+            totalPrice,
+            paymentInfo,
+            paidAt: Date.now(),
+            user: req.user._id
+        }], { session })
+
+        await session.commitTransaction()
+
+        const orderForEmail = await Order.findById(order._id).populate('user', 'name email')
+        let emailSent = true
+        try {
+            await sendOrderEmail(
+                orderForEmail,
+                'Your BrickNation order confirmation',
+                'Thank you for your order!'
+            )
+        } catch (emailError) {
+            emailSent = false
+            console.error('Order confirmation email failed:', emailError.message)
+        }
+
+        return res.status(200).json({
+            success: true,
+            order,
+            emailSent
+        })
+    } catch (error) {
+        if (session.inTransaction()) {
+            await session.abortTransaction()
+        }
+        return next(error)
+    } finally {
+        await session.endSession()
+    }
 }
 
 exports.myOrders = async (req, res, next) => {
@@ -91,32 +136,39 @@ exports.deleteOrder = async (req, res, next) => {
 
 exports.updateOrder = async (req, res, next) => {
     const order = await Order.findById(req.params.id)
-    console.log(req.body.order)
-    if (order.orderStatus === 'Delivered') {
-        return res.status(400).json({
-            message: 'You have already delivered this order',
-
+    if (!order) {
+        return res.status(404).json({
+            message: 'No Order found with this ID'
         })
     }
 
-    order.orderItems.forEach(async item => {
-        await updateStock(item.product, item.quantity)
-    })
+    if (order.orderStatus === 'Delivered') {
+        return res.status(400).json({
+            message: 'You have already delivered this order',
+        })
+    }
 
     order.orderStatus = req.body.status
     order.deliveredAt = Date.now()
     await order.save()
-    res.status(200).json({
+
+    let emailSent = true
+    try {
+        const orderForEmail = await Order.findById(order._id).populate('user', 'name email')
+        await sendOrderEmail(
+            orderForEmail,
+            `Your BrickNation order status is now ${order.orderStatus}`,
+            `Your order status has been updated to ${order.orderStatus}.`
+        )
+    } catch (emailError) {
+        emailSent = false
+        console.error('Order status email failed:', emailError.message)
+    }
+
+    return res.status(200).json({
         success: true,
+        emailSent
     })
-}
-
-async function updateStock(id, quantity) {
-    const product = await Product.findById(id);
-
-    product.stock = product.stock - quantity;
-
-    await product.save({ validateBeforeSave: false })
 }
 
 exports.totalOrders = async (req, res, next) => {

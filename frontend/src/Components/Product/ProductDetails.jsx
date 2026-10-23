@@ -53,7 +53,7 @@ const ProductDetails = () => {
             <Box className="row d-flex justify-content-around" sx={{ rowGap: 3 }}>
                 <div className="col-12 col-lg-5 img-fluid" id="product_image">
                     <Paper elevation={3} sx={{ p: 2, borderRadius: 2 }}>
-                        <Carousel pause="hover">
+                        <Carousel pause="hover" className="product-carousel">
                             {product.images && product.images.map(image => (
                                 <Carousel.Item key={image.public_id}>
                                     <img className="d-block w-100" src={image.url} alt={product.name} />
@@ -65,7 +65,6 @@ const ProductDetails = () => {
                 <div className="col-12 col-lg-5 mt-5">
                     <Paper elevation={2} sx={{ p: 3, textAlign: 'left', borderRadius: 2 }}>
                         <Typography variant="h4" component="h1" sx={{ fontWeight: 600 }}>{product.name}</Typography>
-                        <Typography id="product_id" variant="body2" sx={{ mt: 1 }}>Product # {product._id}</Typography>
                         <Divider sx={{ my: 2 }} />
                         <Stack direction="row" alignItems="center" spacing={1.5}>
                             <Rating value={product.ratings || 0} precision={0.5} readOnly size="small" />

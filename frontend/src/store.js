@@ -7,12 +7,12 @@ import {
     newProductReducer,
     productReducer,
     newReviewReducer,
-
-
+    adminReviewsReducer,
 } from './reducers/productReducers'
 import {
     authReducer,
     userReducer,
+    allUsersReducer,
     forgotPasswordReducer,
     // allUsersReducer,
     // userDetailsReducer, 
@@ -52,6 +52,7 @@ const reducer = combineReducers({
     productDetails: productDetailsReducer,
     auth: authReducer,
     user: userReducer,
+    allUsers: allUsersReducer,
     forgotPassword: forgotPasswordReducer,
     newProduct: newProductReducer,
     cart: cartReducer,
@@ -60,6 +61,7 @@ const reducer = combineReducers({
     orderDetails: orderDetailsReducer,
     product: productReducer,
     newReview: newReviewReducer,
+    adminReviews: adminReviewsReducer,
     allOrders: allOrdersReducer,
     order: orderReducer,
     // allUsers: allUsersReducer,

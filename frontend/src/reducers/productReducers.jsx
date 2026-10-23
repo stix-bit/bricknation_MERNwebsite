@@ -38,6 +38,12 @@ import {
     BULK_UNARCHIVE_PRODUCTS_SUCCESS,
     BULK_UNARCHIVE_PRODUCTS_FAIL,
     BULK_PRODUCTS_RESET,
+    GET_REVIEWS_REQUEST,
+    GET_REVIEWS_SUCCESS,
+    GET_REVIEWS_FAIL,
+    DELETE_REVIEW_REQUEST,
+    DELETE_REVIEW_SUCCESS,
+    DELETE_REVIEW_FAIL,
     CLEAR_ERRORS
 } from '../constants/productConstants'
 
@@ -48,14 +54,19 @@ export const productsReducer = (state = { products: [] }, action) => {
             return {
                 ...state,
                 loading: true,
-                products: []
+                products: action.append ? state.products : []
             }
+
 
         case ALL_PRODUCTS_SUCCESS:
             return {
                 ...state,
                 loading: false,
-                products: action.payload.products,
+                products: action.meta?.append
+                    ? [...state.products, ...action.payload.products.filter(product =>
+                        !state.products.some(existingProduct => existingProduct._id === product._id)
+                    )]
+                    : action.payload.products,
                 productsCount: action.payload.productsCount,
                 resPerPage: action.payload.resPerPage,
                 filteredProductsCount: action.payload.filteredProductsCount
@@ -248,6 +259,7 @@ export const newReviewReducer = (state = {}, action) => {
                 error: null,
                 success: false
             }
+
         case NEW_REVIEW_SUCCESS:
             return {
                 ...state,
@@ -256,6 +268,8 @@ export const newReviewReducer = (state = {}, action) => {
                 message: action.payload.message,
                 error: null
             }
+
+
         case NEW_REVIEW_FAIL:
             return {
                 ...state,
@@ -298,4 +312,29 @@ export const newReviewReducer = (state = {}, action) => {
             return state
     }
 
+}
+
+export const adminReviewsReducer = (state = { reviews: [] }, action) => {
+    switch (action.type) {
+        case GET_REVIEWS_REQUEST:
+            return { ...state, loading: true, error: null }
+        case GET_REVIEWS_SUCCESS:
+            return { loading: false, reviews: action.payload, error: null }
+        case GET_REVIEWS_FAIL:
+            return { ...state, loading: false, error: action.payload }
+        case DELETE_REVIEW_REQUEST:
+            return { ...state, deleting: true, error: null }
+        case DELETE_REVIEW_SUCCESS:
+            return {
+                ...state,
+                deleting: false,
+                reviews: state.reviews.filter(review => review._id !== action.payload)
+            }
+        case DELETE_REVIEW_FAIL:
+            return { ...state, deleting: false, error: action.payload }
+        case CLEAR_ERRORS:
+            return { ...state, error: null }
+        default:
+            return state
+    }
 }

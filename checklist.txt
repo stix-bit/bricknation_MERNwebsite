@@ -11,30 +11,30 @@ category filter 5pts
 ratings filter 5pts
 review filter 5pts
 
-mp3 review ratings 20pts 
-users who availed of the product/service can write a review and rate the product 10pts✅
-users can update their own review/rating. 5pts✅
+mp3 review ratings 20pts ✅
+users who availed of the product/service can write a review and rate the product 10pts
+users can update their own review/rating. 5pts
 admin can delete a review 5pts.
 
-term test lab 30pts
+term test lab 30pts ✅
 completed transaction. 10pts
 admin updates the status of the transaction. 5pts 
 email the customer of the updated transaction details. the email contains the list of products, their subtotal and grand total. 5pts
 attach a pdf receipt on the email 10pts
 
-unit 1 20pts 
+unit 1 20pts ✅
 filter/mask bad words from reviews. bad-words package 10pts
 form validation on product and user forms. (product crud, user login, update profile) YUP formik React Hook FCorm 10pts
 
 unit 2 20pts
  # user interface design css 10pts 
  # user interface design css and bootstrap components 15pts
-user interface design css and Material UI (MUI) or similar library components 20pts
+user interface design css and Material UI (MUI) or similar library components 20pts ✅
 
-quiz 2 15pts
+quiz 2 15pts ✅
 sales charts with date range filter.  line or bar chart 15pts
 
-quiz 3
+quiz 3 ✅
  # pagination on products list on homepage. 10pts
 infinite scroll on products list on homepage. 15pts
 
@@ -42,7 +42,7 @@ quiz 4 -> ✅
 facebook or gmail login 15pts react-facebook-login or similar packages.
 facebook or gmail login using firebase|supabase|clerk 15pts
 
-term test LEC
+term test LEC ✅
 functional requirements completeness 10pts
 program execution (errors).  10pts
 project contribution 10pts
@@ -58,7 +58,7 @@ ADDITIONAL/OPTIONAL:
 5. Make transaction be the usual .startTransaction() with rollback features
 6. For changing user roles, when you change your own role, make it so that you change it on 
     your own profile and will log the user out after confirming
-7. Make registers send you to the login page and not home page
-8. Make reviews restricted to only people that bought the products
-9. Make admin reviews, search the customer's user id and then view all of their comments on different products, and on the product details page make admins be able to have an delete comment function that is like the ... to edit
+7. Make registers send you to the login page and not home page 
+8. Make reviews restricted to only people that bought the products ✅
+9. Make admin reviews page, search the product id and then view all of the comments on the producs
 10. Add payment gateway using XENDIT Test Mode

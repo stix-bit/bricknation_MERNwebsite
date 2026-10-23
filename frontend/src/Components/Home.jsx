@@ -1,14 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import MetaData from './Layout/MetaData'
 import Product from './Product/Product'
 import Loader from './Layout/Loader'
-// import Stack from '@mui/material/Stack'
-import Stack from '@mui/material/Stack'
-import Pagination from '@mui/material/Pagination'
 import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
 import { useDispatch, useSelector } from 'react-redux'
 import { getProducts } from '../actions/productActions'
 
@@ -30,9 +28,8 @@ const Home = () => {
     let { keyword } = useParams();
 
     const dispatch = useDispatch();
-    const { loading, products, productsCount, resPerPage, filteredProductsCount } = useSelector(state => state.products);
-
-    let count = productsCount;
+    const { loading, products, filteredProductsCount } = useSelector(state => state.products);
+    const loadMoreRef = useRef(null)
     // console.log(products)
     // const getProducts = async (keyword = '', price, page = 1) => {
 
@@ -48,10 +45,6 @@ const Home = () => {
     // }
     // getProducts()
     // console.log(products)
-
-    if (keyword) {
-        count = filteredProductsCount
-    }
 
     const handlePriceChange = (index, value) => {
         const numericValue = value === '' ? '' : Number(value)
@@ -101,8 +94,19 @@ const Home = () => {
     }, [])
 
     useEffect(() => {
-        dispatch(getProducts(currentPage, keyword, price, category, rating, reviews))
+        dispatch(getProducts(currentPage, keyword, price, category, rating, reviews, currentPage > 1))
     }, [currentPage, keyword, price, category, rating, reviews, dispatch]);
+
+    useEffect(() => {
+        const loadMore = entries => {
+            if (entries[0].isIntersecting && !loading && products.length < filteredProductsCount) {
+                setCurrentPage(page => page + 1)
+            }
+        }
+        const observer = new IntersectionObserver(loadMore, { rootMargin: '300px' })
+        if (loadMoreRef.current) observer.observe(loadMoreRef.current)
+        return () => observer.disconnect()
+    }, [filteredProductsCount, loading, products.length])
 
     const resetFilters = () => {
         setPrice([0, 100000])
@@ -118,7 +122,7 @@ const Home = () => {
     return (
         <>
             <MetaData title={'shop Here'} />
-            {loading ? <Loader /> :
+            {loading && currentPage === 1 ? <Loader /> :
                 (<div className="storefront">
                     <section className="hero-banner">
                         <div className="hero-copy">
@@ -318,26 +322,9 @@ const Home = () => {
                             )}
 
                         </div>
-                        {resPerPage < count && (
-                            <div className="d-flex justify-content-center mt-5">
-                                <Stack spacing={2}>
-                                    <Pagination
-                                        count={Math.ceil(count / resPerPage)}
-                                        page={currentPage}
-                                        onChange={(event, value) => setCurrentPage(value)}
-
-                                        color="primary"
-                                        variant="outlined"
-                                        shape="rounded"
-                                        showFirstButton
-                                        showLastButton
-                                        size="large"
-                                        sx={{
-                                            backgroundColor: 'white',
-
-                                        }}
-                                    />
-                                </Stack>
+                        {products.length < filteredProductsCount && (
+                            <div ref={loadMoreRef} className="d-flex justify-content-center mt-5" style={{ minHeight: 48 }}>
+                                {loading && <CircularProgress size={32} />}
                             </div>
                         )}
                     </section>

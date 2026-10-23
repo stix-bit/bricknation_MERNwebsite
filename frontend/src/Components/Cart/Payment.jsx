@@ -1,23 +1,30 @@
-import React, { Fragment, useEffect, useState } from 'react'
 import { useNavigate } from "react-router-dom";
 import MetaData from '../Layout/MetaData'
 import CheckoutSteps from './CheckoutSteps'
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-// import { getToken } from '../../Utils/helpers';
 import { useDispatch, useSelector } from 'react-redux'
-import { createOrder, clearErrors } from '../../actions/orderActions'
+import { createOrder } from '../../actions/orderActions'
 import { clearCart } from '../../actions/cartActions';
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
 
 
 const Payment = () => {
     const dispatch = useDispatch();
     const { cartItems, shippingInfo } = useSelector(state => state.cart)
-    const { error, loading } = useSelector(state => state.newOrder)
-
-    // const [loading, setLoading] = useState(true)
     let navigate = useNavigate();
+    const formik = useFormik({
+        initialValues: { cardNumber: '', expiry: '', cvc: '' },
+        validationSchema: Yup.object({
+            cardNumber: Yup.string().matches(/^\d{16}$/, 'Card number must contain 16 digits').required('Card number is required'),
+            expiry: Yup.string().matches(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Use MM/YY format').required('Expiry is required'),
+            cvc: Yup.string().matches(/^\d{3,4}$/, 'CVC must contain 3 or 4 digits').required('CVC is required')
+        }),
+        onSubmit: async () => {
+            await submitOrder()
+        }
+    })
     // useEffect(() => {
     // }, [])
 
@@ -60,19 +67,29 @@ const Payment = () => {
     //     }
     // }
 
-    const submitHandler = async (e) => {
-        e.preventDefault();
+    const submitOrder = async () => {
         document.querySelector('#pay_btn').disabled = true;
-        order.paymentInfo = {
-            id: 'pi_1DpdYh2eZvKYlo2CYIynhU32',
-            status: 'succeeded'
+        const checkoutOrder = {
+            ...order,
+            paymentInfo: {
+                id: 'pi_1DpdYh2eZvKYlo2CYIynhU32',
+                status: 'succeeded'
+            }
         }
-        dispatch(createOrder(order))
-        toast.success('order created', {
-            position: 'bottom-right'
-        })
-        dispatch(clearCart())
-        navigate('/success')
+        const result = await dispatch(createOrder(checkoutOrder))
+        if (result && typeof result !== 'string') {
+            toast.success('Order created successfully', {
+                position: 'bottom-right'
+            })
+            dispatch(clearCart())
+            sessionStorage.removeItem('orderInfo')
+            navigate('/success')
+        } else {
+            document.querySelector('#pay_btn').disabled = false
+            toast.error(result || 'Unable to create order', {
+                position: 'bottom-right'
+            })
+        }
     }
 
     return (
@@ -81,7 +98,7 @@ const Payment = () => {
             <CheckoutSteps shipping confirmOrder payment />
             <div className="row wrapper">
                 <div className="col-10 col-lg-5">
-                    <form className="shadow-lg" onSubmit={submitHandler}>
+                            <form className="shadow-lg" onSubmit={formik.handleSubmit} noValidate>
                         <h1 className="mb-4">Card Info</h1>
                         <div className="form-group">
                             <label htmlFor="card_num_field">Card Number</label>
@@ -89,8 +106,10 @@ const Payment = () => {
                                 type="text"
                                 id="card_num_field"
                                 className="form-control"
-
+                                inputMode="numeric"
+                                {...formik.getFieldProps('cardNumber')}
                             />
+                            {formik.touched.cardNumber && formik.errors.cardNumber && <small className="text-danger">{formik.errors.cardNumber}</small>}
                         </div>
 
                         <div className="form-group">
@@ -99,8 +118,10 @@ const Payment = () => {
                                 type="text"
                                 id="card_exp_field"
                                 className="form-control"
-
+                                placeholder="MM/YY"
+                                {...formik.getFieldProps('expiry')}
                             />
+                            {formik.touched.expiry && formik.errors.expiry && <small className="text-danger">{formik.errors.expiry}</small>}
                         </div>
 
                         <div className="form-group">
@@ -109,8 +130,10 @@ const Payment = () => {
                                 type="text"
                                 id="card_cvc_field"
                                 className="form-control"
-
+                                inputMode="numeric"
+                                {...formik.getFieldProps('cvc')}
                             />
+                            {formik.touched.cvc && formik.errors.cvc && <small className="text-danger">{formik.errors.cvc}</small>}
                         </div>
                         <button
                             id="pay_btn"

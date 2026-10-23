@@ -47,6 +47,23 @@ body {
   box-sizing: border-box;
 }
 
+.app-shell {
+  min-height: 100%;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.app-shell > .navbar,
+.app-shell > header {
+  flex: 0 0 auto;
+}
+
+.app-shell > footer {
+  margin-top: auto;
+  flex: 0 0 auto;
+}
+
 h1,
 h2 {
   font-family: var(--heading);

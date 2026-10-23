@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 
 import Loader from '../Layout/Loader'
@@ -8,6 +8,8 @@ import 'react-toastify/dist/ReactToastify.css';
 // import axios from 'axios';
 // import { getUser, authenticate } from '../../Utils/helpers';
 import { useDispatch, useSelector } from 'react-redux'
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
 import { login, firebaseLogin, clearErrors } from '../../actions/userActions'
 import {
     signInWithFacebook,
@@ -16,17 +18,18 @@ import {
 
 const Login = () => {
     const { isAuthenticated, error, loading, } = useSelector(state => state.auth)
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const formik = useFormik({
+        initialValues: { email: '', password: '' },
+        validationSchema: Yup.object({
+            email: Yup.string().email('Enter a valid email').required('Email is required'),
+            password: Yup.string().required('Password is required')
+        }),
+        onSubmit: values => dispatch(login(values.email, values.password))
+    })
     // const [loading, setLoading] = useState(false)
     let navigate = useNavigate()
     let location = useLocation()
     const dispatch = useDispatch()
-
-    const submitHandler = (e) => {
-        e.preventDefault();
-        dispatch(login(email, password))
-    }
 
     const socialLoginHandler = async (providerLogin) => {
         try {
@@ -90,7 +93,8 @@ const Login = () => {
                     <main className="login-page">
                         <div className="login-card">
                             <form
-                                onSubmit={submitHandler}
+                                onSubmit={formik.handleSubmit}
+                                noValidate
                             >
                                 <h1 className="mb-3">Login</h1>
                                 <div className="form-group">
@@ -99,9 +103,9 @@ const Login = () => {
                                         type="email"
                                         id="email_field"
                                         className="form-control"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        {...formik.getFieldProps('email')}
                                     />
+                                    {formik.touched.email && formik.errors.email && <small className="text-danger">{formik.errors.email}</small>}
                                 </div>
 
                                 <div className="form-group">
@@ -110,9 +114,9 @@ const Login = () => {
                                         type="password"
                                         id="password_field"
                                         className="form-control"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
+                                        {...formik.getFieldProps('password')}
                                     />
+                                    {formik.touched.password && formik.errors.password && <small className="text-danger">{formik.errors.password}</small>}
                                 </div>
 
                                 <Link to="/password/forgot" className="float-right mb-4">Forgot Password?</Link>

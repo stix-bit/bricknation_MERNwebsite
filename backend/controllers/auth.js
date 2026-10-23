@@ -94,6 +94,13 @@ exports.firebaseLogin = async (req, res) => {
                 ...profile
             })
         } else {
+            if (user.isDeleted) {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Your account is suspended. Please contact an administrator for assistance.'
+                })
+            }
+
             user = await User.findByIdAndUpdate(user._id, profile, {
                 new: true,
                 runValidators: true
@@ -129,6 +136,12 @@ exports.loginUser = async (req, res, next) => {
     let user = await User.findOne({ email }).select('+password')
     if (!user) {
         return res.status(401).json({ message: 'Invalid Email or Password' })
+    }
+
+    if (user.isDeleted) {
+        return res.status(403).json({
+            message: 'Your account is suspended. Please contact an administrator for assistance.'
+        })
     }
 
     const now = Date.now()
@@ -195,7 +208,7 @@ exports.forgotPassword = async (req, res, next) => {
     try {
         await sendEmail({
             email: user.email,
-            subject: 'ShopIT Password Recovery',
+            subject: 'BrickNation Password Recovery',
             message
         })
 
@@ -318,11 +331,35 @@ exports.updatePassword = async (req, res, next) => {
 }
 
 exports.allUsers = async (req, res, next) => {
-    const users = await User.find();
+    const users = await User.find().sort({ createdAt: -1 });
     res.status(200).json({
         success: true,
         users
     })
+}
+
+exports.softDeleteUser = async (req, res, next) => {
+    const user = await User.findByIdAndUpdate(
+        req.params.id,
+        { isDeleted: true },
+        { new: true }
+    )
+    if (!user) {
+        return res.status(404).json({ message: `User does not exist with id: ${req.params.id}` })
+    }
+    return res.status(200).json({ success: true, user })
+}
+
+exports.restoreUser = async (req, res, next) => {
+    const user = await User.findByIdAndUpdate(
+        req.params.id,
+        { isDeleted: false },
+        { new: true }
+    )
+    if (!user) {
+        return res.status(404).json({ message: `User does not exist with id: ${req.params.id}` })
+    }
+    return res.status(200).json({ success: true, user })
 }
 
 exports.deleteUser = async (req, res, next) => {
@@ -363,6 +400,9 @@ exports.updateUser = async (req, res, next) => {
         name: req.body.name,
         email: req.body.email,
         role: req.body.role
+    }
+    if (req.body.isDeleted !== undefined) {
+        newUserData.isDeleted = req.body.isDeleted === true || req.body.isDeleted === 'true'
     }
 
     const user = await User.findByIdAndUpdate(req.params.id, newUserData, {

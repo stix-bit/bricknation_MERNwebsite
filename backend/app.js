@@ -51,9 +51,11 @@ app.use((error, req, res, next) => {
     }
 
     console.error(`${req.method} ${req.originalUrl}:`, error)
-    return res.status(500).json({
+    return res.status(error.statusCode || 500).json({
         success: false,
-        message: `Product update failed due to a server error: ${error.message || 'Unknown error'}`
+        message: error.statusCode
+            ? error.message
+            : `Request failed due to a server error: ${error.message || 'Unknown error'}`
     })
 })
 

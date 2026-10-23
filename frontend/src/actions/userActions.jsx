@@ -3,9 +3,6 @@ import {
     LOGIN_REQUEST,
     LOGIN_SUCCESS,
     LOGIN_FAIL,
-    REGISTER_USER_REQUEST,
-    REGISTER_USER_SUCCESS,
-    REGISTER_USER_FAIL,
     LOAD_USER_REQUEST,
     LOAD_USER_SUCCESS,
     LOAD_USER_FAIL,
@@ -20,21 +17,21 @@ import {
     FORGOT_PASSWORD_REQUEST,
     FORGOT_PASSWORD_SUCCESS,
     FORGOT_PASSWORD_FAIL,
-    NEW_PASSWORD_REQUEST,
-    NEW_PASSWORD_SUCCESS,
-    NEW_PASSWORD_FAIL,
     ALL_USERS_REQUEST,
     ALL_USERS_SUCCESS,
     ALL_USERS_FAIL,
     UPDATE_USER_REQUEST,
     UPDATE_USER_SUCCESS,
     UPDATE_USER_FAIL,
-    USER_DETAILS_REQUEST,
-    USER_DETAILS_SUCCESS,
-    USER_DETAILS_FAIL,
     DELETE_USER_REQUEST,
     DELETE_USER_SUCCESS,
     DELETE_USER_FAIL,
+    SOFT_DELETE_USER_REQUEST,
+    SOFT_DELETE_USER_SUCCESS,
+    SOFT_DELETE_USER_FAIL,
+    RESTORE_USER_REQUEST,
+    RESTORE_USER_SUCCESS,
+    RESTORE_USER_FAIL,
     CLEAR_ERRORS
 } from '../constants/userConstants'
 
@@ -81,6 +78,86 @@ export const login = (email, password) => async (dispatch) => {
             type: LOGIN_FAIL,
             payload: error.response?.data?.message || error.message || 'Unable to log in'
         })
+    }
+
+}
+
+export const getAllUsers = () => async (dispatch) => {
+    try {
+        dispatch({ type: ALL_USERS_REQUEST })
+        const { data } = await axios.get(`${import.meta.env.VITE_API}/admin/users`, { withCredentials: true })
+        dispatch({ type: ALL_USERS_SUCCESS, payload: data.users })
+    } catch (error) {
+        dispatch({
+            type: ALL_USERS_FAIL,
+            payload: error.response?.data?.message || error.message || 'Unable to load users'
+        })
+    }
+}
+
+export const updateAdminUser = (id, userData) => async (dispatch) => {
+    try {
+        dispatch({ type: UPDATE_USER_REQUEST })
+        const { data } = await axios.put(`${import.meta.env.VITE_API}/admin/user/${id}`, userData, {
+            withCredentials: true
+        })
+        dispatch({ type: UPDATE_USER_SUCCESS, payload: data.success })
+        return true
+    } catch (error) {
+        dispatch({
+            type: UPDATE_USER_FAIL,
+            payload: error.response?.data?.message || error.message || 'Unable to update user'
+        })
+        return false
+    }
+}
+
+export const deleteAdminUser = (id) => async (dispatch) => {
+    try {
+        dispatch({ type: DELETE_USER_REQUEST })
+        await axios.delete(`${import.meta.env.VITE_API}/admin/user/${id}`, { withCredentials: true })
+        dispatch({ type: DELETE_USER_SUCCESS, payload: id })
+        return true
+    } catch (error) {
+        dispatch({
+            type: DELETE_USER_FAIL,
+            payload: error.response?.data?.message || error.message || 'Unable to delete user'
+        })
+        return false
+    }
+}
+
+export const softDeleteAdminUser = (id) => async (dispatch) => {
+    try {
+        dispatch({ type: SOFT_DELETE_USER_REQUEST })
+        await axios.patch(`${import.meta.env.VITE_API}/admin/user/${id}/soft-delete`, {}, {
+            withCredentials: true
+        })
+        dispatch({ type: SOFT_DELETE_USER_SUCCESS, payload: id })
+        return true
+    } catch (error) {
+        dispatch({
+            type: SOFT_DELETE_USER_FAIL,
+            payload: error.response?.data?.message || error.message || 'Unable to archive user'
+        })
+        return false
+    }
+}
+
+export const restoreAdminUser = (id) => async (dispatch) => {
+    try {
+        dispatch({ type: RESTORE_USER_REQUEST })
+        await axios.patch(`${import.meta.env.VITE_API}/admin/user/${id}/restore`, {}, {
+            withCredentials: true
+        })
+        dispatch({ type: RESTORE_USER_SUCCESS, payload: id })
+        return true
+    } catch (error) {
+        dispatch({
+            type: RESTORE_USER_FAIL,
+            payload: error.response?.data?.message || error.message || 'Unable to restore user'
+        })
+        return false
     }
 }
 

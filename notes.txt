@@ -8,7 +8,7 @@ read checklist.txt for full to do list
 6. For changing user roles, when you change your own role, make it so that you change it on 
     your own profile and will log the user out after confirming
 7. Make registers send you to the login page and not home page
-8. Make reviews restricted to only people that bought the products
+8. Make reviews restricted to only people that bought the products 
 9. Make admin reviews, search the customer's user id and then view all of their comments on different products, and on the product details page make admins be able to have an delete comment function that is like the ... to edit
 10. Add payment gateway using XENDIT Test Mode
 

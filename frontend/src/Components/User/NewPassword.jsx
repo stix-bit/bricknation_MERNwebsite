@@ -1,13 +1,21 @@
-import  {  useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from "react-router-dom";
 import MetaData from '../Layout/MetaData'
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
 
 const NewPassword = () => {
-    const [password, setPassword] = useState('')
-    const [confirmPassword, setConfirmPassword] = useState('')
+    const formik = useFormik({
+        initialValues: { password: '', confirmPassword: '' },
+        validationSchema: Yup.object({
+            password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
+            confirmPassword: Yup.string().oneOf([Yup.ref('password')], 'Passwords must match').required('Please confirm your password')
+        }),
+        onSubmit: values => resetPassword(token, values)
+    })
 
     let navigate = useNavigate();
     const [error, setError] = useState('')
@@ -45,22 +53,14 @@ const NewPassword = () => {
             navigate('/login')
         }
 
-    }, [error, success,])
-
-    const submitHandler = (e) => {
-        e.preventDefault();
-        const formData = new FormData();
-        formData.set('password', password);
-        formData.set('confirmPassword', confirmPassword);
-        resetPassword(token, formData)
-    }
+    }, [error, success, navigate])
 
     return (
         <>
             <MetaData title={'New Password Reset'} />
             <div className="row wrapper">
                 <div className="col-10 col-lg-5">
-                    <form className="shadow-lg" onSubmit={submitHandler}>
+                    <form className="shadow-lg" onSubmit={formik.handleSubmit} noValidate>
                         <h1 className="mb-3">New Password</h1>
 
                         <div className="form-group">
@@ -69,9 +69,9 @@ const NewPassword = () => {
                                 type="password"
                                 id="password_field"
                                 className="form-control"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                {...formik.getFieldProps('password')}
                             />
+                            {formik.touched.password && formik.errors.password && <small className="text-danger">{formik.errors.password}</small>}
                         </div>
 
                         <div className="form-group">
@@ -80,9 +80,9 @@ const NewPassword = () => {
                                 type="password"
                                 id="confirm_password_field"
                                 className="form-control"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                {...formik.getFieldProps('confirmPassword')}
                             />
+                            {formik.touched.confirmPassword && formik.errors.confirmPassword && <small className="text-danger">{formik.errors.confirmPassword}</small>}
                         </div>
 
                         <button

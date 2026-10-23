@@ -2,6 +2,7 @@ const Product = require('../models/product')
 const Order = require('../models/order')
 const Category = require('../models/category')
 const Review = require('../models/review')
+const { filterComment } = require('../utils/contentFilter')
 const Blueprint = require('../models/blueprint')
 const mongoose = require('mongoose')
 const cloudinary = require('cloudinary')
@@ -101,6 +102,7 @@ exports.getSingleProduct = async (req, res, next) => {
     const productResponse = product.toObject()
     productResponse.reviews = productResponse.reviews.map(review => ({
         ...review,
+        comment: filterComment(review.comment),
         user: review.user_id?._id,
         name: review.user_id?.name,
         avatar: review.user_id?.avatar
@@ -113,7 +115,7 @@ exports.getSingleProduct = async (req, res, next) => {
 
 exports.getProducts = async (req, res) => {
 
-    const resPerPage = 4;
+    const resPerPage = 10;
     const productsCount = await Product.countDocuments({ isArchived: { $ne: true } });
 
    // const products = await Product.find()
@@ -317,7 +319,8 @@ exports.bulkUnarchiveProducts = async (req, res, next) => {
 exports.createProductReview = async (req, res, next) => {
     const { rating, comment, productId } = req.body;
     const numericRating = Number(rating)
-    if (!Number.isInteger(numericRating) || numericRating < 1 || numericRating > 5 || !comment?.trim()) {
+    const filteredComment = filterComment(comment)
+    if (!Number.isInteger(numericRating) || numericRating < 1 || numericRating > 5 || !filteredComment) {
         return res.status(400).json({ success: false, message: 'Please provide a rating from 1 to 5 and a review' })
     }
     const product = await Product.findById(productId);
@@ -339,7 +342,7 @@ exports.createProductReview = async (req, res, next) => {
 
     await Review.findOneAndUpdate(
         { user_id: req.user._id, product_id: productId },
-        { rating: numericRating, comment: comment.trim() },
+        { rating: numericRating, comment: filteredComment },
         { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
     )
     const stats = await Review.aggregate([
@@ -379,7 +382,9 @@ exports.getMyProductReview = async (req, res, next) => {
         return res.status(200).json({
             success: true,
             canReview: true,
-            review
+            review: review
+                ? { ...review.toObject(), comment: filterComment(review.comment) }
+                : null
         })
     } catch (error) {
         return next(error)
@@ -394,6 +399,7 @@ exports.getProductReviews = async (req, res, next) => {
         success: true,
         reviews: reviews.map(review => ({
             ...review.toObject(),
+            comment: filterComment(review.comment),
             user: review.user_id?._id,
             name: review.user_id?.name,
             avatar: review.user_id?.avatar

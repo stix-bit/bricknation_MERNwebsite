@@ -33,6 +33,12 @@ import {
     BULK_UNARCHIVE_PRODUCTS_REQUEST,
     BULK_UNARCHIVE_PRODUCTS_SUCCESS,
     BULK_UNARCHIVE_PRODUCTS_FAIL,
+    GET_REVIEWS_REQUEST,
+    GET_REVIEWS_SUCCESS,
+    GET_REVIEWS_FAIL,
+    DELETE_REVIEW_REQUEST,
+    DELETE_REVIEW_SUCCESS,
+    DELETE_REVIEW_FAIL,
     CLEAR_ERRORS
 } from '../constants/productConstants';
 
@@ -42,11 +48,13 @@ export const getProducts = (
     price = [0, 100000],
     category = '',
     rating = '',
-    reviews = ''
+    reviews = '',
+    append = false
 ) => async (dispatch) => {
     try {
         dispatch({
-            type: ALL_PRODUCTS_REQUEST
+            type: ALL_PRODUCTS_REQUEST,
+            append
         })
 
         const params = new URLSearchParams({
@@ -67,7 +75,8 @@ export const getProducts = (
         console.log(data)
         dispatch({
             type: ALL_PRODUCTS_SUCCESS,
-            payload: data
+            payload: data,
+            meta: { append }
         })
 
     } catch (error) {
@@ -255,6 +264,39 @@ export const getMyProductReview = (productId) => async (dispatch) => {
             type: MY_REVIEW_FAIL,
             payload: error.response?.data?.message || error.message || 'Unable to load review status'
         })
+    }
+}
+
+export const getProductReviews = (productId) => async (dispatch) => {
+    try {
+        dispatch({ type: GET_REVIEWS_REQUEST })
+        const { data } = await axios.get(`${import.meta.env.VITE_API}/reviews?id=${encodeURIComponent(productId)}`, {
+            withCredentials: true
+        })
+        dispatch({ type: GET_REVIEWS_SUCCESS, payload: data.reviews })
+    } catch (error) {
+        dispatch({
+            type: GET_REVIEWS_FAIL,
+            payload: error.response?.data?.message || error.message || 'Unable to load reviews'
+        })
+    }
+}
+
+export const deleteReview = (reviewId, productId) => async (dispatch) => {
+    try {
+        dispatch({ type: DELETE_REVIEW_REQUEST })
+        await axios.delete(
+            `${import.meta.env.VITE_API}/reviews?id=${encodeURIComponent(reviewId)}&productId=${encodeURIComponent(productId)}`,
+            { withCredentials: true }
+        )
+        dispatch({ type: DELETE_REVIEW_SUCCESS, payload: reviewId })
+        return true
+    } catch (error) {
+        dispatch({
+            type: DELETE_REVIEW_FAIL,
+            payload: error.response?.data?.message || error.message || 'Unable to delete review'
+        })
+        return false
     }
 }
 

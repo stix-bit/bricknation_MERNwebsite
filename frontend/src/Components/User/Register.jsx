@@ -1,24 +1,33 @@
-import React, { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import MetaData from '../Layout/MetaData'
 import axios from 'axios'
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
 
 
 const Register = () => {
 
-    const [user, setUser] = useState({
-        name: '',
-        email: '',
-        password: '',
+    const formik = useFormik({
+        initialValues: { name: '', email: '', password: '' },
+        validationSchema: Yup.object({
+            name: Yup.string().trim().min(2, 'Name must be at least 2 characters').required('Name is required'),
+            email: Yup.string().email('Enter a valid email').required('Email is required'),
+            password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required')
+        }),
+        onSubmit: values => {
+            const formData = new FormData()
+            formData.set('name', values.name)
+            formData.set('email', values.email)
+            formData.set('password', values.password)
+            formData.set('avatar', avatar)
+            register(formData)
+        }
     })
-
-    const { name, email, password } = user;
 
     const [avatar, setAvatar] = useState('')
     const [avatarPreview, setAvatarPreview] = useState('/images/default_avatar.jpg')
 
-    const [error, setError] = useState('')
-    const [loading, setLoading] = useState(true)
 
 
     let navigate = useNavigate()
@@ -35,18 +44,6 @@ const Register = () => {
 
     // }, [error, navigate, isAuthenticated])
 
-    const submitHandler = (e) => {
-        e.preventDefault();
-
-        const formData = new FormData();
-        formData.set('name', name);
-        formData.set('email', email);
-        formData.set('password', password);
-        formData.set('avatar', avatar);
-
-        register(formData)
-    }
-
     const onChange = e => {
         if (e.target.name === 'avatar') {
 
@@ -61,8 +58,6 @@ const Register = () => {
 
             reader.readAsDataURL(e.target.files[0])
 
-        } else {
-            setUser({ ...user, [e.target.name]: e.target.value })
         }
     }
 
@@ -78,14 +73,9 @@ const Register = () => {
             const { data } = await axios.post(`http://localhost:4001/api/v1/register`, userData, config)
             console.log(data.user)
 
-            setLoading(false)
-            setUser(data.user)
             navigate('/')
 
         } catch (error) {
-            setLoading(false)
-            setUser(null)
-            setError(error.response.data.message)
             console.log(error.response.data.message)
         }
     }
@@ -100,7 +90,7 @@ const Register = () => {
 
             <div className="row wrapper">
                 <div className="col-10 col-lg-5">
-                    <form className="shadow-lg" onSubmit={submitHandler} encType='multipart/form-data'>
+                    <form className="shadow-lg" onSubmit={formik.handleSubmit} encType='multipart/form-data' noValidate>
                         <h1 className="mb-3">Register</h1>
 
                         <div className="form-group">
@@ -110,9 +100,9 @@ const Register = () => {
                                 id="name_field"
                                 className="form-control"
                                 name='name'
-                                value={name}
-                                onChange={onChange}
+                                {...formik.getFieldProps('name')}
                             />
+                            {formik.touched.name && formik.errors.name && <small className="text-danger">{formik.errors.name}</small>}
                         </div>
 
                         <div className="form-group">
@@ -122,9 +112,9 @@ const Register = () => {
                                 id="email_field"
                                 className="form-control"
                                 name='email'
-                                value={email}
-                                onChange={onChange}
+                                {...formik.getFieldProps('email')}
                             />
+                            {formik.touched.email && formik.errors.email && <small className="text-danger">{formik.errors.email}</small>}
                         </div>
 
                         <div className="form-group">
@@ -134,9 +124,9 @@ const Register = () => {
                                 id="password_field"
                                 className="form-control"
                                 name='password'
-                                value={password}
-                                onChange={onChange}
+                                {...formik.getFieldProps('password')}
                             />
+                            {formik.touched.password && formik.errors.password && <small className="text-danger">{formik.errors.password}</small>}
                         </div>
 
                         <div className='form-group'>

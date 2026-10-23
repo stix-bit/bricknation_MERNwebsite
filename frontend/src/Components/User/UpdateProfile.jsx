@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import MetaData from '../Layout/MetaData'
 import { useNavigate } from "react-router-dom";
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 // import { getToken } from '../../Utils/helpers';
 import { updateProfile, loadUser, clearErrors } from '../../actions/userActions'
 
 import { UPDATE_PROFILE_RESET } from '../../constants/userConstants'
 import { useDispatch, useSelector } from 'react-redux'
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
 
 
 const UpdateProfile = () => {
@@ -17,8 +16,6 @@ const UpdateProfile = () => {
     const { user } = useSelector(state => state.auth);
     const { error, isUpdated, loading } = useSelector(state => state.user)
 
-    const [name, setName] = useState('')
-    const [email, setEmail] = useState('')
     const [avatar, setAvatar] = useState('')
     const [avatarPreview, setAvatarPreview] = useState('/images/default_avatar.jpg')
     // const [error, setError] = useState('')
@@ -26,6 +23,21 @@ const UpdateProfile = () => {
     // const [loading, setLoading] = useState(false)
     // const [isUpdated, setIsUpdated] = useState(false)
     let navigate = useNavigate();
+    const formik = useFormik({
+        enableReinitialize: true,
+        initialValues: { name: user?.name || '', email: user?.email || '' },
+        validationSchema: Yup.object({
+            name: Yup.string().trim().min(2, 'Name must be at least 2 characters').required('Name is required'),
+            email: Yup.string().email('Enter a valid email').required('Email is required')
+        }),
+        onSubmit: values => {
+            const formData = new FormData()
+            formData.set('name', values.name)
+            formData.set('email', values.email)
+            formData.set('avatar', avatar)
+            dispatch(updateProfile(formData))
+        }
+    })
 
     // const getProfile = async () => {
     //     const config = {
@@ -82,11 +94,10 @@ const UpdateProfile = () => {
 
     // }, [])
 
+    /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
     useEffect(() => {
         console.log(user)
         if (user) {
-            setName(user.name);
-            setEmail(user.email);
             setAvatarPreview(user.avatar.url)
         }
         if (error) {
@@ -103,15 +114,7 @@ const UpdateProfile = () => {
             })
         }
     }, [error, isUpdated, user])
-
-    const submitHandler = (e) => {
-        e.preventDefault();
-        const formData = new FormData();
-        formData.set('name', name);
-        formData.set('email', email);
-        formData.set('avatar', avatar);
-        dispatch(updateProfile(formData))
-    }
+    /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
 
     const onChange = e => {
         const reader = new FileReader();
@@ -135,7 +138,7 @@ const UpdateProfile = () => {
 
             <div className="row wrapper">
                 <div className="col-10 col-lg-5">
-                    <form className="shadow-lg" onSubmit={submitHandler} encType='multipart/form-data'>
+                    <form className="shadow-lg" onSubmit={formik.handleSubmit} encType='multipart/form-data' noValidate>
                         <h1 className="mt-2 mb-5">Update Profile</h1>
 
                         <div className="form-group">
@@ -145,9 +148,9 @@ const UpdateProfile = () => {
                                 id="name_field"
                                 className="form-control"
                                 name='name'
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
+                                {...formik.getFieldProps('name')}
                             />
+                            {formik.touched.name && formik.errors.name && <small className="text-danger">{formik.errors.name}</small>}
                         </div>
 
                         <div className="form-group">
@@ -157,9 +160,9 @@ const UpdateProfile = () => {
                                 id="email_field"
                                 className="form-control"
                                 name='email'
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                {...formik.getFieldProps('email')}
                             />
+                            {formik.touched.email && formik.errors.email && <small className="text-danger">{formik.errors.email}</small>}
                         </div>
 
                         <div className='form-group'>

@@ -5,13 +5,16 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "seed": "node seeders/seed.js",
+    "seed:rollback": "node seeders/seed.js rollback"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "bad-words": "^4.1.5",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.10.1",
     "cookie-parser": "^1.4.7",
@@ -23,6 +26,7 @@
     "mongoose": "^9.9.3",
     "multer": "^2.2.0",
     "nodemailer": "^9.0.5",
+    "pdfkit": "^0.20.2",
     "validator": "^13.15.35"
   },
   "devDependencies": {

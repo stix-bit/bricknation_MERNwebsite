@@ -22,7 +22,7 @@ const Search = () => {
                     type="text"
                     id="search_field"
                     className="form-control"
-                    placeholder="Search your next build..."
+                    placeholder="Search your item..."
                     value={keyword}
                     onChange={(e) => setKeyword(e.target.value)}
                 />

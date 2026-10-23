@@ -125,8 +125,7 @@ function App() {
 //   }
 
   return (
-    <>
-      
+    <div className="app-shell">
       <Router>
         {/* <Header cartItems={state.cartItems} /> */}
         <Header />
@@ -221,7 +220,7 @@ function App() {
       </Router>
       <Footer />
       <ToastContainer />
-    </>
+    </div>
   )
 }
 

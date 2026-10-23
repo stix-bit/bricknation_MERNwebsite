@@ -1,20 +1,26 @@
-import React, { useState, } from 'react'
 
 import MetaData from '../Layout/MetaData'
-import axios from 'axios'
-import { toast } from 'react-toastify';
-
-import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux'
 import { forgotPassword } from '../../actions/userActions';
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
 
 
 
 const ForgotPassword = () => {
     const dispatch = useDispatch();
-    const { error, loading, message } = useSelector(state => state.forgotPassword)
-    const [email, setEmail] = useState('')
+    const { loading } = useSelector(state => state.forgotPassword)
+    const formik = useFormik({
+        initialValues: { email: '' },
+        validationSchema: Yup.object({
+            email: Yup.string().email('Enter a valid email').required('Email is required')
+        }),
+        onSubmit: values => {
+            const formData = new FormData()
+            formData.set('email', values.email)
+            dispatch(forgotPassword(formData))
+        }
+    })
     // const [loading, setLoading] = useState('')
 
     // const navigate = useNavigate()
@@ -42,19 +48,12 @@ const ForgotPassword = () => {
     // }
 
 
-    const submitHandler = (e) => {
-        e.preventDefault();
-        const formData = new FormData();
-        formData.set('email', email);
-        dispatch(forgotPassword(formData))
-    }
-
     return (
         <>
             <MetaData title={'Forgot Password'} />
             <div className="row wrapper">
                 <div className="col-10 col-lg-5">
-                    <form className="shadow-lg" onSubmit={submitHandler}>
+                    <form className="shadow-lg" onSubmit={formik.handleSubmit} noValidate>
                         <h1 className="mb-3">Forgot Password</h1>
                         <div className="form-group">
                             <label htmlFor="email_field">Enter Email</label>
@@ -62,9 +61,9 @@ const ForgotPassword = () => {
                                 type="email"
                                 id="email_field"
                                 className="form-control"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                {...formik.getFieldProps('email')}
                             />
+                            {formik.touched.email && formik.errors.email && <small className="text-danger">{formik.errors.email}</small>}
                         </div>
 
                         <button

@@ -1,28 +1,37 @@
-import React, { useState } from 'react'
 import { useNavigate } from "react-router-dom";
 import { countries } from 'countries-list'
 import MetaData from '../Layout/MetaData'
 import CheckoutSteps from './CheckoutSteps'
 import { useDispatch, useSelector } from 'react-redux'
 import { saveShippingInfo } from '../../actions/cartActions'
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
 
 const Shipping = () => {
     const dispatch = useDispatch();
     const { shippingInfo } = useSelector(state => state.cart)
     const countriesList = Object.values(countries)
-    const [address, setAddress] = useState(shippingInfo.address)
-    const [city, setCity] = useState(shippingInfo.city)
-    const [postalCode, setPostalCode] = useState(shippingInfo.postalCode)
-    const [phoneNo, setPhoneNo] = useState(shippingInfo.phoneNo)
-    const [country, setCountry] = useState(shippingInfo.country)
+    const formik = useFormik({
+        initialValues: {
+            address: shippingInfo.address || '',
+            city: shippingInfo.city || '',
+            postalCode: shippingInfo.postalCode || '',
+            phoneNo: shippingInfo.phoneNo || '',
+            country: shippingInfo.country || ''
+        },
+        validationSchema: Yup.object({
+            address: Yup.string().trim().required('Address is required'),
+            city: Yup.string().trim().required('City is required'),
+            postalCode: Yup.string().trim().required('Postal code is required'),
+            phoneNo: Yup.string().matches(/^[0-9+\-\s()]{7,20}$/, 'Enter a valid phone number').required('Phone number is required'),
+            country: Yup.string().required('Country is required')
+        }),
+        onSubmit: values => {
+            dispatch(saveShippingInfo(values))
+            navigate('/confirm')
+        }
+    })
     let navigate = useNavigate();
-    const submitHandler = (e) => {
-        e.preventDefault()
-
-        dispatch(saveShippingInfo({ address, city, phoneNo, postalCode, country }))
-        navigate('/confirm')
-    }
-
     return (
         <>
             <MetaData title={'Shipping Info'} />
@@ -31,7 +40,8 @@ const Shipping = () => {
                 <div className="col-10 col-lg-5">
                     <form
                         className="shadow-lg"
-                        onSubmit={submitHandler}
+                        onSubmit={formik.handleSubmit}
+                        noValidate
                     >
                         <h1 className="mb-4">Shipping Info</h1>
                         <div className="form-group">
@@ -40,10 +50,9 @@ const Shipping = () => {
                                 type="text"
                                 id="address_field"
                                 className="form-control"
-                                value={address}
-                                onChange={(e) => setAddress(e.target.value)}
-                                required
+                                {...formik.getFieldProps('address')}
                             />
+                            {formik.touched.address && formik.errors.address && <small className="text-danger">{formik.errors.address}</small>}
                         </div>
 
                         <div className="form-group">
@@ -52,10 +61,9 @@ const Shipping = () => {
                                 type="text"
                                 id="city_field"
                                 className="form-control"
-                                value={city}
-                                onChange={(e) => setCity(e.target.value)}
-                                required
+                                {...formik.getFieldProps('city')}
                             />
+                            {formik.touched.city && formik.errors.city && <small className="text-danger">{formik.errors.city}</small>}
                         </div>
 
                         <div className="form-group">
@@ -64,10 +72,9 @@ const Shipping = () => {
                                 type="phone"
                                 id="phone_field"
                                 className="form-control"
-                                value={phoneNo}
-                                onChange={(e) => setPhoneNo(e.target.value)}
-                                required
+                                {...formik.getFieldProps('phoneNo')}
                             />
+                            {formik.touched.phoneNo && formik.errors.phoneNo && <small className="text-danger">{formik.errors.phoneNo}</small>}
                         </div>
 
                         <div className="form-group">
@@ -76,10 +83,9 @@ const Shipping = () => {
                                 type="number"
                                 id="postal_code_field"
                                 className="form-control"
-                                value={postalCode}
-                                onChange={(e) => setPostalCode(e.target.value)}
-                                required
+                                {...formik.getFieldProps('postalCode')}
                             />
+                            {formik.touched.postalCode && formik.errors.postalCode && <small className="text-danger">{formik.errors.postalCode}</small>}
                         </div>
 
                         <div className="form-group">
@@ -87,9 +93,7 @@ const Shipping = () => {
                             <select
                                 id="country_field"
                                 className="form-control"
-                                value={country}
-                                onChange={(e) => setCountry(e.target.value)}
-                                required
+                                {...formik.getFieldProps('country')}
                             >
 
                                 {countriesList.map(country => (

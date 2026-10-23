@@ -31,13 +31,16 @@ import {
     UPDATE_USER_SUCCESS,
     UPDATE_USER_RESET,
     UPDATE_USER_FAIL,
-    USER_DETAILS_REQUEST,
-    USER_DETAILS_SUCCESS,
-    USER_DETAILS_FAIL,
     DELETE_USER_REQUEST,
     DELETE_USER_SUCCESS,
     DELETE_USER_RESET,
     DELETE_USER_FAIL,
+    SOFT_DELETE_USER_REQUEST,
+    SOFT_DELETE_USER_SUCCESS,
+    SOFT_DELETE_USER_FAIL,
+    RESTORE_USER_REQUEST,
+    RESTORE_USER_SUCCESS,
+    RESTORE_USER_FAIL,
     CLEAR_ERRORS
 } from '../constants/userConstants'
 
@@ -105,6 +108,7 @@ export const userReducer = (state = {}, action) => {
                 loading: true,
                 isUpdated: false,
             }
+
         case UPDATE_PROFILE_SUCCESS:
         case UPDATE_PASSWORD_SUCCESS:
         case UPDATE_USER_SUCCESS:
@@ -147,6 +151,55 @@ export const userReducer = (state = {}, action) => {
             }
         default:
             return state;
+    }
+}
+
+export const allUsersReducer = (state = { users: [] }, action) => {
+    switch (action.type) {
+        case ALL_USERS_REQUEST:
+            return { ...state, loading: true, error: null }
+        case ALL_USERS_SUCCESS:
+            return { loading: false, users: action.payload, error: null }
+        case ALL_USERS_FAIL:
+            return { ...state, loading: false, error: action.payload }
+        case UPDATE_USER_REQUEST:
+        case DELETE_USER_REQUEST:
+        case SOFT_DELETE_USER_REQUEST:
+        case RESTORE_USER_REQUEST:
+            return { ...state, actionLoading: true, error: null }
+        case UPDATE_USER_SUCCESS:
+            return { ...state, actionLoading: false }
+        case DELETE_USER_SUCCESS:
+            return {
+                ...state,
+                actionLoading: false,
+                users: state.users.filter(user => user._id !== action.payload)
+            }
+        case SOFT_DELETE_USER_SUCCESS:
+            return {
+                ...state,
+                actionLoading: false,
+                users: state.users.map(user => user._id === action.payload
+                    ? { ...user, isDeleted: true }
+                    : user)
+            }
+        case RESTORE_USER_SUCCESS:
+            return {
+                ...state,
+                actionLoading: false,
+                users: state.users.map(user => user._id === action.payload
+                    ? { ...user, isDeleted: false }
+                    : user)
+            }
+        case UPDATE_USER_FAIL:
+        case DELETE_USER_FAIL:
+        case SOFT_DELETE_USER_FAIL:
+        case RESTORE_USER_FAIL:
+            return { ...state, actionLoading: false, error: action.payload }
+        case CLEAR_ERRORS:
+            return { ...state, error: null }
+        default:
+            return state
     }
 }
 

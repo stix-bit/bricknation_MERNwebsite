@@ -58,6 +58,10 @@ const userSchema = new mongoose.Schema({
     loginLockedUntil: {
         type: Date,
         default: null
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
     }
 })
 

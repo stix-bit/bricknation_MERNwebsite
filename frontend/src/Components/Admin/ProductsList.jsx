@@ -8,6 +8,15 @@ import Sidebar from './SideBar'
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { DataGrid, } from '@mui/x-data-grid'
+import {
+    Button,
+    CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Typography
+} from '@mui/material'
 import { useDispatch, useSelector } from 'react-redux'
 import {
     getAdminProducts,
@@ -26,9 +35,10 @@ const ProductsList = () => {
     const { loading, error, products } = useSelector(state => state.products)
     const { error: deleteError, isBulkActionComplete, affectedCount, loading: actionLoading } = useSelector(state => state.product)
     const [selectedIds, setSelectedIds] = useState([])
+    const [confirmation, setConfirmation] = useState(null)
     const selectedProducts = products.filter(product => selectedIds.includes(product._id))
-    const hasActiveSelection = selectedProducts.some(product => !product.isArchived)
-    const hasArchivedSelection = selectedProducts.some(product => product.isArchived)
+    const allSelectedProductsArchived = selectedProducts.length > 0
+        && selectedProducts.every(product => product.isArchived)
 
     // const [loading, setLoading] = useState(true)
     // const [isDeleted, setIsDeleted] = useState(false)
@@ -106,46 +116,22 @@ const ProductsList = () => {
     //     }
     // }
 
-    const bulkActionHandler = (action) => {
-        const actionName = action === 'delete'
-            ? 'permanently delete'
-            : action === 'archive' ? 'archive' : 'unarchive'
-        toast(({ closeToast }) => (
-            <div>
-                <p className="mb-2">{actionName} <strong>{selectedIds.length} selected product{selectedIds.length === 1 ? '' : 's'}</strong>?</p>
-                <div className="d-flex justify-content-end gap-2">
-                    <button
-                        type="button"
-                        className="btn btn-danger btn-sm"
-                        onClick={() => {
-                            closeToast()
-                            setSelectedIds([])
-                            dispatch(
-                                action === 'delete'
-                                    ? bulkDeleteProducts(selectedIds)
-                                    : action === 'archive'
-                                        ? bulkArchiveProducts(selectedIds)
-                                        : bulkUnarchiveProducts(selectedIds)
-                            )
-                        }}
-                    >
-                        {action === 'delete' ? 'Delete' : action === 'archive' ? 'Archive' : 'Unarchive'}
-                    </button>
-                    <button
-                        type="button"
-                        className="btn btn-secondary btn-sm"
-                        onClick={closeToast}
-                    >
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        ), {
-            autoClose: false,
-            closeOnClick: false,
-            closeButton: false,
-            position: 'bottom-right'
-        })
+    const bulkActionHandler = (action, ids = selectedIds, productName = '') => {
+        setConfirmation({ action, ids, productName })
+    }
+
+    const confirmAction = () => {
+        if (!confirmation) return
+        const { action, ids } = confirmation
+        setConfirmation(null)
+        setSelectedIds([])
+        dispatch(
+            action === 'delete'
+                ? bulkDeleteProducts(ids)
+                : action === 'archive'
+                    ? bulkArchiveProducts(ids)
+                    : bulkUnarchiveProducts(ids)
+        )
     }
 
     const columns = [
@@ -160,6 +146,13 @@ const ProductsList = () => {
             headerName: 'Name',
 
             width: 130,
+            align: 'right',
+            headerAlign: 'right'
+        },
+        {
+            field: 'category',
+            headerName: 'Category',
+            width: 140,
             align: 'right',
             headerAlign: 'right'
         },
@@ -194,19 +187,11 @@ const ProductsList = () => {
                 <div className="d-flex gap-1">
                     <button
                         type="button"
-                        className="btn btn-warning btn-sm"
-                        disabled={!hasActiveSelection || actionLoading}
-                        onClick={() => bulkActionHandler('archive')}
+                        className={`btn btn-sm ${allSelectedProductsArchived ? 'btn-success' : 'btn-warning'}`}
+                        disabled={!selectedIds.length || actionLoading}
+                        onClick={() => bulkActionHandler(allSelectedProductsArchived ? 'unarchive' : 'archive')}
                     >
-                        Archive
-                    </button>
-                    <button
-                        type="button"
-                        className="btn btn-success btn-sm"
-                        disabled={!hasArchivedSelection || actionLoading}
-                        onClick={() => bulkActionHandler('unarchive')}
-                    >
-                        Unarchive
+                        {allSelectedProductsArchived ? 'Restore' : 'Archive'}
                     </button>
                     <button
                         type="button"
@@ -219,11 +204,11 @@ const ProductsList = () => {
                 </div>
             ),
             renderCell: (params) => (
-                <>
+                <div className="d-flex gap-1 align-items-center">
                     <Link to={`/admin/product/${params.id}`} className="btn btn-primary py-1 px-2">
                         <i className="fa fa-pencil"></i>
                     </Link>
-                </>
+                </div>
             )
         }
     ];
@@ -231,6 +216,7 @@ const ProductsList = () => {
     const rows = products.map(product => ({
         id: product._id,
         name: product.name,
+        category: product.category_id?.name || 'Uncategorized',
         price: `$${product.price}`,
         stock: product.stock,
         isArchived: product.isArchived,
@@ -262,6 +248,46 @@ const ProductsList = () => {
                                     getRowId={(row) => row.id}
                                     showToolbar
                                 />
+                                <Dialog
+                                    open={Boolean(confirmation)}
+                                    onClose={() => !actionLoading && setConfirmation(null)}
+                                    maxWidth="xs"
+                                    fullWidth
+                                >
+                                    <DialogTitle>
+                                        {confirmation?.action === 'delete'
+                                            ? 'Permanently delete product?'
+                                            : confirmation?.action === 'archive'
+                                                ? 'Archive product?'
+                                                : 'Restore product?'}
+                                    </DialogTitle>
+                                    <DialogContent>
+                                        <Typography color="text.secondary">
+                                            {confirmation?.action === 'delete'
+                                                ? `Permanently remove ${confirmation?.productName || 'the selected product'} and related data. This cannot be undone.`
+                                                : confirmation?.action === 'archive'
+                                                    ? `Archive ${confirmation?.productName || 'the selected product'} without permanently removing it.`
+                                                    : `Restore ${confirmation?.productName || 'the selected product'} and make it active again.`}
+                                        </Typography>
+                                    </DialogContent>
+                                    <DialogActions sx={{ px: 3, py: 2 }}>
+                                        <Button onClick={() => setConfirmation(null)} disabled={actionLoading}>
+                                            Cancel
+                                        </Button>
+                                        <Button
+                                            color={confirmation?.action === 'delete' ? 'error' : confirmation?.action === 'archive' ? 'warning' : 'success'}
+                                            variant="contained"
+                                            onClick={confirmAction}
+                                            disabled={actionLoading}
+                                        >
+                                            {actionLoading
+                                                ? <CircularProgress size={20} color="inherit" />
+                                                : confirmation?.action === 'delete'
+                                                    ? 'Delete permanently'
+                                                    : confirmation?.action === 'archive' ? 'Archive' : 'Restore'}
+                                        </Button>
+                                    </DialogActions>
+                                </Dialog>
                             </div>
                         )}
 
