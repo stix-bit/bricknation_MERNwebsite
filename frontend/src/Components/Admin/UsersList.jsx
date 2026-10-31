@@ -66,7 +66,7 @@ const UsersList = () => {
             ? await dispatch(softDeleteAdminUser(userToDelete._id))
             : deleteMode === 'restore'
                 ? await dispatch(restoreAdminUser(userToDelete._id))
-            : await dispatch(deleteAdminUser(userToDelete._id))
+                : await dispatch(deleteAdminUser(userToDelete._id))
         if (deleted) setUserToDelete(null)
     }
 
@@ -113,7 +113,7 @@ const UsersList = () => {
                                                 <Chip size="small" label={user.role} color={user.role === 'admin' ? 'primary' : 'default'} />
                                             </TableCell>
                                             <TableCell>
-                                                <Chip size="small" label={user.isDeleted ? 'Archived' : 'Active'}
+                                                <Chip size="small" label={user.isDeleted ? 'Suspended' : 'Active'}
                                                     color={user.isDeleted ? 'warning' : 'success'} variant="outlined" />
                                             </TableCell>
                                             <TableCell align="right">
@@ -127,7 +127,7 @@ const UsersList = () => {
                                                             setDeleteMode(user.isDeleted ? 'restore' : 'soft')
                                                             setUserToDelete(user)
                                                         }}>
-                                                        {user.isDeleted ? 'Restore' : 'Archive'}
+                                                        {user.isDeleted ? 'Restore' : 'Suspend'}
                                                     </Button>
                                                     <Button size="small" color="error" variant="outlined"
                                                         disabled={actionLoading}
@@ -178,15 +178,15 @@ const UsersList = () => {
             <Dialog open={Boolean(userToDelete)} onClose={() => !actionLoading && setUserToDelete(null)}
                 maxWidth="xs" fullWidth>
                 <DialogTitle>
-                    {deleteMode === 'soft' ? 'Archive user?' : deleteMode === 'restore' ? 'Restore user?' : 'Permanently delete user?'}
+                    {deleteMode === 'soft' ? 'Suspend user?' : deleteMode === 'restore' ? 'Restore user?' : 'Permanently delete user?'}
                 </DialogTitle>
                 <DialogContent>
                     <Typography color="text.secondary">
                         {deleteMode === 'soft'
-                            ? `Disable ${userToDelete?.name || 'this user'} without permanently removing the account.`
+                            ? `Suspend ${userToDelete?.name || 'this user'} without permanently removing the account.`
                             : deleteMode === 'restore'
                                 ? `Restore ${userToDelete?.name || 'this user'} and allow the account to log in again.`
-                            : `Permanently remove ${userToDelete?.name || 'this user'} and related data. This cannot be undone.`}
+                                : `Permanently remove ${userToDelete?.name || 'this user'} and related data. This cannot be undone.`}
                     </Typography>
                 </DialogContent>
                 <Divider />
@@ -196,7 +196,7 @@ const UsersList = () => {
                         onClick={confirmDelete} disabled={actionLoading}>
                         {actionLoading
                             ? <CircularProgress size={20} color="inherit" />
-                            : deleteMode === 'soft' ? 'Archive' : deleteMode === 'restore' ? 'Restore' : 'Delete permanently'}
+                            : deleteMode === 'soft' ? 'Suspend' : deleteMode === 'restore' ? 'Restore' : 'Delete permanently'}
                     </Button>
                 </DialogActions>
             </Dialog>

@@ -1,12 +1,22 @@
-import { useEffect } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useEffect, useState, useRef } from 'react'
+import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom'
+import {
+    Container,
+    Paper,
+    Box,
+    Typography,
+    TextField,
+    Button,
+    Alert,
+    Stack,
+    Link,
+    CircularProgress
+} from '@mui/material'
 
 import Loader from '../Layout/Loader'
-import MetaData from '../Layout/MetaData';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-// import axios from 'axios';
-// import { getUser, authenticate } from '../../Utils/helpers';
+import MetaData from '../Layout/MetaData'
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
@@ -17,21 +27,91 @@ import {
 } from '../../Utils/firebaseAuth'
 
 const Login = () => {
-    const { isAuthenticated, error, loading, } = useSelector(state => state.auth)
+    const { isAuthenticated, error, loading } = useSelector(state => state.auth)
+
+    const [isLocked, setIsLocked] = useState(false)
+    const [lockSecondsRemaining, setLockSecondsRemaining] = useState(0)
+
+    const timerRef = useRef(null)
+    const navigate = useNavigate()
+    const location = useLocation()
+    const dispatch = useDispatch()
+
+    const startLockout = (seconds = 60) => {
+        const lockUntil = Date.now() + seconds * 1000
+        localStorage.setItem('login_locked_until', lockUntil.toString())
+        localStorage.setItem('login_failed_attempts', '0')
+        setIsLocked(true)
+        setLockSecondsRemaining(seconds)
+    }
+
+    // Check lock status on mount and manage 1-second countdown
+    useEffect(() => {
+        const checkLockStatus = () => {
+            const storedLockUntil = localStorage.getItem('login_locked_until')
+            if (storedLockUntil) {
+                const remainingMs = parseInt(storedLockUntil, 10) - Date.now()
+                if (remainingMs > 0) {
+                    const remainingSec = Math.ceil(remainingMs / 1000)
+                    setIsLocked(true)
+                    setLockSecondsRemaining(remainingSec)
+                    return remainingSec
+                } else {
+                    localStorage.removeItem('login_locked_until')
+                    localStorage.removeItem('login_failed_attempts')
+                    setIsLocked(false)
+                    setLockSecondsRemaining(0)
+                    return 0
+                }
+            } else {
+                setIsLocked(false)
+                setLockSecondsRemaining(0)
+                return 0
+            }
+        }
+
+        const remaining = checkLockStatus()
+        if (remaining > 0) {
+            timerRef.current = setInterval(() => {
+                const rem = checkLockStatus()
+                if (rem <= 0 && timerRef.current) {
+                    clearInterval(timerRef.current)
+                }
+            }, 1000)
+        }
+
+        return () => {
+            if (timerRef.current) {
+                clearInterval(timerRef.current)
+            }
+        }
+    }, [isLocked])
+
     const formik = useFormik({
         initialValues: { email: '', password: '' },
         validationSchema: Yup.object({
             email: Yup.string().email('Enter a valid email').required('Email is required'),
             password: Yup.string().required('Password is required')
         }),
-        onSubmit: values => dispatch(login(values.email, values.password))
+        onSubmit: values => {
+            if (isLocked) {
+                toast.error(`Login is temporarily locked. Please wait ${lockSecondsRemaining}s.`, {
+                    position: 'bottom-right'
+                })
+                return
+            }
+            dispatch(login(values.email, values.password))
+        }
     })
-    // const [loading, setLoading] = useState(false)
-    let navigate = useNavigate()
-    let location = useLocation()
-    const dispatch = useDispatch()
 
     const socialLoginHandler = async (providerLogin) => {
+        if (isLocked) {
+            toast.error(`Login is temporarily locked. Please wait ${lockSecondsRemaining}s.`, {
+                position: 'bottom-right'
+            })
+            return
+        }
+
         try {
             const result = await providerLogin()
             const idToken = await result.user.getIdToken()
@@ -45,42 +125,44 @@ const Login = () => {
         }
     }
 
-    // const login = async (email, password) => {
-    //     try {
-    //         const config = {
-    //             headers: {
-    //                 'Content-Type': 'application/json'
-    //             }
-    //         }
-    //         const { data } = await axios.post(`http://localhost:4001/api/v1/login`, { email, password }, config)
-    //         console.log(data)
-    //         authenticate(data, () => navigate("/"))
-
-    //     } catch (error) {
-
-    //         toast.error("invalid user or password", {
-    //             position: 'bottom-right'
-    //         })
-    //     }
-    // }
-
     const redirect = location.search ? new URLSearchParams(location.search).get('redirect') : ''
-    // console.log(redirect)
-    // useEffect(() => {
-    //     if (getUser()) {
-    //         navigate('/')
-    //     }
-    // }, [])
 
     useEffect(() => {
-        if (isAuthenticated && redirect === 'shipping') {
-            navigate(`/${redirect}`)
+        if (isAuthenticated) {
+            localStorage.removeItem('login_locked_until')
+            localStorage.removeItem('login_failed_attempts')
+            setIsLocked(false)
+            setLockSecondsRemaining(0)
+
+            if (redirect === 'shipping') {
+                navigate(`/${redirect}`)
+            } else {
+                navigate('/')
+            }
         }
-        else if (isAuthenticated)
-            navigate('/')
+
         if (error) {
-            toast.error(error, { position: 'bottom-right' })
-            dispatch(clearErrors());
+            const errorMsg = typeof error === 'string' ? error : (error?.message || 'Login failed')
+            const isLockError = /too many failed login attempts|locked|try again in/i.test(errorMsg)
+
+            if (isLockError) {
+                const match = errorMsg.match(/in\s+(\d+)\s+seconds/i)
+                const secs = match ? parseInt(match[1], 10) : 60
+                startLockout(secs)
+            } else {
+                const currentAttempts = parseInt(localStorage.getItem('login_failed_attempts') || '0', 10) + 1
+                if (currentAttempts >= 5) {
+                    startLockout(60)
+                    toast.error('Too many failed login attempts. Login is temporarily locked for 1 minute.', {
+                        position: 'bottom-right'
+                    })
+                } else {
+                    localStorage.setItem('login_failed_attempts', currentAttempts.toString())
+                }
+            }
+
+            toast.error(errorMsg, { position: 'bottom-right' })
+            dispatch(clearErrors())
         }
     }, [error, isAuthenticated, dispatch, navigate, redirect])
 
@@ -90,70 +172,220 @@ const Login = () => {
                 <>
                     <MetaData title={'Login'} />
 
-                    <main className="login-page">
-                        <div className="login-card">
-                            <form
-                                onSubmit={formik.handleSubmit}
-                                noValidate
+                    <Box
+                        component="main"
+                        className="login-page"
+                        sx={{
+                            flex: 1,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '100%',
+                            py: { xs: 4, md: 6 },
+                            px: 2,
+                            boxSizing: 'border-box',
+                        }}
+                    >
+                        <Container maxWidth="xs" disableGutters>
+                            <Paper
+                                elevation={0}
+                                className="login-card"
+                                sx={{
+                                    width: '100%',
+                                    p: { xs: 3, sm: 4.5 },
+                                    borderRadius: '10px',
+                                    border: '1px solid #eee7df',
+                                    boxShadow: '0 12px 30px rgba(38, 22, 10, 0.1)',
+                                    backgroundColor: '#ffffff',
+                                    boxSizing: 'border-box',
+                                }}
                             >
-                                <h1 className="mb-3">Login</h1>
-                                <div className="form-group">
-                                    <label htmlFor="email_field">Email</label>
-                                    <input
-                                        type="email"
+                                <Typography
+                                    variant="h4"
+                                    component="h1"
+                                    align="center"
+                                    sx={{
+                                        mb: 3,
+                                        fontWeight: 700,
+                                        fontSize: '2.25rem',
+                                        fontFamily: "'Space Grotesk', sans-serif",
+                                        color: 'var(--ink, #17151b)',
+                                    }}
+                                >
+                                    Login
+                                </Typography>
+
+                                {isLocked && (
+                                    <Alert severity="error" sx={{ mb: 3, fontWeight: 500 }}>
+                                        Too many failed login attempts. Please wait {lockSecondsRemaining}s before trying again.
+                                    </Alert>
+                                )}
+
+                                <Box
+                                    component="form"
+                                    onSubmit={formik.handleSubmit}
+                                    noValidate
+                                >
+                                    <TextField
+                                        fullWidth
                                         id="email_field"
-                                        className="form-control"
-                                        {...formik.getFieldProps('email')}
+                                        name="email"
+                                        label="Email"
+                                        type="email"
+                                        margin="normal"
+                                        disabled={isLocked}
+                                        value={formik.values.email}
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        error={formik.touched.email && Boolean(formik.errors.email)}
+                                        helperText={formik.touched.email && formik.errors.email}
+                                        sx={{
+                                            mb: 2,
+                                            '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: 'var(--red, #e30620)',
+                                            },
+                                            '& .MuiInputLabel-root.Mui-focused': {
+                                                color: 'var(--red, #e30620)',
+                                            },
+                                        }}
                                     />
-                                    {formik.touched.email && formik.errors.email && <small className="text-danger">{formik.errors.email}</small>}
-                                </div>
 
-                                <div className="form-group">
-                                    <label htmlFor="password_field">Password</label>
-                                    <input
-                                        type="password"
+                                    <TextField
+                                        fullWidth
                                         id="password_field"
-                                        className="form-control"
-                                        {...formik.getFieldProps('password')}
+                                        name="password"
+                                        label="Password"
+                                        type="password"
+                                        margin="normal"
+                                        disabled={isLocked}
+                                        value={formik.values.password}
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        error={formik.touched.password && Boolean(formik.errors.password)}
+                                        helperText={formik.touched.password && formik.errors.password}
+                                        sx={{
+                                            mb: 1.5,
+                                            '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: 'var(--red, #e30620)',
+                                            },
+                                            '& .MuiInputLabel-root.Mui-focused': {
+                                                color: 'var(--red, #e30620)',
+                                            },
+                                        }}
                                     />
-                                    {formik.touched.password && formik.errors.password && <small className="text-danger">{formik.errors.password}</small>}
-                                </div>
 
-                                <Link to="/password/forgot" className="float-right mb-4">Forgot Password?</Link>
+                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
+                                        <Link
+                                            component={RouterLink}
+                                            to="/password/forgot"
+                                            underline="hover"
+                                            sx={{
+                                                color: 'var(--red, #e30620)',
+                                                fontSize: '0.9rem',
+                                                fontWeight: 600,
+                                            }}
+                                        >
+                                            Forgot Password?
+                                        </Link>
+                                    </Box>
 
-                                <button
-                                    id="login_button"
-                                    type="submit"
-                                    className="btn btn-block py-3"
-                                >
-                                    LOGIN
-                                </button>
+                                    <Button
+                                        id="login_button"
+                                        type="submit"
+                                        fullWidth
+                                        variant="contained"
+                                        disabled={isLocked || loading}
+                                        sx={{
+                                            py: 1.5,
+                                            fontWeight: 700,
+                                            fontSize: '0.95rem',
+                                            backgroundColor: 'var(--red, #e30620)',
+                                            '&:hover': {
+                                                backgroundColor: 'var(--red-dark, #ad071d)',
+                                            },
+                                            '&.Mui-disabled': {
+                                                backgroundColor: '#c7c7c7',
+                                                color: '#666',
+                                            },
+                                            boxShadow: 'none',
+                                            borderRadius: '4px',
+                                        }}
+                                    >
+                                        {loading ? (
+                                            <CircularProgress size={24} color="inherit" />
+                                        ) : isLocked ? (
+                                            `LOCKED (${lockSecondsRemaining}s)`
+                                        ) : (
+                                            'LOGIN'
+                                        )}
+                                    </Button>
 
-                                <button
-                                    type="button"
-                                    className="btn btn-danger btn-block py-3 mt-3"
-                                    onClick={() => socialLoginHandler(signInWithGoogle)}
-                                >
-                                    CONTINUE WITH GOOGLE
-                                </button>
+                                    <Stack spacing={1.5} sx={{ mt: 2 }}>
+                                        <Button
+                                            type="button"
+                                            fullWidth
+                                            variant="contained"
+                                            disabled={isLocked || loading}
+                                            onClick={() => socialLoginHandler(signInWithGoogle)}
+                                            sx={{
+                                                py: 1.4,
+                                                fontWeight: 700,
+                                                fontSize: '0.85rem',
+                                                backgroundColor: '#dc3545',
+                                                '&:hover': {
+                                                    backgroundColor: '#bd2130',
+                                                },
+                                                boxShadow: 'none',
+                                                borderRadius: '4px',
+                                            }}
+                                        >
+                                            CONTINUE WITH GOOGLE
+                                        </Button>
 
-                                <button
-                                    type="button"
-                                    className="btn btn-primary btn-block py-3 mt-2"
-                                    onClick={() => socialLoginHandler(signInWithFacebook)}
-                                >
-                                    CONTINUE WITH FACEBOOK
-                                </button>
+                                        <Button
+                                            type="button"
+                                            fullWidth
+                                            variant="contained"
+                                            disabled={isLocked || loading}
+                                            onClick={() => socialLoginHandler(signInWithFacebook)}
+                                            sx={{
+                                                py: 1.4,
+                                                fontWeight: 700,
+                                                fontSize: '0.85rem',
+                                                backgroundColor: '#0d6efd',
+                                                '&:hover': {
+                                                    backgroundColor: '#0b5ed7',
+                                                },
+                                                boxShadow: 'none',
+                                                borderRadius: '4px',
+                                            }}
+                                        >
+                                            CONTINUE WITH FACEBOOK
+                                        </Button>
+                                    </Stack>
 
-                                <Link to="/register" className="float-right mt-3">New User?</Link>
-                            </form>
-                        </div>
-                    </main>
-
-
+                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+                                        <Link
+                                            component={RouterLink}
+                                            to="/register"
+                                            underline="hover"
+                                            sx={{
+                                                color: 'var(--red, #e30620)',
+                                                fontSize: '0.9rem',
+                                                fontWeight: 600,
+                                            }}
+                                        >
+                                            New User?
+                                        </Link>
+                                    </Box>
+                                </Box>
+                            </Paper>
+                        </Container>
+                    </Box>
                 </>
             )}
         </>
     )
 }
+
 export default Login

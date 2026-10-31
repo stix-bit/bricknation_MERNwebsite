@@ -2,6 +2,7 @@ const User = require('../models/user');
 const crypto = require('crypto')
 const cloudinary = require('cloudinary')
 const sendEmail = require('../utils/sendEmail')
+const { sendPasswordResetEmail } = require('../utils/passwordResetEmail')
 const sendToken = require('../utils/jwtToken');
 
 exports.registerUser = async (req, res, next) => {
@@ -11,7 +12,25 @@ exports.registerUser = async (req, res, next) => {
         url: '/images/default_avatar.png'
       }
   
+      if (req.file && req.file.size >= 10 * 1024 * 1024) {
+        return res.status(400).json({
+          success: false,
+          message: 'Avatar image file size must be less than 10MB'
+        })
+      }
+
       if (req.body.avatar) {
+        if (typeof req.body.avatar === 'string' && req.body.avatar.startsWith('data:')) {
+          const base64Data = req.body.avatar.split(',')[1] || ''
+          const bufferSize = Buffer.from(base64Data, 'base64').length
+          if (bufferSize >= 10 * 1024 * 1024) {
+            return res.status(400).json({
+              success: false,
+              message: 'Avatar image file size must be less than 10MB'
+            })
+          }
+        }
+
         const result = await cloudinary.v2.uploader.upload(req.body.avatar, {
           folder: 'avatars',
           width: 150,
@@ -161,7 +180,7 @@ exports.loginUser = async (req, res, next) => {
     const isPasswordMatched = await user.comparePassword(password);
 
     if (!isPasswordMatched) {
-        user.failedLoginAttempts += 1
+        user.failedLoginAttempts = (user.failedLoginAttempts || 0) + 1
         if (user.failedLoginAttempts >= 5) {
             user.loginLockedUntil = new Date(now + 60 * 1000)
             await user.save({ validateBeforeSave: false })
@@ -203,14 +222,10 @@ exports.forgotPassword = async (req, res, next) => {
     const resetToken = user.getResetPasswordToken();
     await user.save({ validateBeforeSave: false });
     // Create reset password url
-    const resetUrl = `${req.protocol}://localhost:5173/password/reset/${resetToken}`;
-    const message = `Your password reset token is as follow:\n\n${resetUrl}\n\nIf you have not requested this email, then ignore it.`
+    const origin = req.headers.origin || `${req.protocol}://localhost:5173`;
+    const resetUrl = `${origin}/password/reset/${resetToken}`;
     try {
-        await sendEmail({
-            email: user.email,
-            subject: 'BrickNation Password Recovery',
-            message
-        })
+        await sendPasswordResetEmail(user, resetUrl)
 
         res.status(200).json({
             success: true,

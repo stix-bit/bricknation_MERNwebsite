@@ -1,89 +1,94 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import {
+    Container,
+    Paper,
+    Box,
+    Typography,
+    Button,
+    Chip,
+    CircularProgress,
+    Stack,
+    Alert
+} from '@mui/material'
+import { DataGrid } from '@mui/x-data-grid'
 import MetaData from '../Layout/MetaData'
-import Loader from '../Layout/Loader'
-import axios from 'axios'
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-// import { getToken } from '../../Utils/helpers'
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { myOrders, clearErrors } from '../../actions/orderActions'
 
-import {
-
-    Button
-} from '@mui/material'
-
-
-import { DataGrid, } from '@mui/x-data-grid'
-
 const ListOrders = () => {
-    // const [loading, setLoading] = useState(true)
-    // const [error, setError] = useState('')
-    // const [myOrdersList, setMyOrdersList] = useState([])
-    const dispatch = useDispatch();
-    const { loading, error, orders } = useSelector(state => state.myOrders);
+    const dispatch = useDispatch()
+    const { loading, error, orders = [] } = useSelector(state => state.myOrders)
 
-    // const myOrders = async () => {
-    //     try {
-    //         const config = {
-    //             headers: {
-    //                 'Authorization': `Bearer ${getToken()}`
-    //             }
-    //         }
-    //         const { data } = await axios.get(`${import.meta.env.VITE_API}/orders/me`, config)
-    //         console.log(data)
-    //         setMyOrdersList(data.orders)
-    //         setLoading(false)
-
-    //     } catch (error) {
-    //         setError(error.response.data.message)
-    //     }
-    // }
     useEffect(() => {
-        dispatch(myOrders());
+        dispatch(myOrders())
         if (error) {
             toast.error(error, {
-                position: toast.POSITION.BOTTOM_RIGHT
-            });
+                position: 'bottom-right'
+            })
+            dispatch(clearErrors())
         }
-    }, [error])
+    }, [dispatch, error])
 
     const columns = [
         {
             field: 'id',
             headerName: 'Order ID',
-            flex: 1,
-            renderCell: (params) => <span style={{ wordBreak: 'break-all' }}>{params.value}</span>
+            flex: 1.2,
+            minWidth: 180,
+            renderCell: (params) => (
+                <span style={{ fontFamily: 'monospace', fontWeight: 600 }}>
+                    {params.value}
+                </span>
+            )
         },
         {
             field: 'numOfItems',
             headerName: 'Num of Items',
             type: 'number',
-            width: 130,
-            align: 'right',
-            headerAlign: 'right'
+            width: 140,
+            align: 'center',
+            headerAlign: 'center'
         },
         {
             field: 'amount',
             headerName: 'Amount',
-            width: 120,
+            width: 140,
             align: 'right',
-            headerAlign: 'right'
+            headerAlign: 'right',
+            renderCell: (params) => (
+                <span style={{ fontWeight: 700, color: 'var(--red, #e30620)' }}>
+                    {params.value}
+                </span>
+            )
         },
         {
             field: 'status',
             headerName: 'Status',
             width: 160,
-            renderCell: (params) =>
-                (params.value && String(params.value).includes('Delivered'))
-                    ? <span style={{ color: 'green' }}>{params.value}</span>
-                    : <span style={{ color: 'red' }}>{params.value}</span>
+            align: 'center',
+            headerAlign: 'center',
+            renderCell: (params) => {
+                const isDelivered = params.value && String(params.value).includes('Delivered')
+                return (
+                    <Chip
+                        label={params.value || 'Processing'}
+                        color={isDelivered ? 'success' : 'warning'}
+                        size="small"
+                        variant="outlined"
+                        sx={{ fontWeight: 600 }}
+                    />
+                )
+            }
         },
         {
             field: 'actions',
             headerName: 'Actions',
             width: 120,
+            align: 'center',
+            headerAlign: 'center',
             sortable: false,
             filterable: false,
             renderCell: (params) => (
@@ -92,38 +97,113 @@ const ListOrders = () => {
                     to={`/order/${params.id}`}
                     variant="contained"
                     size="small"
+                    sx={{
+                        minWidth: 38,
+                        height: 32,
+                        backgroundColor: 'var(--red, #e30620)',
+                        '&:hover': {
+                            backgroundColor: 'var(--red-dark, #ad071d)',
+                        },
+                        boxShadow: 'none',
+                    }}
                 >
                     <i className="fa fa-eye" />
                 </Button>
             )
         }
-    ];
+    ]
 
-    const rows = orders.map(order => ({
+    const rows = (orders || []).map(order => ({
         id: order._id,
-        numOfItems: order.orderItems.length,
+        numOfItems: order.orderItems?.length || 0,
         amount: `$${order.totalPrice}`,
-        status: order.orderStatus || ''
-    }));
+        status: order.orderStatus || 'Processing'
+    }))
 
     return (
         <>
             <MetaData title={'My Orders'} />
-            <h1 className="my-5">My Orders</h1>
 
-            {loading ? <Loader /> : (
-                <div style={{ width: '100%' }}>
-                    <DataGrid
-                        rows={rows}
-                        columns={columns}
-                        pageSize={5}
-                        rowsPerPageOptions={[5, 10, 25]}
-                        disableSelectionOnClick
-                        getRowId={(row) => row.id}
-                        showToolbar
-                    />
-                </div>
-            )}
+            <Container maxWidth="lg" sx={{ py: { xs: 4, md: 5 } }}>
+                <Typography
+                    variant="h4"
+                    component="h1"
+                    sx={{
+                        mb: 3,
+                        fontWeight: 700,
+                        fontFamily: "'Space Grotesk', sans-serif",
+                        color: 'var(--ink, #17151b)',
+                    }}
+                >
+                    My Orders
+                </Typography>
+
+                {error && (
+                    <Alert severity="error" sx={{ mb: 3 }}>
+                        {error}
+                    </Alert>
+                )}
+
+                <Paper
+                    elevation={0}
+                    sx={{
+                        p: { xs: 2, sm: 3 },
+                        borderRadius: '10px',
+                        border: '1px solid #eee7df',
+                        boxShadow: '0 8px 24px rgba(38, 22, 10, 0.06)',
+                        backgroundColor: '#ffffff',
+                    }}
+                >
+                    {loading ? (
+                        <Stack alignItems="center" justifyContent="center" sx={{ py: 8 }}>
+                            <CircularProgress sx={{ color: 'var(--red, #e30620)' }} />
+                            <Typography color="text.secondary" sx={{ mt: 2 }}>
+                                Loading your orders...
+                            </Typography>
+                        </Stack>
+                    ) : rows.length === 0 ? (
+                        <Box sx={{ textAlign: 'center', py: 8 }}>
+                            <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
+                                You have not placed any orders yet.
+                            </Typography>
+                            <Button
+                                component={Link}
+                                to="/"
+                                variant="contained"
+                                sx={{
+                                    backgroundColor: 'var(--red, #e30620)',
+                                    '&:hover': { backgroundColor: 'var(--red-dark, #ad071d)' },
+                                    fontWeight: 700,
+                                }}
+                            >
+                                Start Shopping
+                            </Button>
+                        </Box>
+                    ) : (
+                        <Box sx={{ width: '100%', minHeight: 380 }}>
+                            <DataGrid
+                                rows={rows}
+                                columns={columns}
+                                pageSizeOptions={[5, 10, 25]}
+                                initialPageSize={5}
+                                disableRowSelectionOnClick
+                                getRowId={(row) => row.id}
+                                autoHeight
+                                sx={{
+                                    border: 'none',
+                                    '& .MuiDataGrid-columnHeaders': {
+                                        backgroundColor: '#faf7f2',
+                                        fontWeight: 700,
+                                    },
+                                    '& .MuiDataGrid-cell:focus': {
+                                        outline: 'none',
+                                    },
+                                }}
+                            />
+                        </Box>
+                    )}
+                </Paper>
+            </Container>
         </>
     )
 }

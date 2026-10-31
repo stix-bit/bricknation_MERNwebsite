@@ -138,7 +138,7 @@ export const softDeleteAdminUser = (id) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: SOFT_DELETE_USER_FAIL,
-            payload: error.response?.data?.message || error.message || 'Unable to archive user'
+            payload: error.response?.data?.message || error.message || 'Unable to suspend user'
         })
         return false
     }
