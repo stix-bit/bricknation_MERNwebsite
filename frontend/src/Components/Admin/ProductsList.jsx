@@ -213,7 +213,9 @@ const ProductsList = () => {
         }
     ];
 
-    const rows = products.map(product => ({
+    const rows = [...products]
+        .sort((a, b) => String(b._id || '').localeCompare(String(a._id || '')))
+        .map(product => ({
         id: product._id,
         name: product.name,
         category: product.category_id?.name || 'Uncategorized',
@@ -236,6 +238,11 @@ const ProductsList = () => {
                         {loading ? <Loader /> : (
                             <div style={{ width: '100%' }}>
                                 <DataGrid
+                                    initialState={{
+                                        sorting: {
+                                            sortModel: [{ field: 'id', sort: 'desc' }],
+                                        },
+                                    }}
                                     rows={rows}
                                     columns={columns}
 

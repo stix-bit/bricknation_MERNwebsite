@@ -103,7 +103,7 @@ exports.getSingleOrder = async (req, res, next) => {
 }
 
 exports.allOrders = async (req, res, next) => {
-    const orders = await Order.find()
+    const orders = await Order.find().sort({ _id: -1 })
     // console.log(orders)
     let totalAmount = 0;
 

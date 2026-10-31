@@ -47,7 +47,22 @@ functional requirements completeness 10pts
 program execution (errors).  10pts
 project contribution 10pts
 
-ADDITIONAL:
+PAGES TO UPDATE:
+admin - Apply material ui components on these pages
+    dashboard
+    all products
+    orders (add confirm message for deleting)
+    orderdetails
+    users
+
+user - Apply material ui components on these pages
+    cart
+    shipping
+    confirm 
+    payment
+    success
+    checkout steps (its the Shipping Confirm Order and Payment text that shows up when your on shipping, confirm, payment page.)
+        fix it and if needed apply material ui components
 
 
 ADDITIONAL/OPTIONAL:
@@ -59,5 +74,5 @@ ADDITIONAL/OPTIONAL:
 6. For your own user's role make it log you out when you do.
 7. Make registers send you to the login page and not home page ✅
 8. Make reviews restricted to only people that bought the products ✅
-9. Make admin reviews page, search the product id and then view all of the comments on the products 
-10. Add payment gateway using XENDIT Test Mode
+9. Make admin reviews page, search the product id and then view all of the comments on the products ✅ 
+10. Add a category section on the header

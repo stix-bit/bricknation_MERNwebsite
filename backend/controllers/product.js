@@ -150,7 +150,7 @@ exports.getProducts = async (req, res) => {
 }
 
 exports.getAdminProducts = async (req, res, next) => {
-    const products = await Product.find().populate('category_id');
+    const products = await Product.find().populate('category_id').sort({ _id: -1 });
     if (!products) {
         return res.status(404).json({
             success: false,

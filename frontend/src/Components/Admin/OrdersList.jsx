@@ -126,7 +126,9 @@ const OrdersList = () => {
             )
         }
     ];
-    const rows = orders.map(order => ({
+    const rows = [...orders]
+        .sort((a, b) => String(b._id || '').localeCompare(String(a._id || '')))
+        .map(order => ({
         id: order._id,
         numofItems: order.orderItems.length,
         amount: `$${order.totalPrice}`,
@@ -146,6 +148,11 @@ const OrdersList = () => {
                         {loading ? <Loader /> : (
                             <div style={{ width: '100%' }}>
                                 <DataGrid
+                                    initialState={{
+                                        sorting: {
+                                            sortModel: [{ field: 'id', sort: 'desc' }],
+                                        },
+                                    }}
                                     rows={rows}
                                     columns={columns}
 
