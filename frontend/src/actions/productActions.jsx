@@ -59,6 +59,7 @@ export const getProducts = (
 
         const params = new URLSearchParams({
             page: currentPage.toString(),
+            limit: '8',
             keyword,
             'price[lte]': price[1].toString(),
             'price[gte]': price[0].toString()

@@ -48,12 +48,12 @@ program execution (errors).  10pts
 project contribution 10pts
 
 PAGES TO UPDATE:
-admin - Apply material ui components on these pages
-    dashboard
-    all products
-    orders (add confirm message for deleting)
-    orderdetails
-    users
+admin - Apply material ui components on these pages ✅
+    dashboard ✅
+    all products ✅
+    orders (add confirm message for deleting) ✅
+    orderdetails ✅
+    users ✅
 
 user - Apply material ui components on these pages
     cart

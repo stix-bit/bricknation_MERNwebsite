@@ -115,7 +115,7 @@ exports.getSingleProduct = async (req, res, next) => {
 
 exports.getProducts = async (req, res) => {
 
-    const resPerPage = 10;
+    const resPerPage = Number(req.query.limit) || 8;
     const productsCount = await Product.countDocuments({ isArchived: { $ne: true } });
 
    // const products = await Product.find()

@@ -23,6 +23,7 @@ import UpdateProfile from './Components/User/UpdateProfile';
 import UpdatePassword from './Components/User/UpdatePassword';
 
 import ProductDetails from './Components/Product/ProductDetails'
+import CategoriesPage from './Components/Product/CategoriesPage';
 import Cart from './Components/Cart/Cart';
 import Shipping from './Components/Cart/Shipping';
 import ConfirmOrder from './Components/Cart/ConfirmOrder';
@@ -133,6 +134,8 @@ function App() {
           <Route path="/" element={<Home />} exact="true" />
           {/* <Route path="/product/:id" element={<ProductDetails cartItems={state.cartItems} addItemToCart={addItemToCart} />} exact="true" /> */}
           <Route path="/product/:id" element={<ProductDetails />} exact="true" />
+          <Route path="/categories" element={<CategoriesPage />} exact="true" />
+          <Route path="/category/:categoryId" element={<Home />} exact="true" />
           <Route path="/search/:keyword" element={<Home />} exact="true" />
           <Route path="/login" element={<Login />} exact="true" />
           <Route path="/register" element={<Register exact="true" />} />

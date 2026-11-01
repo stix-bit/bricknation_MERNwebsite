@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import MetaData from './Layout/MetaData'
 import Product from './Product/Product'
 import Loader from './Layout/Loader'
@@ -25,7 +25,9 @@ const Home = () => {
     const [categories, setCategories] = useState([]);
     const [openFilter, setOpenFilter] = useState('');
     const [currentPage, setCurrentPage] = useState(1)
-    let { keyword } = useParams();
+    let { keyword, categoryId } = useParams();
+    const [searchParams] = useSearchParams();
+    const queryCategory = categoryId || searchParams.get('category');
 
     const dispatch = useDispatch();
     const { loading, products, filteredProductsCount } = useSelector(state => state.products);
@@ -53,8 +55,8 @@ const Home = () => {
         setPriceInput(nextPrice)
         setPriceError(
             nextPrice[0] !== '' &&
-            nextPrice[1] !== '' &&
-            nextPrice[0] > nextPrice[1]
+                nextPrice[1] !== '' &&
+                nextPrice[0] > nextPrice[1]
                 ? 'Minimum price cannot be greater than maximum price.'
                 : ''
         )
@@ -94,6 +96,22 @@ const Home = () => {
     }, [])
 
     useEffect(() => {
+        if (queryCategory) {
+            if (queryCategory === 'all') {
+                setCategory([])
+            } else if (categories.length > 0) {
+                const matched = categories.find(
+                    c => c._id === queryCategory || c.name.toLowerCase() === queryCategory.toLowerCase()
+                )
+                setCategory(matched ? [matched._id] : [queryCategory])
+            } else {
+                setCategory([queryCategory])
+            }
+            setCurrentPage(1)
+        }
+    }, [queryCategory, categories])
+
+    useEffect(() => {
         dispatch(getProducts(currentPage, keyword, price, category, rating, reviews, currentPage > 1))
     }, [currentPage, keyword, price, category, rating, reviews, dispatch]);
 
@@ -118,10 +136,10 @@ const Home = () => {
         setCurrentPage(1)
     }
 
-    
+
     return (
         <>
-            <MetaData title={'shop Here'} />
+            <MetaData title={'BrickNation'} />
             {loading && currentPage === 1 ? <Loader /> :
                 (<div className="storefront">
                     <section className="hero-banner">
@@ -129,7 +147,7 @@ const Home = () => {
                             <span className="eyebrow">BUILD SOMETHING BOLD</span>
                             <h1>Bring your<br /><strong>imagination</strong> to life.</h1>
                             <center>
-                            <p>Discover bricks, sets and collectibles made for builders who never stop creating.</p>
+                                <p>Discover bricks, sets and collectibles made for builders who never stop creating.</p>
                             </center>
                             <a className="hero-cta" href="#products_heading">Shop the collection <span>→</span></a>
                         </div>
@@ -144,190 +162,190 @@ const Home = () => {
                         <div><span className="feature-icon">↗</span><strong>Fast delivery</strong><small>Build sooner, smile sooner</small></div>
                     </section>
                     <div className="container-fluid px-4">
-                    <div className="section-heading">
-                        <div><span className="eyebrow">OUR COLLECTION</span><h2 id="products_heading">Latest products</h2></div>
-                        <span className="heading-accent">BRICKNATION / 01</span>
-                    </div>
-                    <section id="products" className="container-fluid mt-4">
-                        {/* <div className="row">
+                        <div className="section-heading">
+                            <div><span className="eyebrow">OUR COLLECTION</span><h2 id="products_heading">Latest products</h2></div>
+                            <span className="heading-accent">BRICKNATION / 01</span>
+                        </div>
+                        <section id="products" className="container-fluid mt-4">
+                            {/* <div className="row">
                         {products && products.map(product => (
                             <Product key={product._id} product={product} />
                             // <Product product={product} />
                         ))}
                     </div> */}
 
-                        <div className="row">
-                            {keyword ? (
-                                <>
-                                <div className="col-12 col-md-3 mt-5 mb-5">
-                                    <Paper className="filter-panel" elevation={0} sx={{ p: 3, textAlign: 'left' }}>
-                                        <Typography variant="h5" component="h2" sx={{ mb: 3, fontWeight: 600 }}>
-                                            Filters
-                                        </Typography>
-                                        <div>
-                                            <label className="form-label fw-bold">Price Range</label>
-                                            <div className="row g-2">
-                                                <div className="col-6">
-                                                    <label htmlFor="minimum_price" className="form-label small">Minimum</label>
-                                                    <input
-                                                        id="minimum_price"
-                                                        type="number"
-                                                        className={`form-control ${priceError ? 'is-invalid' : ''}`}
-                                                        min="0"
-                                                        value={priceInput[0]}
-                                                        onChange={(event) => handlePriceChange(0, event.target.value)}
-                                                        aria-describedby={priceError ? 'price_filter_error' : undefined}
-                                                    />
+                            <div className="row">
+                                {keyword ? (
+                                    <>
+                                        <div className="col-12 col-md-3 mt-5 mb-5">
+                                            <Paper className="filter-panel" elevation={0} sx={{ p: 3, textAlign: 'left' }}>
+                                                <Typography variant="h5" component="h2" sx={{ mb: 3, fontWeight: 600 }}>
+                                                    Filters
+                                                </Typography>
+                                                <div>
+                                                    <label className="form-label fw-bold">Price Range</label>
+                                                    <div className="row g-2">
+                                                        <div className="col-6">
+                                                            <label htmlFor="minimum_price" className="form-label small">Minimum</label>
+                                                            <input
+                                                                id="minimum_price"
+                                                                type="number"
+                                                                className={`form-control ${priceError ? 'is-invalid' : ''}`}
+                                                                min="0"
+                                                                value={priceInput[0]}
+                                                                onChange={(event) => handlePriceChange(0, event.target.value)}
+                                                                aria-describedby={priceError ? 'price_filter_error' : undefined}
+                                                            />
+                                                        </div>
+                                                        <div className="col-6">
+                                                            <label htmlFor="maximum_price" className="form-label small">Maximum</label>
+                                                            <input
+                                                                id="maximum_price"
+                                                                type="number"
+                                                                className={`form-control ${priceError ? 'is-invalid' : ''}`}
+                                                                min="0"
+                                                                value={priceInput[1]}
+                                                                onChange={(event) => handlePriceChange(1, event.target.value)}
+                                                                aria-describedby={priceError ? 'price_filter_error' : undefined}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    {priceError && (
+                                                        <div id="price_filter_error" className="invalid-feedback d-block">
+                                                            {priceError}
+                                                        </div>
+                                                    )}
+                                                    <Button type="button" variant="contained" fullWidth sx={{ mt: 2 }} onClick={applyPriceFilter}>
+                                                        Apply price range
+                                                    </Button>
                                                 </div>
-                                                <div className="col-6">
-                                                    <label htmlFor="maximum_price" className="form-label small">Maximum</label>
-                                                    <input
-                                                        id="maximum_price"
-                                                        type="number"
-                                                        className={`form-control ${priceError ? 'is-invalid' : ''}`}
-                                                        min="0"
-                                                        value={priceInput[1]}
-                                                        onChange={(event) => handlePriceChange(1, event.target.value)}
-                                                        aria-describedby={priceError ? 'price_filter_error' : undefined}
-                                                    />
+                                                <div className="mt-4">
+                                                    <button type="button" className="btn btn-outline-secondary w-100 text-start" onClick={() => setOpenFilter(openFilter === 'category' ? '' : 'category')}>
+                                                        Category <span className="float-end">{openFilter === 'category' ? '▲' : '▼'}</span>
+                                                    </button>
+                                                    {openFilter === 'category' && (
+                                                        <div className="border rounded p-2 mt-1 bg-white text-start">
+                                                            <label className="d-flex align-items-center py-1">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    className="flex-shrink-0 me-3"
+                                                                    style={{ marginRight: '12px' }}
+                                                                    checked={category.length === 0}
+                                                                    onChange={() => {
+                                                                        setCategory([])
+                                                                        setCurrentPage(1)
+                                                                    }}
+                                                                />
+                                                                <span className="flex-grow-1">All categories</span>
+                                                            </label>
+                                                            {categories.map(item => (
+                                                                <label key={item._id} className="d-flex align-items-center py-1">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        className="flex-shrink-0 me-3"
+                                                                        style={{ marginRight: '12px' }}
+                                                                        checked={category.includes(item._id)}
+                                                                        onChange={() => {
+                                                                            setCategory(category.includes(item._id)
+                                                                                ? category.filter(categoryId => categoryId !== item._id)
+                                                                                : [...category, item._id])
+                                                                            setCurrentPage(1)
+                                                                        }}
+                                                                    />
+                                                                    <span className="flex-grow-1">{item.name}</span>
+                                                                </label>
+                                                            ))}
+                                                        </div>
+                                                    )}
                                                 </div>
+                                                <div className="mt-4">
+                                                    <button type="button" className="btn btn-outline-secondary w-100 text-start" onClick={() => setOpenFilter(openFilter === 'rating' ? '' : 'rating')}>
+                                                        Rating <span className="float-end">{openFilter === 'rating' ? '▲' : '▼'}</span>
+                                                    </button>
+                                                    {openFilter === 'rating' && (
+                                                        <div className="border rounded p-2 mt-1 bg-white text-start">
+                                                            {[
+                                                                ['', 'Any rating'],
+                                                                ['5', '5 stars'],
+                                                                ['4', '4 stars and up'],
+                                                                ['3', '3 stars and up'],
+                                                                ['2', '2 stars and up'],
+                                                                ['1', '1 star and up']
+                                                            ].map(([value, label]) => (
+                                                                <label key={label} className="d-flex align-items-center py-1">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        className="flex-shrink-0 me-3"
+                                                                        style={{ marginRight: '12px' }}
+                                                                        checked={rating === value}
+                                                                        onChange={() => {
+                                                                            setRating(rating === value ? '' : value)
+                                                                            setCurrentPage(1)
+                                                                        }}
+                                                                    />
+                                                                    <span className="flex-grow-1">{label}</span>
+                                                                </label>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="mt-4">
+                                                    <button type="button" className="btn btn-outline-secondary w-100 text-start" onClick={() => setOpenFilter(openFilter === 'reviews' ? '' : 'reviews')}>
+                                                        Number of reviews <span className="float-end">{openFilter === 'reviews' ? '▲' : '▼'}</span>
+                                                    </button>
+                                                    {openFilter === 'reviews' && (
+                                                        <div className="border rounded p-2 mt-1 bg-white text-start">
+                                                            {[
+                                                                ['', 'Any number of reviews'],
+                                                                ['5', '5 reviews and up'],
+                                                                ['10', '10 reviews and up'],
+                                                                ['25', '25 reviews and up'],
+                                                                ['50', '50 reviews and up']
+                                                            ].map(([value, label]) => (
+                                                                <label key={label} className="d-flex align-items-center py-1">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        className="flex-shrink-0 me-3"
+                                                                        style={{ marginRight: '12px' }}
+                                                                        checked={reviews === value}
+                                                                        onChange={() => {
+                                                                            setReviews(reviews === value ? '' : value)
+                                                                            setCurrentPage(1)
+                                                                        }}
+                                                                    />
+                                                                    <span className="flex-grow-1">{label}</span>
+                                                                </label>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <Button type="button" variant="outlined" fullWidth sx={{ mt: 3 }} onClick={resetFilters}>
+                                                    Clear filters
+                                                </Button>
+                                            </Paper>
+                                        </div>
+
+                                        <div className="col-6 col-md-9">
+                                            <div className="row">
+                                                {products.map(product => (
+                                                    <Product key={product._id} product={product} />
+                                                ))}
                                             </div>
-                                            {priceError && (
-                                                <div id="price_filter_error" className="invalid-feedback d-block">
-                                                    {priceError}
-                                                </div>
-                                            )}
-                                            <Button type="button" variant="contained" fullWidth sx={{ mt: 2 }} onClick={applyPriceFilter}>
-                                                Apply price range
-                                            </Button>
                                         </div>
-                                        <div className="mt-4">
-                                            <button type="button" className="btn btn-outline-secondary w-100 text-start" onClick={() => setOpenFilter(openFilter === 'category' ? '' : 'category')}>
-                                                Category <span className="float-end">{openFilter === 'category' ? '▲' : '▼'}</span>
-                                            </button>
-                                            {openFilter === 'category' && (
-                                                <div className="border rounded p-2 mt-1 bg-white text-start">
-                                                    <label className="d-flex align-items-center py-1">
-                                                        <input
-                                                            type="checkbox"
-                                                            className="flex-shrink-0 me-3"
-                                                            style={{ marginRight: '12px' }}
-                                                            checked={category.length === 0}
-                                                            onChange={() => {
-                                                                setCategory([])
-                                                                setCurrentPage(1)
-                                                            }}
-                                                        />
-                                                    <span className="flex-grow-1">All categories</span>
-                                                    </label>
-                                                    {categories.map(item => (
-                                                        <label key={item._id} className="d-flex align-items-center py-1">
-                                                            <input
-                                                                type="checkbox"
-                                                                className="flex-shrink-0 me-3"
-                                                                style={{ marginRight: '12px' }}
-                                                                checked={category.includes(item._id)}
-                                                                onChange={() => {
-                                                                    setCategory(category.includes(item._id)
-                                                                        ? category.filter(categoryId => categoryId !== item._id)
-                                                                        : [...category, item._id])
-                                                                    setCurrentPage(1)
-                                                                }}
-                                                            />
-                                                            <span className="flex-grow-1">{item.name}</span>
-                                                        </label>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="mt-4">
-                                            <button type="button" className="btn btn-outline-secondary w-100 text-start" onClick={() => setOpenFilter(openFilter === 'rating' ? '' : 'rating')}>
-                                                Rating <span className="float-end">{openFilter === 'rating' ? '▲' : '▼'}</span>
-                                            </button>
-                                            {openFilter === 'rating' && (
-                                                <div className="border rounded p-2 mt-1 bg-white text-start">
-                                                    {[
-                                                        ['', 'Any rating'],
-                                                        ['5', '5 stars'],
-                                                        ['4', '4 stars and up'],
-                                                        ['3', '3 stars and up'],
-                                                        ['2', '2 stars and up'],
-                                                        ['1', '1 star and up']
-                                                    ].map(([value, label]) => (
-                                                        <label key={label} className="d-flex align-items-center py-1">
-                                                            <input
-                                                                type="checkbox"
-                                                                className="flex-shrink-0 me-3"
-                                                                style={{ marginRight: '12px' }}
-                                                                checked={rating === value}
-                                                                onChange={() => {
-                                                                    setRating(rating === value ? '' : value)
-                                                                    setCurrentPage(1)
-                                                                }}
-                                                            />
-                                                            <span className="flex-grow-1">{label}</span>
-                                                        </label>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="mt-4">
-                                            <button type="button" className="btn btn-outline-secondary w-100 text-start" onClick={() => setOpenFilter(openFilter === 'reviews' ? '' : 'reviews')}>
-                                                Number of reviews <span className="float-end">{openFilter === 'reviews' ? '▲' : '▼'}</span>
-                                            </button>
-                                            {openFilter === 'reviews' && (
-                                                <div className="border rounded p-2 mt-1 bg-white text-start">
-                                                    {[
-                                                        ['', 'Any number of reviews'],
-                                                        ['5', '5 reviews and up'],
-                                                        ['10', '10 reviews and up'],
-                                                        ['25', '25 reviews and up'],
-                                                        ['50', '50 reviews and up']
-                                                    ].map(([value, label]) => (
-                                                        <label key={label} className="d-flex align-items-center py-1">
-                                                            <input
-                                                                type="checkbox"
-                                                                className="flex-shrink-0 me-3"
-                                                                style={{ marginRight: '12px' }}
-                                                                checked={reviews === value}
-                                                                onChange={() => {
-                                                                    setReviews(reviews === value ? '' : value)
-                                                                    setCurrentPage(1)
-                                                                }}
-                                                            />
-                                                            <span className="flex-grow-1">{label}</span>
-                                                        </label>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <Button type="button" variant="outlined" fullWidth sx={{ mt: 3 }} onClick={resetFilters}>
-                                            Clear filters
-                                        </Button>
-                                    </Paper>
-                                </div>
+                                    </>
+                                ) : (
+                                    products.map(product => (
+                                        <Product key={product._id} product={product} />
+                                    ))
+                                )}
 
-                                    <div className="col-6 col-md-9">
-                                        <div className="row">
-                                            {products.map(product => (
-                                                <Product key={product._id} product={product} />
-                                            ))}
-                                        </div>
-                                    </div>
-                                </>
-                            ) : (
-                                products.map(product => (
-                                    <Product key={product._id} product={product} />
-                                ))
-                            )}
-
-                        </div>
-                        {products.length < filteredProductsCount && (
-                            <div ref={loadMoreRef} className="d-flex justify-content-center mt-5" style={{ minHeight: 48 }}>
-                                {loading && <CircularProgress size={32} />}
                             </div>
-                        )}
-                    </section>
+                            {products.length < filteredProductsCount && (
+                                <div ref={loadMoreRef} className="d-flex justify-content-center mt-5" style={{ minHeight: 48 }}>
+                                    {loading && <CircularProgress size={32} />}
+                                </div>
+                            )}
+                        </section>
                     </div>
                 </div>)}
         </>

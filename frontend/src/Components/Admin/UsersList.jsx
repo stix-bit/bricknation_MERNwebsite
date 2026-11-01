@@ -12,6 +12,9 @@ import {
     DialogContent,
     DialogTitle,
     Divider,
+    FormControl,
+    InputAdornment,
+    InputLabel,
     MenuItem,
     Paper,
     Select,
@@ -19,9 +22,11 @@ import {
     Table,
     TableBody,
     TableCell,
+    TableContainer,
     TableHead,
     TableRow,
     TextField,
+    Tooltip,
     Typography
 } from '@mui/material'
 import MetaData from '../Layout/MetaData'
@@ -36,7 +41,8 @@ import {
 
 const UsersList = () => {
     const dispatch = useDispatch()
-    const { users, loading, actionLoading, error } = useSelector(state => state.allUsers)
+    const { users = [], loading, actionLoading, error } = useSelector(state => state.allUsers)
+    const [searchTerm, setSearchTerm] = useState('')
     const [editingUser, setEditingUser] = useState(null)
     const [userToDelete, setUserToDelete] = useState(null)
     const [deleteMode, setDeleteMode] = useState('soft')
@@ -70,133 +76,263 @@ const UsersList = () => {
         if (deleted) setUserToDelete(null)
     }
 
+    const filteredUsers = users.filter(user =>
+        (user.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (user.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (user._id || '').toLowerCase().includes(searchTerm.toLowerCase())
+    )
+
     return (
         <>
             <MetaData title="All Users" />
-            <Box sx={{ display: 'flex', gap: 3, px: { xs: 1, md: 3 }, py: 3 }}>
+            <Box sx={{ display: 'flex', gap: 3, px: { xs: 1, md: 3 }, py: 3, minHeight: '80vh' }}>
                 <Box sx={{ display: { xs: 'none', md: 'block' }, width: 220, flexShrink: 0 }}>
                     <Sidebar />
                 </Box>
+
                 <Box component="main" sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography variant="h4" fontWeight={700} sx={{ mb: 3 }}>Users</Typography>
+                    <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                        <div>
+                            <Typography variant="h4" fontWeight={700} sx={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                                Users
+                            </Typography>
+                            <Typography color="text.secondary" variant="body2">
+                                Manage registered customer profiles, administrative roles, and access status
+                            </Typography>
+                        </div>
+                        <TextField
+                            size="small"
+                            placeholder="Search by name, email, or ID..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            sx={{ minWidth: 260 }}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <i className="fa fa-search" style={{ color: '#888' }}></i>
+                                    </InputAdornment>
+                                )
+                            }}
+                        />
+                    </Box>
+
                     {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-                    <Paper elevation={0} sx={{ border: '1px solid', borderColor: 'divider', overflowX: 'auto' }}>
+
+                    <Paper elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 3, overflow: 'hidden' }}>
                         {loading ? (
                             <Stack alignItems="center" sx={{ py: 8 }}>
-                                <CircularProgress />
+                                <CircularProgress sx={{ color: 'var(--red, #e30620)' }} />
                                 <Typography color="text.secondary" sx={{ mt: 2 }}>Loading users...</Typography>
                             </Stack>
                         ) : (
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>User</TableCell>
-                                        <TableCell>Email</TableCell>
-                                        <TableCell>Role</TableCell>
-                                        <TableCell>Status</TableCell>
-                                        <TableCell align="right">Actions</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {users.map(user => (
-                                        <TableRow key={user._id} hover>
-                                            <TableCell>
-                                                <Stack direction="row" spacing={1.5} alignItems="center">
-                                                    <Avatar src={user.avatar?.url} alt={user.name}>
-                                                        {(user.name || 'U').charAt(0).toUpperCase()}
-                                                    </Avatar>
-                                                    <Typography fontWeight={600}>{user.name}</Typography>
-                                                </Stack>
-                                            </TableCell>
-                                            <TableCell>{user.email}</TableCell>
-                                            <TableCell>
-                                                <Chip size="small" label={user.role} color={user.role === 'admin' ? 'primary' : 'default'} />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Chip size="small" label={user.isDeleted ? 'Suspended' : 'Active'}
-                                                    color={user.isDeleted ? 'warning' : 'success'} variant="outlined" />
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} justifyContent="flex-end">
-                                                    <Button size="small" variant="outlined" onClick={() => openEditDialog(user)}>
-                                                        Edit
-                                                    </Button>
-                                                    <Button size="small" color={user.isDeleted ? 'success' : 'warning'} variant="outlined"
-                                                        disabled={actionLoading}
-                                                        onClick={() => {
-                                                            setDeleteMode(user.isDeleted ? 'restore' : 'soft')
-                                                            setUserToDelete(user)
-                                                        }}>
-                                                        {user.isDeleted ? 'Restore' : 'Suspend'}
-                                                    </Button>
-                                                    <Button size="small" color="error" variant="outlined"
-                                                        disabled={actionLoading}
-                                                        onClick={() => { setDeleteMode('hard'); setUserToDelete(user) }}>
-                                                        Delete
-                                                    </Button>
-                                                </Stack>
-                                            </TableCell>
+                            <TableContainer sx={{ maxHeight: 600 }}>
+                                <Table stickyHeader>
+                                    <TableHead>
+                                        <TableRow sx={{ '& th': { bgcolor: 'rgba(0, 0, 0, 0.02)', fontWeight: 700 } }}>
+                                            <TableCell>User</TableCell>
+                                            <TableCell>Email</TableCell>
+                                            <TableCell>Role</TableCell>
+                                            <TableCell>Status</TableCell>
+                                            <TableCell align="right">Actions</TableCell>
                                         </TableRow>
-                                    ))}
-                                    {users.length === 0 && (
-                                        <TableRow>
-                                            <TableCell colSpan={5} align="center">No users found.</TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
+                                    </TableHead>
+                                    <TableBody>
+                                        {filteredUsers.map(user => (
+                                            <TableRow key={user._id} hover>
+                                                <TableCell>
+                                                    <Stack direction="row" spacing={1.5} alignItems="center">
+                                                        <Avatar src={user.avatar?.url} alt={user.name} sx={{ width: 40, height: 40 }}>
+                                                            {(user.name || 'U').charAt(0).toUpperCase()}
+                                                        </Avatar>
+                                                        <Box>
+                                                            <Typography fontWeight={600} variant="body2">{user.name}</Typography>
+                                                            <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+                                                                {user._id}
+                                                            </Typography>
+                                                        </Box>
+                                                    </Stack>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography variant="body2">{user.email}</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Chip
+                                                        size="small"
+                                                        label={user.role}
+                                                        color={user.role === 'admin' ? 'primary' : 'default'}
+                                                        variant={user.role === 'admin' ? 'filled' : 'outlined'}
+                                                        sx={{ fontWeight: 600, textTransform: 'capitalize' }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Chip
+                                                        size="small"
+                                                        label={user.isDeleted ? 'Suspended' : 'Active'}
+                                                        color={user.isDeleted ? 'warning' : 'success'}
+                                                        variant="outlined"
+                                                        sx={{ fontWeight: 600 }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell align="right">
+                                                    <Stack direction="row" spacing={1} justifyContent="flex-end">
+                                                        <Button
+                                                            size="small"
+                                                            variant="outlined"
+                                                            onClick={() => openEditDialog(user)}
+                                                            sx={{ textTransform: 'none', borderRadius: 1.5 }}
+                                                        >
+                                                            Edit
+                                                        </Button>
+                                                        <Button
+                                                            size="small"
+                                                            color={user.isDeleted ? 'success' : 'warning'}
+                                                            variant="outlined"
+                                                            disabled={actionLoading}
+                                                            onClick={() => {
+                                                                setDeleteMode(user.isDeleted ? 'restore' : 'soft')
+                                                                setUserToDelete(user)
+                                                            }}
+                                                            sx={{ textTransform: 'none', borderRadius: 1.5 }}
+                                                        >
+                                                            {user.isDeleted ? 'Restore' : 'Suspend'}
+                                                        </Button>
+                                                        <Button
+                                                            size="small"
+                                                            color="error"
+                                                            variant="outlined"
+                                                            disabled={actionLoading}
+                                                            onClick={() => {
+                                                                setDeleteMode('hard')
+                                                                setUserToDelete(user)
+                                                            }}
+                                                            sx={{ textTransform: 'none', borderRadius: 1.5 }}
+                                                        >
+                                                            Delete
+                                                        </Button>
+                                                    </Stack>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                        {filteredUsers.length === 0 && (
+                                            <TableRow>
+                                                <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
+                                                    <Typography color="text.secondary">
+                                                        {searchTerm ? `No users matching "${searchTerm}"` : 'No users found.'}
+                                                    </Typography>
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
                         )}
                     </Paper>
                 </Box>
             </Box>
 
-            <Dialog open={Boolean(editingUser)} onClose={() => !actionLoading && setEditingUser(null)}
-                fullWidth maxWidth="sm">
-                <DialogTitle>Modify user</DialogTitle>
+            {/* Modify User Dialog */}
+            <Dialog
+                open={Boolean(editingUser)}
+                onClose={() => !actionLoading && setEditingUser(null)}
+                fullWidth
+                maxWidth="sm"
+            >
+                <DialogTitle sx={{ fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif" }}>
+                    Modify User Details
+                </DialogTitle>
                 <Box component="form" onSubmit={submitEdit}>
                     <DialogContent>
-                        <Stack spacing={2} sx={{ pt: 1 }}>
-                            <TextField label="Name" value={form.name} required
-                                onChange={event => setForm({ ...form, name: event.target.value })} />
-                            <TextField label="Email" type="email" value={form.email} required
-                                onChange={event => setForm({ ...form, email: event.target.value })} />
-                            <Select value={form.role} onChange={event => setForm({ ...form, role: event.target.value })}>
-                                <MenuItem value="user">User</MenuItem>
-                                <MenuItem value="admin">Admin</MenuItem>
-                            </Select>
+                        <Stack spacing={2.5} sx={{ pt: 1 }}>
+                            <TextField
+                                label="Full Name"
+                                value={form.name}
+                                required
+                                fullWidth
+                                onChange={event => setForm({ ...form, name: event.target.value })}
+                            />
+                            <TextField
+                                label="Email Address"
+                                type="email"
+                                value={form.email}
+                                required
+                                fullWidth
+                                onChange={event => setForm({ ...form, email: event.target.value })}
+                            />
+                            <FormControl fullWidth>
+                                <InputLabel id="role-select-label">Account Role</InputLabel>
+                                <Select
+                                    labelId="role-select-label"
+                                    value={form.role}
+                                    label="Account Role"
+                                    onChange={event => setForm({ ...form, role: event.target.value })}
+                                >
+                                    <MenuItem value="user">User</MenuItem>
+                                    <MenuItem value="admin">Administrator</MenuItem>
+                                </Select>
+                            </FormControl>
                         </Stack>
                     </DialogContent>
-                    <DialogActions sx={{ px: 3, pb: 2 }}>
-                        <Button onClick={() => setEditingUser(null)} disabled={actionLoading}>Cancel</Button>
-                        <Button type="submit" variant="contained" disabled={actionLoading}>
-                            {actionLoading ? <CircularProgress size={20} color="inherit" /> : 'Save changes'}
+                    <DialogActions sx={{ px: 3, pb: 2.5 }}>
+                        <Button onClick={() => setEditingUser(null)} disabled={actionLoading} sx={{ textTransform: 'none' }}>
+                            Cancel
+                        </Button>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            disabled={actionLoading}
+                            sx={{
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                bgcolor: 'var(--red, #e30620)',
+                                '&:hover': { bgcolor: 'var(--red-dark, #ad071d)' }
+                            }}
+                        >
+                            {actionLoading ? <CircularProgress size={20} color="inherit" /> : 'Save Changes'}
                         </Button>
                     </DialogActions>
                 </Box>
             </Dialog>
 
-            <Dialog open={Boolean(userToDelete)} onClose={() => !actionLoading && setUserToDelete(null)}
-                maxWidth="xs" fullWidth>
-                <DialogTitle>
-                    {deleteMode === 'soft' ? 'Suspend user?' : deleteMode === 'restore' ? 'Restore user?' : 'Permanently delete user?'}
+            {/* Suspend / Restore / Hard Delete Confirmation Dialog */}
+            <Dialog
+                open={Boolean(userToDelete)}
+                onClose={() => !actionLoading && setUserToDelete(null)}
+                maxWidth="xs"
+                fullWidth
+            >
+                <DialogTitle sx={{ fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif" }}>
+                    {deleteMode === 'soft' ? 'Suspend User?' : deleteMode === 'restore' ? 'Restore User?' : 'Permanently Delete User?'}
                 </DialogTitle>
                 <DialogContent>
                     <Typography color="text.secondary">
                         {deleteMode === 'soft'
-                            ? `Suspend ${userToDelete?.name || 'this user'} without permanently removing the account.`
+                            ? `Suspend ${userToDelete?.name || 'this user'} without permanently removing the account. They will not be able to log in.`
                             : deleteMode === 'restore'
-                                ? `Restore ${userToDelete?.name || 'this user'} and allow the account to log in again.`
-                                : `Permanently remove ${userToDelete?.name || 'this user'} and related data. This cannot be undone.`}
+                                ? `Restore ${userToDelete?.name || 'this user'} and re-enable their account access.`
+                                : `Permanently delete ${userToDelete?.name || 'this user'} and all associated records. This action cannot be undone.`}
                     </Typography>
                 </DialogContent>
                 <Divider />
                 <DialogActions sx={{ px: 3, py: 2 }}>
-                    <Button onClick={() => setUserToDelete(null)} disabled={actionLoading}>Cancel</Button>
-                    <Button color={deleteMode === 'soft' ? 'warning' : deleteMode === 'restore' ? 'success' : 'error'} variant="contained"
-                        onClick={confirmDelete} disabled={actionLoading}>
-                        {actionLoading
-                            ? <CircularProgress size={20} color="inherit" />
-                            : deleteMode === 'soft' ? 'Suspend' : deleteMode === 'restore' ? 'Restore' : 'Delete permanently'}
+                    <Button onClick={() => setUserToDelete(null)} disabled={actionLoading} sx={{ textTransform: 'none' }}>
+                        Cancel
+                    </Button>
+                    <Button
+                        color={deleteMode === 'soft' ? 'warning' : deleteMode === 'restore' ? 'success' : 'error'}
+                        variant="contained"
+                        onClick={confirmDelete}
+                        disabled={actionLoading}
+                        sx={{ textTransform: 'none', fontWeight: 600 }}
+                    >
+                        {actionLoading ? (
+                            <CircularProgress size={20} color="inherit" />
+                        ) : deleteMode === 'soft' ? (
+                            'Suspend'
+                        ) : deleteMode === 'restore' ? (
+                            'Restore'
+                        ) : (
+                            'Delete permanently'
+                        )}
                     </Button>
                 </DialogActions>
             </Dialog>

@@ -1,170 +1,328 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useParams, useNavigate, } from 'react-router-dom'
-import MetaData from '../Layout/MetaData'
-import Loader from '../Layout/Loader'
-import Sidebar from './SideBar'
-
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-// import axios from 'axios'
-// import { getToken } from '../../Utils/helpers'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import {
+    Avatar,
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Chip,
+    CircularProgress,
+    Divider,
+    FormControl,
+    Grid,
+    InputLabel,
+    MenuItem,
+    Paper,
+    Select,
+    Stack,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography
+} from '@mui/material'
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+
+import MetaData from '../Layout/MetaData'
+import Sidebar from './SideBar'
 import { getOrderDetails, updateOrder, clearErrors } from '../../actions/orderActions'
 import { UPDATE_ORDER_RESET } from '../../constants/orderConstants'
 
 const ProcessOrder = () => {
-    const dispatch = useDispatch();
-    const { loading, order = {} } = useSelector(state => state.orderDetails)
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+    const { id } = useParams()
+    const orderId = id
 
+    const { loading, order = {} } = useSelector(state => state.orderDetails)
     const { error, isUpdated } = useSelector(state => state.order)
-    const { shippingInfo, orderItems, paymentInfo, user, totalPrice, orderStatus } = order
+    const { shippingInfo, orderItems = [], paymentInfo, user, totalPrice, orderStatus } = order
 
     const [status, setStatus] = useState('')
-    // const [loading, setLoading] = useState(true)
-    // const [error, setError] = useState('')
-    // const [order, setOrder] = useState({})
-    // const [isUpdated, setIsUpdated] = useState(false)
-    let navigate = useNavigate()
-
-    let { id } = useParams();
-    const orderId = id;
-    const errMsg = (message = '') => toast.error(message, {
-        position: 'bottom-center'
-    });
-
-    const successMsg = (message = '') => toast.success(message, {
-        position: 'bottom-center'
-    });
-
-    // const getOrderDetails = async (id) => {
-    //     try {
-    //         const config = {
-    //             headers: {
-
-    //                 'Authorization': `Bearer ${getToken()}`
-    //             }
-    //         }
-
-    //         const { data } = await axios.get(`${import.meta.env.VITE_API}/order/${id}`, config)
-    //         setOrder(data.order)
-    //         setLoading(false)
-    //     } catch (error) {
-    //         setError(error.response.data.message)
-    //     }
-    // }
-    // const updateOrder = async (id, formData) => {
-
-    //     try {
-    //         const config = {
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 'Authorization': `Bearer ${getToken()}`
-    //             }
-    //         }
-    //         const { data } = await axios.put(`${import.meta.env.VITE_API}/admin/order/${id}`, formData, config)
-    //         setIsUpdated(data.success)
-
-
-    //     } catch (error) {
-    //         setError(error.response.data.message)
-    //     }
-    // }
+    const [actionLoading, setActionLoading] = useState(false)
 
     useEffect(() => {
         dispatch(getOrderDetails(orderId))
+    }, [dispatch, orderId])
+
+    useEffect(() => {
+        if (orderStatus) {
+            setStatus(orderStatus)
+        }
+    }, [orderStatus])
+
+    useEffect(() => {
         if (error) {
-            errMsg(error);
+            toast.error(error, { position: 'bottom-right' })
             dispatch(clearErrors())
+            setActionLoading(false)
         }
         if (isUpdated) {
-            successMsg('Order updated successfully');
+            toast.success('Order status updated successfully', { position: 'bottom-right' })
             dispatch({ type: UPDATE_ORDER_RESET })
-            // setIsUpdated('')
+            setActionLoading(false)
             navigate('/admin/orders')
         }
-    }, [error, isUpdated, orderId])
+    }, [dispatch, error, isUpdated, navigate])
 
-    const updateOrderHandler = (id) => {
-        const formData = new FormData();
-        formData.set('status', status);
-        dispatch(updateOrder(id, formData))
+    const updateOrderHandler = () => {
+        if (!status) return
+        setActionLoading(true)
+        const formData = new FormData()
+        formData.set('status', status)
+        dispatch(updateOrder(orderId, formData))
     }
 
-    const shippingDetails = shippingInfo && `${shippingInfo.address}, ${shippingInfo.city}, ${shippingInfo.postalCode}, ${shippingInfo.country}`
-    const isPaid = paymentInfo && paymentInfo.status === 'succeeded' ? true : false
+    const isPaid = paymentInfo && paymentInfo.status === 'succeeded'
+    const shippingDetails = shippingInfo
+        ? `${shippingInfo.address}, ${shippingInfo.city}, ${shippingInfo.postalCode}, ${shippingInfo.country}`
+        : 'N/A'
+
+    const getStatusChipColor = (st) => {
+        const s = String(st || '').toLowerCase()
+        if (s.includes('delivered')) return 'success'
+        if (s.includes('shipped')) return 'info'
+        return 'warning'
+    }
+
     return (
         <>
-            <MetaData title={`Process Order # ${order && order._id}`} />
-            <div className="row">
-                <div className="col-12 col-md-2">
+            <MetaData title={`Process Order #${orderId}`} />
+            <Box sx={{ display: 'flex', gap: 3, px: { xs: 1, md: 3 }, py: 3, minHeight: '80vh' }}>
+                <Box sx={{ display: { xs: 'none', md: 'block' }, width: 220, flexShrink: 0 }}>
                     <Sidebar />
-                </div>
-                <div className="col-12 col-md-10">
-                    <>
-                        {loading ? <Loader /> : (
-                            <div className="row d-flex justify-content-around">
-                                <div className="col-12 col-lg-7 order-details">
-                                    <h2 className="my-5">Order # {order._id}</h2>
-                                    <h4 className="mb-4">Shipping Info</h4>
-                                    <p><b>Name:</b> {user && user.name}</p>
-                                    <p><b>Phone:</b> {shippingInfo && shippingInfo.phoneNo}</p>
-                                    <p className="mb-4"><b>Address:</b>{shippingDetails}</p>
-                                    <p><b>Amount:</b> ${totalPrice}</p>
-                                    <hr />
-                                    <h4 className="my-4">Payment</h4>
-                                    <p className={isPaid ? "greenColor" : "redColor"}><b>{isPaid ? "PAID" : "NOT PAID"}</b></p>
-                                    <h4 className="my-4">Stripe ID</h4>
-                                    <p><b>{paymentInfo && paymentInfo.id}</b></p>
+                </Box>
 
-                                    <h4 className="my-4">Order Status:</h4>
-                                    <p className={order.orderStatus && String(order.orderStatus).includes('Delivered') ? "greenColor" : "redColor"} ><b>{orderStatus}</b></p>
-                                    <h4 className="my-4">Order Items:</h4>
-                                    <hr />
-                                    <div className="cart-item my-1">
-                                        {orderItems && orderItems.map(item => (
-                                            <div key={item.product} className="row my-5">
-                                                <div className="col-4 col-lg-2">
-                                                    <img src={item.image} alt={item.name} height="45" width="65" />
-                                                </div>
+                <Box component="main" sx={{ flex: 1, minWidth: 0 }}>
+                    {/* Header */}
+                    <Box sx={{ mb: 3 }}>
+                        <Button
+                            component={Link}
+                            to="/admin/orders"
+                            startIcon={<i className="fa fa-arrow-left"></i>}
+                            sx={{ mb: 1.5, textTransform: 'none', color: 'text.secondary', fontWeight: 600 }}
+                        >
+                            Back to Orders
+                        </Button>
+                        <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={1}>
+                            <div>
+                                <Typography variant="h4" fontWeight={700} sx={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                                    Order #{orderId}
+                                </Typography>
+                                <Typography color="text.secondary" variant="body2">
+                                    Review order details, shipping parameters, and advance fulfillment status
+                                </Typography>
+                            </div>
+                            {orderStatus && (
+                                <Chip
+                                    label={orderStatus}
+                                    color={getStatusChipColor(orderStatus)}
+                                    sx={{ fontWeight: 600, px: 1 }}
+                                />
+                            )}
+                        </Stack>
+                    </Box>
 
-                                                <div className="col-5 col-lg-5">
-                                                    <Link to={`/products/${item.product}`}>{item.name}</Link>
-                                                </div>
-                                                <div className="col-4 col-lg-2 mt-4 mt-lg-0">
-                                                    <p>${item.price}</p>
-                                                </div>
-                                                <div className="col-4 col-lg-3 mt-4 mt-lg-0">
-                                                    <p>{item.quantity} Piece(s)</p>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <hr />
-                                </div>
-                                <div className="col-12 col-lg-3 mt-5">
-                                    <h4 className="my-4">Status</h4>
-                                    <div className="form-group">
-                                        <select
-                                            className="form-control"
-                                            name='status'
+                    {loading ? (
+                        <Paper elevation={0} sx={{ border: '1px solid', borderColor: 'divider', p: 8, textAlign: 'center' }}>
+                            <CircularProgress sx={{ color: 'var(--red, #e30620)' }} />
+                            <Typography color="text.secondary" sx={{ mt: 2 }}>Loading order information...</Typography>
+                        </Paper>
+                    ) : (
+                        <Grid container spacing={3}>
+                            {/* Left Column: Order Information */}
+                            <Grid item xs={12} lg={8}>
+                                <Stack spacing={3}>
+                                    {/* Shipping Info Card */}
+                                    <Paper elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 3, p: 3 }}>
+                                        <Typography variant="h6" fontWeight={700} sx={{ mb: 2, fontFamily: "'Space Grotesk', sans-serif" }}>
+                                            Shipping Details
+                                        </Typography>
+                                        <Divider sx={{ mb: 2 }} />
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={12} sm={6}>
+                                                <Typography variant="caption" color="text.secondary" fontWeight={600} display="block">
+                                                    CUSTOMER NAME
+                                                </Typography>
+                                                <Typography variant="body1" fontWeight={600}>
+                                                    {user?.name || 'Guest User'}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={12} sm={6}>
+                                                <Typography variant="caption" color="text.secondary" fontWeight={600} display="block">
+                                                    CONTACT PHONE
+                                                </Typography>
+                                                <Typography variant="body1" fontWeight={600}>
+                                                    {shippingInfo?.phoneNo || 'N/A'}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Typography variant="caption" color="text.secondary" fontWeight={600} display="block">
+                                                    DELIVERY ADDRESS
+                                                </Typography>
+                                                <Typography variant="body1">
+                                                    {shippingDetails}
+                                                </Typography>
+                                            </Grid>
+                                        </Grid>
+                                    </Paper>
+
+                                    {/* Payment Info Card */}
+                                    <Paper elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 3, p: 3 }}>
+                                        <Typography variant="h6" fontWeight={700} sx={{ mb: 2, fontFamily: "'Space Grotesk', sans-serif" }}>
+                                            Payment Information
+                                        </Typography>
+                                        <Divider sx={{ mb: 2 }} />
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={12} sm={4}>
+                                                <Typography variant="caption" color="text.secondary" fontWeight={600} display="block">
+                                                    PAYMENT STATUS
+                                                </Typography>
+                                                <Chip
+                                                    size="small"
+                                                    label={isPaid ? 'PAID' : 'NOT PAID'}
+                                                    color={isPaid ? 'success' : 'error'}
+                                                    sx={{ mt: 0.5, fontWeight: 700 }}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12} sm={4}>
+                                                <Typography variant="caption" color="text.secondary" fontWeight={600} display="block">
+                                                    PAYMENT / TRANSACTION ID
+                                                </Typography>
+                                                <Typography variant="body2" sx={{ fontFamily: 'monospace', mt: 0.5 }}>
+                                                    {paymentInfo?.id || 'N/A'}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item xs={12} sm={4}>
+                                                <Typography variant="caption" color="text.secondary" fontWeight={600} display="block">
+                                                    TOTAL CHARGED
+                                                </Typography>
+                                                <Typography variant="h6" fontWeight={800} sx={{ color: 'var(--red, #e30620)', mt: 0.2 }}>
+                                                    ${Number(totalPrice || 0).toFixed(2)}
+                                                </Typography>
+                                            </Grid>
+                                        </Grid>
+                                    </Paper>
+
+                                    {/* Order Items Table */}
+                                    <Paper elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 3, p: 3 }}>
+                                        <Typography variant="h6" fontWeight={700} sx={{ mb: 2, fontFamily: "'Space Grotesk', sans-serif" }}>
+                                            Ordered Items ({orderItems.length})
+                                        </Typography>
+                                        <TableContainer>
+                                            <Table>
+                                                <TableHead>
+                                                    <TableRow sx={{ bgcolor: 'rgba(0,0,0,0.02)' }}>
+                                                        <TableCell sx={{ fontWeight: 600 }}>Product</TableCell>
+                                                        <TableCell align="right" sx={{ fontWeight: 600 }}>Price</TableCell>
+                                                        <TableCell align="center" sx={{ fontWeight: 600 }}>Qty</TableCell>
+                                                        <TableCell align="right" sx={{ fontWeight: 600 }}>Total</TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {orderItems.map((item, idx) => (
+                                                        <TableRow key={item.product || idx} hover>
+                                                            <TableCell>
+                                                                <Stack direction="row" spacing={2} alignItems="center">
+                                                                    <Avatar
+                                                                        src={item.image}
+                                                                        alt={item.name}
+                                                                        variant="rounded"
+                                                                        sx={{ width: 48, height: 48, bgcolor: 'grey.100' }}
+                                                                    >
+                                                                        <i className="fa fa-cube"></i>
+                                                                    </Avatar>
+                                                                    <Link
+                                                                        to={`/product/${item.product}`}
+                                                                        style={{
+                                                                            textDecoration: 'none',
+                                                                            color: 'inherit',
+                                                                            fontWeight: 600,
+                                                                            fontSize: '0.92rem'
+                                                                        }}
+                                                                    >
+                                                                        {item.name}
+                                                                    </Link>
+                                                                </Stack>
+                                                            </TableCell>
+                                                            <TableCell align="right">${Number(item.price).toFixed(2)}</TableCell>
+                                                            <TableCell align="center">{item.quantity} Piece(s)</TableCell>
+                                                            <TableCell align="right" sx={{ fontWeight: 700 }}>
+                                                                ${(Number(item.price) * Number(item.quantity)).toFixed(2)}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
+                                    </Paper>
+                                </Stack>
+                            </Grid>
+
+                            {/* Right Column: Status Processing Box */}
+                            <Grid item xs={12} lg={4}>
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        border: '1px solid',
+                                        borderColor: 'divider',
+                                        borderRadius: 3,
+                                        p: 3,
+                                        position: 'sticky',
+                                        top: 24
+                                    }}
+                                >
+                                    <Typography variant="h6" fontWeight={700} sx={{ mb: 1, fontFamily: "'Space Grotesk', sans-serif" }}>
+                                        Fulfillment Status
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                                        Change and commit the current operational state of this order.
+                                    </Typography>
+
+                                    <FormControl fullWidth sx={{ mb: 3 }}>
+                                        <InputLabel id="order-status-select-label">Select Status</InputLabel>
+                                        <Select
+                                            labelId="order-status-select-label"
                                             value={status}
+                                            label="Select Status"
                                             onChange={(e) => setStatus(e.target.value)}
                                         >
-                                            <option value="Processing">Processing</option>
-                                            <option value="Shipped">Shipped</option>
-                                            <option value="Delivered">Delivered</option>
-                                        </select>
-                                    </div>
-                                    <button className="btn btn-primary btn-block" onClick={() => updateOrderHandler(order._id)}>
-                                        Update Status
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </>
-                </div>
-            </div>
+                                            <MenuItem value="Processing">Processing</MenuItem>
+                                            <MenuItem value="Shipped">Shipped</MenuItem>
+                                            <MenuItem value="Delivered">Delivered</MenuItem>
+                                        </Select>
+                                    </FormControl>
+
+                                    <Button
+                                        fullWidth
+                                        variant="contained"
+                                        disabled={actionLoading || status === orderStatus}
+                                        onClick={updateOrderHandler}
+                                        sx={{
+                                            bgcolor: 'var(--red, #e30620)',
+                                            color: '#fff',
+                                            py: 1.3,
+                                            fontWeight: 700,
+                                            borderRadius: 2,
+                                            textTransform: 'none',
+                                            '&:hover': { bgcolor: 'var(--red-dark, #ad071d)' }
+                                        }}
+                                    >
+                                        {actionLoading ? <CircularProgress size={22} color="inherit" /> : 'Update Status'}
+                                    </Button>
+                                </Paper>
+                            </Grid>
+                        </Grid>
+                    )}
+                </Box>
+            </Box>
         </>
     )
 }
+
 export default ProcessOrder
