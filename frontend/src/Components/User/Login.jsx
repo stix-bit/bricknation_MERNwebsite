@@ -33,52 +33,31 @@ const Login = () => {
     const [lockSecondsRemaining, setLockSecondsRemaining] = useState(0)
 
     const timerRef = useRef(null)
+    const loginAttemptRef = useRef(false)
     const navigate = useNavigate()
     const location = useLocation()
     const dispatch = useDispatch()
 
     const startLockout = (seconds = 60) => {
-        const lockUntil = Date.now() + seconds * 1000
-        localStorage.setItem('login_locked_until', lockUntil.toString())
-        localStorage.setItem('login_failed_attempts', '0')
         setIsLocked(true)
         setLockSecondsRemaining(seconds)
     }
 
-    // Check lock status on mount and manage 1-second countdown
     useEffect(() => {
-        const checkLockStatus = () => {
-            const storedLockUntil = localStorage.getItem('login_locked_until')
-            if (storedLockUntil) {
-                const remainingMs = parseInt(storedLockUntil, 10) - Date.now()
-                if (remainingMs > 0) {
-                    const remainingSec = Math.ceil(remainingMs / 1000)
-                    setIsLocked(true)
-                    setLockSecondsRemaining(remainingSec)
-                    return remainingSec
-                } else {
-                    localStorage.removeItem('login_locked_until')
-                    localStorage.removeItem('login_failed_attempts')
-                    setIsLocked(false)
-                    setLockSecondsRemaining(0)
-                    return 0
-                }
-            } else {
-                setIsLocked(false)
-                setLockSecondsRemaining(0)
-                return 0
-            }
+        if (!isLocked) {
+            return undefined
         }
 
-        const remaining = checkLockStatus()
-        if (remaining > 0) {
-            timerRef.current = setInterval(() => {
-                const rem = checkLockStatus()
-                if (rem <= 0 && timerRef.current) {
+        timerRef.current = setInterval(() => {
+            setLockSecondsRemaining(current => {
+                if (current <= 1) {
                     clearInterval(timerRef.current)
+                    setIsLocked(false)
+                    return 0
                 }
-            }, 1000)
-        }
+                return current - 1
+            })
+        }, 1000)
 
         return () => {
             if (timerRef.current) {
@@ -100,6 +79,7 @@ const Login = () => {
                 })
                 return
             }
+            loginAttemptRef.current = true
             dispatch(login(values.email, values.password))
         }
     })
@@ -129,8 +109,6 @@ const Login = () => {
 
     useEffect(() => {
         if (isAuthenticated) {
-            localStorage.removeItem('login_locked_until')
-            localStorage.removeItem('login_failed_attempts')
             setIsLocked(false)
             setLockSecondsRemaining(0)
 
@@ -141,7 +119,7 @@ const Login = () => {
             }
         }
 
-        if (error) {
+        if (error && loginAttemptRef.current) {
             const errorMsg = typeof error === 'string' ? error : (error?.message || 'Login failed')
             const isLockError = /too many failed login attempts|locked|try again in/i.test(errorMsg)
 
@@ -149,22 +127,17 @@ const Login = () => {
                 const match = errorMsg.match(/in\s+(\d+)\s+seconds/i)
                 const secs = match ? parseInt(match[1], 10) : 60
                 startLockout(secs)
-            } else {
-                const currentAttempts = parseInt(localStorage.getItem('login_failed_attempts') || '0', 10) + 1
-                if (currentAttempts >= 5) {
-                    startLockout(60)
-                    toast.error('Too many failed login attempts. Login is temporarily locked for 1 minute.', {
-                        position: 'bottom-right'
-                    })
-                } else {
-                    localStorage.setItem('login_failed_attempts', currentAttempts.toString())
-                }
             }
 
             toast.error(errorMsg, { position: 'bottom-right' })
+            loginAttemptRef.current = false
             dispatch(clearErrors())
         }
     }, [error, isAuthenticated, dispatch, navigate, redirect])
+
+    useEffect(() => {
+        dispatch(clearErrors())
+    }, [dispatch])
 
     return (
         <>

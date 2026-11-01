@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import { formatPeso } from '../../Utils/helpers'
 import {
     Avatar,
     Box,
@@ -203,7 +204,7 @@ const ProcessOrder = () => {
                                                     TOTAL CHARGED
                                                 </Typography>
                                                 <Typography variant="h6" fontWeight={800} sx={{ color: 'var(--red, #e30620)', mt: 0.2 }}>
-                                                    ${Number(totalPrice || 0).toFixed(2)}
+                                                    ₱{formatPeso(totalPrice)}
                                                 </Typography>
                                             </Grid>
                                         </Grid>
@@ -250,10 +251,10 @@ const ProcessOrder = () => {
                                                                     </Link>
                                                                 </Stack>
                                                             </TableCell>
-                                                            <TableCell align="right">${Number(item.price).toFixed(2)}</TableCell>
+                                                            <TableCell align="right">₱{formatPeso(item.price)}</TableCell>
                                                             <TableCell align="center">{item.quantity} Piece(s)</TableCell>
                                                             <TableCell align="right" sx={{ fontWeight: 700 }}>
-                                                                ${(Number(item.price) * Number(item.quantity)).toFixed(2)}
+                                                                ₱{formatPeso(Number(item.price) * Number(item.quantity))}
                                                             </TableCell>
                                                         </TableRow>
                                                     ))}

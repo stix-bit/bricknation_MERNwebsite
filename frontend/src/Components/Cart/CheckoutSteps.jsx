@@ -1,41 +1,32 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import { Step, StepButton, StepLabel, Stepper } from '@mui/material'
+import { Link as RouterLink } from 'react-router-dom'
 
 const CheckoutSteps = ({ shipping, confirmOrder, payment }) => {
+    const activeStep = payment ? 2 : confirmOrder ? 1 : shipping ? 0 : -1
+    const steps = [
+        { label: 'Shipping', path: '/shipping' },
+        { label: 'Confirm Order', path: '/confirm' },
+        { label: 'Payment', path: '/payment' },
+    ]
+
     return (
-        <div className="checkout-progress d-flex justify-content-center mt-5">
-
-            {shipping ? <Link to='shipping' className="float-right">
-                <div className="triangle2-active"></div>
-                <div className="step active-step">Shipping</div>
-                <div className="triangle-active"></div>
-            </Link> : <Link to="#!" disabled>
-                    <div className="triangle2-incomplete"></div>
-                    <div className="step incomplete">Shipping</div>
-                    <div className="triangle-incomplete"></div>
-                </Link>}
-
-            {confirmOrder ? <Link to='/order/confirm' className="float-right">
-                <div className="triangle2-active"></div>
-                <div className="step active-step">Confirm Order</div>
-                <div className="triangle-active"></div>
-            </Link> : <Link to="#!" disabled>
-                    <div className="triangle2-incomplete"></div>
-                    <div className="step incomplete">Confirm Order</div>
-                    <div className="triangle-incomplete"></div>
-                </Link>}
-
-            {payment ? <Link to='/payment' className="float-right">
-                <div className="triangle2-active"></div>
-                <div className="step active-step">Payment</div>
-                <div className="triangle-active"></div>
-            </Link> : <Link to="#!" disabled>
-                    <div className="triangle2-incomplete"></div>
-                    <div className="step incomplete">Payment</div>
-                    <div className="triangle-incomplete"></div>
-                </Link>}
-
-        </div>
+        <Stepper
+            activeStep={activeStep}
+            alternativeLabel
+            sx={{ maxWidth: 720, mx: 'auto', px: 2, py: { xs: 3, sm: 5 } }}
+        >
+            {steps.map((step, index) => (
+                <Step key={step.label} completed={index < activeStep}>
+                    <StepButton
+                        component={RouterLink}
+                        to={step.path}
+                        disabled={index > activeStep}
+                    >
+                        <StepLabel>{step.label}</StepLabel>
+                    </StepButton>
+                </Step>
+            ))}
+        </Stepper>
     )
 }
 

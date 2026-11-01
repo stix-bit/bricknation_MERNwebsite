@@ -10,6 +10,51 @@ import CircularProgress from '@mui/material/CircularProgress'
 import { useDispatch, useSelector } from 'react-redux'
 import { getProducts } from '../actions/productActions'
 
+const categoryBannerDetails = {
+    consumables: {
+        image: '/images/category%20pages/consumables.jpg',
+        eyebrow: 'EVERYDAY ESSENTIALS',
+        title: 'The details that',
+        highlight: 'hold it all together.',
+        description: 'Stock up on fasteners, sealants, adhesives, abrasives, and tapes for every job.',
+    },
+    design: {
+        image: '/images/category%20pages/design.jpg',
+        eyebrow: 'MAKE IT YOURS',
+        title: 'Shape your',
+        highlight: 'perfect space.',
+        description: 'Bring your vision to life with modern hardware, drafting tools, and finishing details.',
+    },
+    electrical: {
+        image: '/images/category%20pages/electrical.jpg',
+        eyebrow: 'POWER EVERY PROJECT',
+        title: 'Work smarter with',
+        highlight: 'the right tools.',
+        description: 'Find dependable electrical tools, testers, wire, outlets, and jobsite essentials.',
+    },
+    equipment: {
+        image: '/images/category%20pages/equipment.jpg',
+        eyebrow: 'READY FOR THE JOB',
+        title: 'Gear up for',
+        highlight: 'the work ahead.',
+        description: 'Tackle demanding projects with practical equipment and complete tool sets.',
+    },
+    materials: {
+        image: '/images/category%20pages/materials.jpg',
+        eyebrow: 'BUILD WITH CONFIDENCE',
+        title: 'Start strong with',
+        highlight: 'quality materials.',
+        description: 'Discover reliable structural materials, piping, roofing, and masonry supplies.',
+    },
+    tools: {
+        image: '/images/category%20pages/tools.jpg',
+        eyebrow: 'TOOLS FOR EVERY TASK',
+        title: 'Turn every project into',
+        highlight: 'your best work.',
+        description: 'Get the hand tools and measuring essentials trusted by builders and makers.',
+    },
+}
+
 const Home = () => {
     // const [products, setProducts] = useState([])
     // const [loading, setLoading] = useState(true)
@@ -28,6 +73,19 @@ const Home = () => {
     let { keyword, categoryId } = useParams();
     const [searchParams] = useSearchParams();
     const queryCategory = categoryId || searchParams.get('category');
+    const selectedCategory = categories.find(
+        item => item._id === queryCategory || item.name.toLowerCase() === queryCategory?.toLowerCase()
+    )
+    const categoryBanner = selectedCategory
+        ? categoryBannerDetails[selectedCategory.name.toLowerCase()]
+        : null
+    const bannerDetails = categoryBanner || {
+        image: '/images/download.jpg',
+        eyebrow: 'BUILD SOMETHING BOLD',
+        title: 'Bring your',
+        highlight: 'imagination to life.',
+        description: 'Discover bricks, sets and collectibles made for builders who never stop creating.',
+    }
 
     const dispatch = useDispatch();
     const { loading, products, filteredProductsCount } = useSelector(state => state.products);
@@ -144,16 +202,16 @@ const Home = () => {
                 (<div className="storefront">
                     <section className="hero-banner">
                         <div className="hero-copy">
-                            <span className="eyebrow">BUILD SOMETHING BOLD</span>
-                            <h1>Bring your<br /><strong>imagination</strong> to life.</h1>
+                            <span className="eyebrow">{bannerDetails.eyebrow}</span>
+                            <h1>{bannerDetails.title}<br /><strong>{bannerDetails.highlight}</strong></h1>
                             <center>
-                                <p>Discover bricks, sets and collectibles made for builders who never stop creating.</p>
+                                <p>{bannerDetails.description}</p>
                             </center>
                             <a className="hero-cta" href="#products_heading">Shop the collection <span>→</span></a>
                         </div>
                         <div className="hero-art">
                             <span className="sun-shape"></span>
-                            <img src="./images/download.jpg" alt="Creative BrickNation character" />
+                            <img src={bannerDetails.image} alt={selectedCategory ? `${selectedCategory.name} products` : 'BrickNation collection'} />
                         </div>
                     </section>
                     <section className="feature-strip">

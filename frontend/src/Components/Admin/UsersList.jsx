@@ -76,11 +76,18 @@ const UsersList = () => {
         if (deleted) setUserToDelete(null)
     }
 
-    const filteredUsers = users.filter(user =>
-        (user.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (user.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (user._id || '').toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    const normalizedSearchTerm = searchTerm.trim().toLowerCase()
+    const filteredUsers = users.filter(user => {
+        if (!normalizedSearchTerm) return true
+
+        return [
+            user.name,
+            user.email,
+            user._id,
+            user.role,
+            user.isDeleted ? 'suspended' : 'active'
+        ].some(value => String(value || '').toLowerCase().includes(normalizedSearchTerm))
+    })
 
     return (
         <>
@@ -91,7 +98,7 @@ const UsersList = () => {
                 </Box>
 
                 <Box component="main" sx={{ flex: 1, minWidth: 0 }}>
-                    <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                    <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2, textAlign: 'left' }}>
                         <div>
                             <Typography variant="h4" fontWeight={700} sx={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                                 Users
@@ -102,7 +109,8 @@ const UsersList = () => {
                         </div>
                         <TextField
                             size="small"
-                            placeholder="Search by name, email, or ID..."
+                            placeholder="Search by name, email, role, or ID..."
+                            aria-label="Search users"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             sx={{ minWidth: 260 }}

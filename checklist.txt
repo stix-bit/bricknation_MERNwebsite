@@ -55,16 +55,16 @@ admin - Apply material ui components on these pages ✅
     orderdetails ✅
     users ✅
 
-user - Apply material ui components on these pages
-    cart
-    shipping
-    confirm 
-    payment
-    success
-    checkout steps (its the Shipping Confirm Order and Payment text that shows up when your on shipping, confirm, payment page.)
-        fix it and if needed apply material ui components
+user - Apply material ui components on these pages ✅
+    cart ✅
+    shipping ✅
+    confirm ✅
+    payment ✅
+    success ✅
+    checkout steps (its the Shipping Confirm Order and Payment text that shows up when your on shipping, confirm, payment page.) ✅
+    fix it and if needed apply material ui components ✅
 
-- Change our favicon
+- Change our favicon ✅
 
 ADDITIONAL/OPTIONAL:
 1. Don't forget to SOFT DELETE/ARCHIVE products instead of Delete products - add a feature to delete just in case ✅

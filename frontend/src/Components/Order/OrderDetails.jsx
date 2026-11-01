@@ -19,6 +19,7 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { getOrderDetails, clearErrors } from '../../actions/orderActions'
+import { formatPeso } from '../../Utils/helpers'
 
 const OrderDetails = () => {
     const { id } = useParams()
@@ -189,7 +190,7 @@ const OrderDetails = () => {
                                                         {item.name}
                                                     </Link>
                                                     <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                                                        ${Number(item.price).toFixed(2)} &times; {item.quantity} Piece{item.quantity !== 1 ? 's' : ''}
+                                                        ₱{formatPeso(item.price)} &times; {item.quantity} Piece{item.quantity !== 1 ? 's' : ''}
                                                     </Typography>
                                                 </Box>
 
@@ -198,7 +199,7 @@ const OrderDetails = () => {
                                                     fontWeight={700}
                                                     sx={{ color: 'var(--ink, #17151b)', whiteSpace: 'nowrap' }}
                                                 >
-                                                    ${(Number(item.price) * Number(item.quantity)).toFixed(2)}
+                                                    ₱{formatPeso(Number(item.price) * Number(item.quantity))}
                                                 </Typography>
                                             </Box>
                                         ))}
@@ -306,7 +307,7 @@ const OrderDetails = () => {
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                             <Typography color="text.secondary">Items Subtotal</Typography>
                                             <Typography fontWeight={600}>
-                                                ${Number(itemsPrice !== undefined ? itemsPrice : (orderItems.reduce((acc, i) => acc + i.price * i.quantity, 0))).toFixed(2)}
+                                                ₱{formatPeso(itemsPrice !== undefined ? itemsPrice : (orderItems.reduce((acc, i) => acc + i.price * i.quantity, 0)))}
                                             </Typography>
                                         </Box>
 
@@ -314,7 +315,7 @@ const OrderDetails = () => {
                                             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                                 <Typography color="text.secondary">Shipping</Typography>
                                                 <Typography fontWeight={600}>
-                                                    ${Number(shippingPrice).toFixed(2)}
+                                                    ₱{Number(shippingPrice).toFixed(2)}
                                                 </Typography>
                                             </Box>
                                         )}
@@ -323,7 +324,7 @@ const OrderDetails = () => {
                                             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                                 <Typography color="text.secondary">Tax</Typography>
                                                 <Typography fontWeight={600}>
-                                                    ${Number(taxPrice).toFixed(2)}
+                                                    ₱{Number(taxPrice).toFixed(2)}
                                                 </Typography>
                                             </Box>
                                         )}
@@ -339,7 +340,7 @@ const OrderDetails = () => {
                                                 fontWeight={700}
                                                 sx={{ color: 'var(--red, #e30620)' }}
                                             >
-                                                ${Number(totalPrice).toFixed(2)}
+                                                ₱{formatPeso(totalPrice)}
                                             </Typography>
                                         </Box>
                                     </Stack>

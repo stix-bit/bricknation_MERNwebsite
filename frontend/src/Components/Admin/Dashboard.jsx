@@ -93,7 +93,7 @@ const Dashboard = () => {
                 </Box>
 
                 <Box component="main" sx={{ flex: 1, minWidth: 0 }}>
-                    <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                    <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2, textAlign: 'left' }}>
                         <div>
                             <Typography variant="h4" fontWeight={700} sx={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                                 Dashboard
@@ -133,7 +133,7 @@ const Dashboard = () => {
                                         Total Platform Revenue
                                     </Typography>
                                     <Typography variant="h3" fontWeight={800} sx={{ fontFamily: "'Space Grotesk', sans-serif", mt: 0.5 }}>
-                                        ${totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        ₱{totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </Typography>
                                     <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', mt: 0.5 }}>
                                         Calculated from {orders.length} order{orders.length === 1 ? '' : 's'} placed to date

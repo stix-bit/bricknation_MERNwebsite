@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { saveShippingInfo } from '../../actions/cartActions'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import { Button, Container, FormControl, InputLabel, MenuItem, Paper, Select, Stack, TextField, Typography } from '@mui/material'
 
 const Shipping = () => {
     const dispatch = useDispatch();
@@ -36,85 +37,25 @@ const Shipping = () => {
         <>
             <MetaData title={'Shipping Info'} />
             <CheckoutSteps shipping />
-            <div className="row wrapper">
-                <div className="col-10 col-lg-5">
-                    <form
-                        className="shadow-lg"
-                        onSubmit={formik.handleSubmit}
-                        noValidate
-                    >
-                        <h1 className="mb-4">Shipping Info</h1>
-                        <div className="form-group">
-                            <label htmlFor="address_field">Address</label>
-                            <input
-                                type="text"
-                                id="address_field"
-                                className="form-control"
-                                {...formik.getFieldProps('address')}
-                            />
-                            {formik.touched.address && formik.errors.address && <small className="text-danger">{formik.errors.address}</small>}
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="city_field">City</label>
-                            <input
-                                type="text"
-                                id="city_field"
-                                className="form-control"
-                                {...formik.getFieldProps('city')}
-                            />
-                            {formik.touched.city && formik.errors.city && <small className="text-danger">{formik.errors.city}</small>}
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="phone_field">Phone No</label>
-                            <input
-                                type="phone"
-                                id="phone_field"
-                                className="form-control"
-                                {...formik.getFieldProps('phoneNo')}
-                            />
-                            {formik.touched.phoneNo && formik.errors.phoneNo && <small className="text-danger">{formik.errors.phoneNo}</small>}
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="postal_code_field">Postal Code</label>
-                            <input
-                                type="number"
-                                id="postal_code_field"
-                                className="form-control"
-                                {...formik.getFieldProps('postalCode')}
-                            />
-                            {formik.touched.postalCode && formik.errors.postalCode && <small className="text-danger">{formik.errors.postalCode}</small>}
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="country_field">Country</label>
-                            <select
-                                id="country_field"
-                                className="form-control"
-                                {...formik.getFieldProps('country')}
-                            >
-
-                                {countriesList.map(country => (
-                                    <option key={country.name} value={country.name}>
-                                        {country.name}
-                                    </option>
-                                ))}
-
-                            </select>
-                        </div>
-
-                        <button
-                            id="shipping_btn"
-                            type="submit"
-                            className="btn btn-block py-3"
-                        >
-                            CONTINUE
-                        </button>
-                    </form>
-                </div>
-            </div>
+            <Container maxWidth="sm" sx={{ pb: 6 }}>
+                <Paper component="form" onSubmit={formik.handleSubmit} noValidate elevation={0} variant="outlined" sx={{ p: { xs: 2.5, sm: 4 }, borderRadius: 2 }}>
+                    <Typography variant="h4" component="h1" fontWeight={700} sx={{ mb: 3 }}>Shipping Info</Typography>
+                    <Stack spacing={2.5}>
+                        <TextField id="address_field" label="Address" fullWidth {...formik.getFieldProps('address')} error={formik.touched.address && Boolean(formik.errors.address)} helperText={formik.touched.address && formik.errors.address} />
+                        <TextField id="city_field" label="City" fullWidth {...formik.getFieldProps('city')} error={formik.touched.city && Boolean(formik.errors.city)} helperText={formik.touched.city && formik.errors.city} />
+                        <TextField id="phone_field" label="Phone No" type="tel" fullWidth {...formik.getFieldProps('phoneNo')} error={formik.touched.phoneNo && Boolean(formik.errors.phoneNo)} helperText={formik.touched.phoneNo && formik.errors.phoneNo} />
+                        <TextField id="postal_code_field" label="Postal Code" fullWidth {...formik.getFieldProps('postalCode')} error={formik.touched.postalCode && Boolean(formik.errors.postalCode)} helperText={formik.touched.postalCode && formik.errors.postalCode} />
+                        <FormControl fullWidth error={formik.touched.country && Boolean(formik.errors.country)}>
+                            <InputLabel id="country-label">Country</InputLabel>
+                            <Select labelId="country-label" id="country_field" label="Country" {...formik.getFieldProps('country')}>
+                                <MenuItem value=""><em>Select a country</em></MenuItem>
+                                {countriesList.map(country => <MenuItem key={country.name} value={country.name}>{country.name}</MenuItem>)}
+                            </Select>
+                        </FormControl>
+                        <Button id="shipping_btn" type="submit" variant="contained" size="large" fullWidth>Continue</Button>
+                    </Stack>
+                </Paper>
+            </Container>
 
         </>
     )

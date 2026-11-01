@@ -8,6 +8,8 @@ import { createOrder } from '../../actions/orderActions'
 import { clearCart } from '../../actions/cartActions';
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import { Button, Container, Paper, Stack, TextField, Typography } from '@mui/material'
+import { formatPeso } from '../../Utils/helpers'
 
 
 const Payment = () => {
@@ -96,56 +98,17 @@ const Payment = () => {
         <>
             <MetaData title={'Payment'} />
             <CheckoutSteps shipping confirmOrder payment />
-            <div className="row wrapper">
-                <div className="col-10 col-lg-5">
-                            <form className="shadow-lg" onSubmit={formik.handleSubmit} noValidate>
-                        <h1 className="mb-4">Card Info</h1>
-                        <div className="form-group">
-                            <label htmlFor="card_num_field">Card Number</label>
-                            <input
-                                type="text"
-                                id="card_num_field"
-                                className="form-control"
-                                inputMode="numeric"
-                                {...formik.getFieldProps('cardNumber')}
-                            />
-                            {formik.touched.cardNumber && formik.errors.cardNumber && <small className="text-danger">{formik.errors.cardNumber}</small>}
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="card_exp_field">Card Expiry</label>
-                            <input
-                                type="text"
-                                id="card_exp_field"
-                                className="form-control"
-                                placeholder="MM/YY"
-                                {...formik.getFieldProps('expiry')}
-                            />
-                            {formik.touched.expiry && formik.errors.expiry && <small className="text-danger">{formik.errors.expiry}</small>}
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="card_cvc_field">Card CVC</label>
-                            <input
-                                type="text"
-                                id="card_cvc_field"
-                                className="form-control"
-                                inputMode="numeric"
-                                {...formik.getFieldProps('cvc')}
-                            />
-                            {formik.touched.cvc && formik.errors.cvc && <small className="text-danger">{formik.errors.cvc}</small>}
-                        </div>
-                        <button
-                            id="pay_btn"
-                            type="submit"
-                            className="btn btn-block py-3"
-                        >
-                            Pay {` - ${orderInfo && orderInfo.totalPrice}`}
-                        </button>
-
-                    </form>
-                </div>
-            </div>
+            <Container maxWidth="sm" sx={{ pb: 6 }}>
+                <Paper component="form" onSubmit={formik.handleSubmit} noValidate elevation={0} variant="outlined" sx={{ p: { xs: 2.5, sm: 4 }, borderRadius: 2 }}>
+                    <Typography variant="h4" component="h1" fontWeight={700} sx={{ mb: 3 }}>Card Info</Typography>
+                    <Stack spacing={2.5}>
+                        <TextField id="card_num_field" label="Card Number" inputMode="numeric" fullWidth {...formik.getFieldProps('cardNumber')} error={formik.touched.cardNumber && Boolean(formik.errors.cardNumber)} helperText={formik.touched.cardNumber && formik.errors.cardNumber} />
+                        <TextField id="card_exp_field" label="Card Expiry" placeholder="MM/YY" fullWidth {...formik.getFieldProps('expiry')} error={formik.touched.expiry && Boolean(formik.errors.expiry)} helperText={formik.touched.expiry && formik.errors.expiry} />
+                        <TextField id="card_cvc_field" label="Card CVC" inputMode="numeric" fullWidth {...formik.getFieldProps('cvc')} error={formik.touched.cvc && Boolean(formik.errors.cvc)} helperText={formik.touched.cvc && formik.errors.cvc} />
+                        <Button id="pay_btn" type="submit" variant="contained" size="large" fullWidth>Pay {` - ₱${formatPeso(orderInfo && orderInfo.totalPrice)}`}</Button>
+                    </Stack>
+                </Paper>
+            </Container>
 
         </>
     )

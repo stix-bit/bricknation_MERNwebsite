@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
     Alert,
@@ -97,27 +97,42 @@ const CategoriesPage = () => {
     return (
         <>
             <MetaData title="Hardware Departments - BrickNation" />
-            <Container maxWidth="lg" sx={{ py: 4, minHeight: '80vh' }}>
-                {/* Breadcrumbs */}
-                <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-                    <Link to="/" style={{ color: '#716d74', textDecoration: 'none', fontWeight: 500, fontSize: '0.9rem' }}>
-                        Home
-                    </Link>
-                    <Typography color="text.primary" sx={{ fontWeight: 600, fontSize: '0.9rem' }}>
-                        Categories
-                    </Typography>
-                </Breadcrumbs>
+            <Container maxWidth="lg" sx={{ py: { xs: 2.5, md: 4 }, minHeight: '80vh' }}>
+                <Paper
+                    elevation={0}
+                    sx={{
+                        px: { xs: 2, sm: 4 },
+                        py: 1.5,
+                        mb: { xs: 3, md: 4 },
+                        border: '1px solid #f0ebe4',
+                        borderRadius: 1,
+                        boxShadow: '0 6px 18px rgba(38, 22, 10, 0.04)'
+                    }}
+                >
+                    <Breadcrumbs aria-label="breadcrumb">
+                        <Link to="/" style={{ color: '#716d74', textDecoration: 'none', fontWeight: 500, fontSize: '0.9rem' }}>
+                            Home
+                        </Link>
+                        <Typography color="text.primary" sx={{ fontWeight: 600, fontSize: '0.9rem' }}>
+                            Categories
+                        </Typography>
+                    </Breadcrumbs>
+                </Paper>
 
-                {/* Page Title & Subtitle */}
-                <Box sx={{ mb: 4 }}>
+                <Box sx={{ mb: { xs: 3, md: 4 }, textAlign: 'center' }}>
                     <Typography
-                        variant="h3"
+                        variant="h2"
                         fontWeight={800}
-                        sx={{ fontFamily: "'Space Grotesk', sans-serif", letterSpacing: '-0.03em', mb: 1 }}
+                        sx={{
+                            fontFamily: "'Space Grotesk', sans-serif",
+                            letterSpacing: '-0.03em',
+                            mb: 1,
+                            fontSize: { xs: '2.25rem', sm: '2.75rem' }
+                        }}
                     >
                         Hardware Departments
                     </Typography>
-                    <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 700 }}>
+                    <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 760, mx: 'auto', lineHeight: 1.5 }}>
                         Browse our comprehensive inventory of structural building supplies, contractor-grade tools, heavy machinery, and everyday jobsite consumables.
                     </Typography>
                 </Box>
@@ -132,7 +147,7 @@ const CategoriesPage = () => {
                         </Typography>
                     </Box>
                 ) : (
-                    <Grid container spacing={3}>
+                    <Grid container spacing={{ xs: 2.5, md: 3 }} justifyContent="center">
                         {categories.map(cat => {
                             const details = departmentDetails[cat.name] || {
                                 icon: 'fa-cube',
@@ -143,32 +158,30 @@ const CategoriesPage = () => {
                             }
 
                             return (
-                                <Grid item xs={12} sm={6} md={4} key={cat._id}>
+                                <Grid size={{ xs: 12, sm: 6 }} key={cat._id}>
                                     <Card
                                         elevation={0}
                                         sx={{
-                                            height: '100%',
+                                            overflow: 'hidden',
                                             display: 'flex',
                                             flexDirection: 'column',
-                                            justifyContent: 'space-between',
                                             border: '1px solid',
-                                            borderColor: 'divider',
-                                            borderRadius: 3,
-                                            transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
+                                            borderColor: cat.name === 'Consumables' ? '#f0d7c1' : 'divider',
+                                            borderRadius: 2.5,
+                                            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                                             '&:hover': {
                                                 transform: 'translateY(-4px)',
-                                                boxShadow: '0 12px 28px rgba(0, 0, 0, 0.08)',
-                                                borderColor: details.color
+                                                boxShadow: '0 12px 28px rgba(0, 0, 0, 0.08)'
                                             }
                                         }}
                                     >
-                                        <CardContent sx={{ p: 3 }}>
-                                            <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+                                        <CardContent sx={{ p: { xs: 2.5, sm: 3 }, pb: { xs: 2.5, sm: 3 } }}>
+                                            <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2.25 }}>
                                                 <Box
                                                     sx={{
-                                                        width: 52,
-                                                        height: 52,
-                                                        borderRadius: 2.5,
+                                                        width: 50,
+                                                        height: 50,
+                                                        borderRadius: 2,
                                                         bgcolor: details.bg,
                                                         color: details.color,
                                                         display: 'flex',
@@ -181,9 +194,9 @@ const CategoriesPage = () => {
                                                 </Box>
                                                 <Box>
                                                     <Typography
-                                                        variant="h5"
+                                                        variant="h6"
                                                         fontWeight={700}
-                                                        sx={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                                                        sx={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: { xs: '1.35rem', sm: '1.5rem' } }}
                                                     >
                                                         {cat.name}
                                                     </Typography>
@@ -193,7 +206,7 @@ const CategoriesPage = () => {
                                                 </Box>
                                             </Stack>
 
-                                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5, minHeight: 48, lineHeight: 1.6 }}>
+                                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5, lineHeight: 1.6 }}>
                                                 {details.description}
                                             </Typography>
 
@@ -218,7 +231,7 @@ const CategoriesPage = () => {
 
                                         <Box>
                                             <Divider />
-                                            <CardActions sx={{ p: 2 }}>
+                                            <CardActions sx={{ p: { xs: 1.5, sm: 2 }, borderTop: '1px solid #eee7df' }}>
                                                 <Button
                                                     component={Link}
                                                     to={`/?category=${cat._id}`}
@@ -294,4 +307,3 @@ const CategoriesPage = () => {
 }
 
 export default CategoriesPage
-

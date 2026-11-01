@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import { formatPeso } from '../../Utils/helpers'
 import {
     Alert,
     Box,
@@ -166,7 +167,7 @@ const OrdersList = () => {
         .map(order => ({
             id: order._id,
             numofItems: order.orderItems?.length || 0,
-            amount: `$${Number(order.totalPrice || 0).toFixed(2)}`,
+            amount: `₱${formatPeso(order.totalPrice)}`,
             status: order.orderStatus,
         }))
 

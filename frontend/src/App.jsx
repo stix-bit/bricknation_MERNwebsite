@@ -40,7 +40,10 @@ import ProcessOrder from './Components/Admin/ProcessOrder';
 import UsersList from './Components/Admin/UsersList';
 import UpdateUser from './Components/Admin/UpdateUser';
 import ProtectedRoute from './Components/Route/ProtectedRoute';
+import NotFound from './Components/Route/NotFound';
 import ProductReviews from './Components/Admin/ProductReviews';
+import BlueprintBuilder from './Components/User/BlueprintBuilder';
+import BobAssistant from './Components/User/BobAssistant';
 import { useDispatch } from 'react-redux';
 import { loadUser } from './actions/userActions';
 import UpdateProduct from './Components/Admin/UpdateProduct';
@@ -157,17 +160,32 @@ function App() {
           <Route path="/success" element={<OrderSuccess />} />
           <Route path="/orders/me" element={<ListOrders />} />
           <Route path="/order/:id" element={<OrderDetails />} />
+          <Route path="/blueprint-builder" element={<BlueprintBuilder />} />
           {/*<Route path="/dashboard" element={<Dashboard />} />
           <Route path="/admin/product" element={<NewProduct />} /> */}
           {/* <Route path="/admin/orders" element={<OrdersList />} /> */}
           <Route
             path="/admin/order/:id"
-            element={<ProcessOrder />} />
+            element={
+              <ProtectedRoute isAdmin={true}>
+                <ProcessOrder />
+              </ProtectedRoute>
+            } />
 
           <Route
             path="/admin/users"
-            element={<UsersList />} />
-          <Route path="/admin/user/:id" element={<UpdateUser />} />
+            element={
+              <ProtectedRoute isAdmin={true}>
+                <UsersList />
+              </ProtectedRoute>
+            } />
+          <Route
+            path="/admin/user/:id"
+            element={
+              <ProtectedRoute isAdmin={true}>
+                <UpdateUser />
+              </ProtectedRoute>
+            } />
 
           <Route
             path="/admin/products"
@@ -219,9 +237,11 @@ function App() {
               <ProtectedRoute isAdmin={true} >
                 <ProductReviews />
               </ProtectedRoute>} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
       <Footer />
+      <BobAssistant />
       <ToastContainer />
     </div>
   )

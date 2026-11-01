@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import MetaData from '../Layout/MetaData'
 import CheckoutSteps from './CheckoutSteps'
-import { getUser } from '../../Utils/helpers'
 import { useSelector } from 'react-redux'
+import { Box, Button, Container, Divider, Paper, Stack, Typography } from '@mui/material'
+import { formatPeso } from '../../Utils/helpers'
 
 const ConfirmOrder = () => {
     // const [user, setUser] = useState(getUser() ? getUser() : {})
@@ -32,61 +32,42 @@ const ConfirmOrder = () => {
         <>
             <MetaData title={'Confirm Order'} />
             <CheckoutSteps shipping confirmOrder />
-            <div className="row d-flex justify-content-between">
-                <div className="col-12 col-lg-8 mt-5 order-confirm">
-                    <h4 className="mb-3">Shipping Info</h4>
-                    {user && <p><b>Name:</b> {user && user.name}</p>}
-                    <p><b>Phone:</b> {shippingInfo.phoneNo}</p>
-                    <p className="mb-4"><b>Address:</b> {`${shippingInfo.address}, ${shippingInfo.city}, ${shippingInfo.postalCode}, ${shippingInfo.country}`}</p>
-
-                    <hr />
-                    <h4 className="mt-4">Your Cart Items:</h4>
-
-                    {cartItems.map(item => (
-                        <>
-                            <hr />
-                            <div className="cart-item my-1" key={item.product}>
-                                <div className="row">
-                                    <div className="col-4 col-lg-2">
-                                        <img src={item.image} alt="Laptop" height="45" width="65" />
-                                    </div>
-
-                                    <div className="col-5 col-lg-6">
-                                        <Link to={`/product/${item.product}`}>{item.name}</Link>
-                                    </div>
-
-
-                                    <div className="col-4 col-lg-4 mt-4 mt-lg-0">
-                                        <p>{item.quantity} x ${item.price} = <b>${(item.quantity * item.price).toFixed(2)}</b></p>
-                                    </div>
-
-                                </div>
-                            </div>
-                            <hr />
-                        </>
-                    ))}
-
-                </div>
-
-                <div className="col-12 col-lg-3 my-4">
-                    <div id="order_summary">
-                        <h4>Order Summary</h4>
-                        <hr />
-                        <p>Subtotal:  <span className="order-summary-values">${itemsPrice}</span></p>
-                        <p>Shipping: <span className="order-summary-values">${shippingPrice}</span></p>
-                        <p>Tax:  <span className="order-summary-values">${taxPrice}</span></p>
-
-                        <hr />
-
-                        <p>Total: <span className="order-summary-values">${totalPrice}</span></p>
-
-                        <hr />
-                        <button id="checkout_btn" className="btn btn-primary btn-block" onClick={processToPayment}>Proceed to Payment</button>
-                    </div>
-                </div>
-
-
-            </div>
+            <Container maxWidth="lg" sx={{ pb: 6 }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '1fr 320px' }, gap: 3 }}>
+                    <Stack spacing={3}>
+                        <Paper variant="outlined" sx={{ p: { xs: 2.5, sm: 3 }, borderRadius: 2 }}>
+                            <Typography variant="h6" fontWeight={700} gutterBottom>Shipping Info</Typography>
+                            {user && <Typography><strong>Name:</strong> {user.name}</Typography>}
+                            <Typography><strong>Phone:</strong> {shippingInfo.phoneNo}</Typography>
+                            <Typography><strong>Address:</strong> {`${shippingInfo.address}, ${shippingInfo.city}, ${shippingInfo.postalCode}, ${shippingInfo.country}`}</Typography>
+                        </Paper>
+                        <Paper variant="outlined" sx={{ p: { xs: 2.5, sm: 3 }, borderRadius: 2 }}>
+                            <Typography variant="h6" fontWeight={700} sx={{ mb: 1 }}>Your Cart Items</Typography>
+                            <Stack divider={<Divider />} spacing={1}>
+                                {cartItems.map(item => (
+                                    <Box key={item.product} sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 1.5 }}>
+                                        <Box component="img" src={item.image} alt={item.name} sx={{ width: 65, height: 50, objectFit: 'contain' }} />
+                                        <Typography component={Link} to={`/product/${item.product}`} sx={{ flex: 1, color: 'text.primary', textDecoration: 'none', fontWeight: 600 }}>{item.name}</Typography>
+                                        <Typography>{item.quantity} x ₱{formatPeso(item.price)} = <strong>₱{formatPeso(item.quantity * item.price)}</strong></Typography>
+                                    </Box>
+                                ))}
+                            </Stack>
+                        </Paper>
+                    </Stack>
+                    <Paper variant="outlined" sx={{ p: 3, borderRadius: 2, height: 'fit-content' }}>
+                        <Typography variant="h6" fontWeight={700}>Order Summary</Typography>
+                        <Divider sx={{ my: 2 }} />
+                        <Stack spacing={1.5}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}><Typography>Subtotal</Typography><Typography>₱{formatPeso(itemsPrice)}</Typography></Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}><Typography>Shipping</Typography><Typography>₱{formatPeso(shippingPrice)}</Typography></Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}><Typography>Tax</Typography><Typography>₱{formatPeso(taxPrice)}</Typography></Box>
+                        </Stack>
+                        <Divider sx={{ my: 2 }} />
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}><Typography fontWeight={700}>Total</Typography><Typography fontWeight={700}>₱{formatPeso(totalPrice)}</Typography></Box>
+                        <Button id="checkout_btn" fullWidth variant="contained" size="large" sx={{ mt: 3 }} onClick={processToPayment}>Proceed to Payment</Button>
+                    </Paper>
+                </Box>
+            </Container>
 
         </>
     )

@@ -7,6 +7,7 @@ const auth = require('./routes/auth');
 const orders = require('./routes/order');
 const categories = require('./routes/category');
 const blueprints = require('./routes/blueprint');
+const bob = require('./routes/bob');
 
 // app.use(cors());
 app.use(cors({
@@ -21,6 +22,7 @@ app.use('/api/v1', auth);
 app.use('/api/v1', orders);
 app.use('/api/v1', categories);
 app.use('/api/v1', blueprints);
+app.use('/api/v1', bob);
 
 app.use((error, req, res, next) => {
     if (res.headersSent) {

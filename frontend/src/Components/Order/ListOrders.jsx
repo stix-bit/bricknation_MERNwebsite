@@ -15,6 +15,7 @@ import { DataGrid } from '@mui/x-data-grid'
 import MetaData from '../Layout/MetaData'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { formatPeso } from '../../Utils/helpers'
 import { useDispatch, useSelector } from 'react-redux'
 import { myOrders, clearErrors } from '../../actions/orderActions'
 
@@ -116,7 +117,7 @@ const ListOrders = () => {
     const rows = (orders || []).map(order => ({
         id: order._id,
         numOfItems: order.orderItems?.length || 0,
-        amount: `$${order.totalPrice}`,
+        amount: `₱${formatPeso(order.totalPrice)}`,
         status: order.orderStatus || 'Processing'
     }))
 

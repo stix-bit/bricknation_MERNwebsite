@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import {
     Avatar,
@@ -41,6 +41,7 @@ const defaultCategories = [
 const Header = () => {
     const dispatch = useDispatch()
     const location = useLocation()
+    const navigate = useNavigate()
     const { user } = useSelector(state => state.auth)
     const { cartItems } = useSelector(state => state.cart)
 
@@ -69,9 +70,10 @@ const Header = () => {
         }
     }, [])
 
-    const logoutHandler = () => {
+    const logoutHandler = async () => {
         setUserMenuAnchor(null)
-        dispatch(logout())
+        await dispatch(logout())
+        navigate('/login')
         toast.success('Logged out successfully', { position: 'bottom-right' })
     }
 
@@ -139,6 +141,13 @@ const Header = () => {
                                         <i className="fa fa-tachometer mr-2" style={{ width: 20 }}></i> Dashboard
                                     </MenuItem>
                                 )}
+                                <MenuItem
+                                    component={Link}
+                                    to="/blueprint-builder"
+                                    onClick={() => setUserMenuAnchor(null)}
+                                >
+                                    <i className="fa fa-pencil-square-o mr-2" style={{ width: 20 }}></i> Blueprint Builder
+                                </MenuItem>
                                 <MenuItem
                                     component={Link}
                                     to="/orders/me"

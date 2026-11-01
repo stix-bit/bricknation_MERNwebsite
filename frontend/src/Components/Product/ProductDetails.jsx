@@ -7,6 +7,7 @@ import MetaData from '../Layout/MetaData'
 import ListReviews from '../Review/ListReviews'
 import { getMyProductReview, getProductDetails, newReview } from '../../actions/productActions'
 import { addItemToCart } from '../../actions/cartActions'
+import { formatPeso } from '../../Utils/helpers'
 
 const ProductDetails = () => {
     const { product } = useSelector(state => state.productDetails)
@@ -74,7 +75,7 @@ const ProductDetails = () => {
                         </Stack>
                         <Divider sx={{ my: 2 }} />
                         <Typography id="product_price" variant="h4" component="p" color="primary" sx={{ fontWeight: 700 }}>
-                            ${product.price}
+                            ₱{formatPeso(product.price)}
                         </Typography>
                         <div className="stockCounter d-inline">
                             <IconButton color="error" size="small" onClick={decreaseQty} aria-label="Decrease quantity">-</IconButton>

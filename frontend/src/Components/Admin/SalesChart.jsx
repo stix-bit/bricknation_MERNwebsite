@@ -16,6 +16,7 @@ import {
     resolveDateRange,
     toInputDate
 } from '../../Utils/chartDates'
+import { formatPeso } from '../../Utils/helpers'
 
 const buildDailySales = (orders, startDate, endDate) => {
     const { start, end } = resolveDateRange(startDate, endDate)
@@ -64,7 +65,7 @@ const SalesChart = ({ orders = [] }) => {
                     <div>
                         <h4 className="mb-1">Sales</h4>
                         <p className="text-muted mb-0">
-                            Total in range: <b>${rangeTotal.toFixed(2)}</b>
+                            Total in range: <b>₱{formatPeso(rangeTotal)}</b>
                         </p>
                     </div>
                     <div className="sales-chart-filters">
@@ -106,9 +107,12 @@ const SalesChart = ({ orders = [] }) => {
                             <LineChart data={sales} margin={{ top: 16, right: 16, bottom: 8, left: 0 }}>
                                 <CartesianGrid stroke="#eee7df" strokeDasharray="4 4" />
                                 <XAxis dataKey="label" tick={{ fontSize: 12 }} interval="preserveStartEnd" />
-                                <YAxis tick={{ fontSize: 12 }} />
+                                <YAxis
+                                    tick={{ fontSize: 12 }}
+                                    tickFormatter={value => `₱${Number(value).toLocaleString('en-PH', { maximumFractionDigits: 0 })}`}
+                                />
                                 <Tooltip
-                                    formatter={value => [`$${Number(value).toFixed(2)}`, 'Sales']}
+                                    formatter={value => [`₱${formatPeso(value)}`, 'Sales']}
                                     labelFormatter={(_, payload) => payload?.[0]?.payload?.date || ''}
                                 />
                                 <Line type="monotone" dataKey="total" stroke="#e30620" strokeWidth={2} dot={false} />

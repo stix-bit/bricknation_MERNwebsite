@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import { formatPeso } from '../../Utils/helpers'
 import {
     Alert,
     Box,
@@ -12,8 +13,10 @@ import {
     DialogContent,
     DialogTitle,
     IconButton,
+    InputAdornment,
     Paper,
     Stack,
+    TextField,
     Tooltip,
     Typography
 } from '@mui/material'
@@ -38,6 +41,7 @@ const ProductsList = () => {
     const { error: deleteError, isBulkActionComplete, affectedCount, loading: actionLoading } = useSelector(state => state.product)
     const [selectedIds, setSelectedIds] = useState([])
     const [confirmation, setConfirmation] = useState(null)
+    const [searchTerm, setSearchTerm] = useState('')
 
     const selectedProducts = products.filter(product => selectedIds.includes(product._id))
     const allSelectedProductsArchived = selectedProducts.length > 0 && selectedProducts.every(product => product.isArchived)
@@ -201,13 +205,25 @@ const ProductsList = () => {
         }
     ]
 
-    const rows = [...products]
+    const normalizedSearchTerm = searchTerm.trim().toLowerCase()
+    const filteredProducts = products.filter(product => {
+        if (!normalizedSearchTerm) return true
+
+        return [
+            product.name,
+            product._id,
+            product.category_id?.name,
+            product.description
+        ].some(value => String(value || '').toLowerCase().includes(normalizedSearchTerm))
+    })
+
+    const rows = [...filteredProducts]
         .sort((a, b) => String(b._id || '').localeCompare(String(a._id || '')))
         .map(product => ({
             id: product._id,
             name: product.name,
             category: product.category_id?.name || 'Uncategorized',
-            price: `$${Number(product.price).toFixed(2)}`,
+            price: `₱${formatPeso(product.price)}`,
             stock: product.stock,
             isArchived: product.isArchived,
         }))
@@ -221,7 +237,7 @@ const ProductsList = () => {
                 </Box>
 
                 <Box component="main" sx={{ flex: 1, minWidth: 0 }}>
-                    <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                    <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2, textAlign: 'left' }}>
                         <div>
                             <Typography variant="h4" fontWeight={700} sx={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                                 All Products
@@ -230,24 +246,41 @@ const ProductsList = () => {
                                 Manage inventory, pricing, catalog items, and status
                             </Typography>
                         </div>
-                        <Button
-                            component={Link}
-                            to="/admin/product"
-                            variant="contained"
-                            sx={{
-                                bgcolor: 'var(--red, #e30620)',
-                                color: '#fff',
-                                textTransform: 'none',
-                                fontWeight: 600,
-                                px: 2.5,
-                                py: 1,
-                                borderRadius: 2,
-                                '&:hover': { bgcolor: 'var(--red-dark, #ad071d)' }
-                            }}
-                            startIcon={<i className="fa fa-plus"></i>}
-                        >
-                            Create Product
-                        </Button>
+                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ width: { xs: '100%', sm: 'auto' } }}>
+                            <TextField
+                                size="small"
+                                value={searchTerm}
+                                onChange={event => setSearchTerm(event.target.value)}
+                                placeholder="Search by name, category, or ID..."
+                                aria-label="Search products"
+                                sx={{ minWidth: { sm: 280 } }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <i className="fa fa-search" style={{ color: '#888' }}></i>
+                                        </InputAdornment>
+                                    )
+                                }}
+                            />
+                            <Button
+                                component={Link}
+                                to="/admin/product"
+                                variant="contained"
+                                sx={{
+                                    bgcolor: 'var(--red, #e30620)',
+                                    color: '#fff',
+                                    textTransform: 'none',
+                                    fontWeight: 600,
+                                    px: 2.5,
+                                    py: 1,
+                                    borderRadius: 2,
+                                    '&:hover': { bgcolor: 'var(--red-dark, #ad071d)' }
+                                }}
+                                startIcon={<i className="fa fa-plus"></i>}
+                            >
+                                Create Product
+                            </Button>
+                        </Stack>
                     </Box>
 
                     {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
@@ -271,6 +304,11 @@ const ProductsList = () => {
                                     }}
                                     pageSizeOptions={[5, 10, 25, 50]}
                                     rows={rows}
+                                    localeText={{
+                                        noRowsLabel: normalizedSearchTerm
+                                            ? `No products matching "${searchTerm}"`
+                                            : 'No products found.'
+                                    }}
                                     columns={columns}
                                     checkboxSelection
                                     disableRowSelectionOnClick

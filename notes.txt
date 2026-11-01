@@ -18,3 +18,21 @@ DONT FORGET TO MAKE THE FEATURES USE REDUX IF POSSIBLE
 ADMIN USERS AND REVIEWS CRUD PAGE DO NOT HAVE REDUX YET SO ITS NOT WORKING AND NOT SHOWING ON THE DASHBOARD
 ADMIN REVIEWS IS SUPPOSED TO WORK LIKE THIS ON THE ADMIN PAGE: SEARCH CUSTOMER USER ID, THEN SHOW LIST OF COMMENTS ON DIFFERENT PRODUCTS AND WITH JUST DELETE/SOFT DELETE (ARCHIVE) FUNCTION
 I ALSO UPDATED THE DATABASE WITH THE ONE FROM THE PDF
+
+CHANGE LOG - 2026-11-01
+
+1. Updated seeded product prices to Philippine peso values and added multiple 4L paint products with different colors.
+2. Added shared Philippine peso formatting with comma separators across product, cart, checkout, order, and admin price displays.
+3. Updated the sales chart to display peso symbols, comma-formatted values, totals, axes, and tooltips.
+4. Fixed login lockout behavior so stale browser state cannot lock users out before a login attempt.
+5. Improved admin Dashboard, Products, and Users heading alignment.
+6. Added live search bars and empty-result messages to the admin Products and Users pages.
+7. Added the user Blueprint Material Planner with blueprint upload/preview, catalog material suggestions, drag-and-drop planning, quantity totals, cart actions, and blueprint saving.
+8. Added the global Bob the Builder assistant with a floating access button, project estimates, peso totals, and Add All to Cart.
+9. Added backend Gemini integration for Bob the Builder, including catalog matching, quantity validation, model fallbacks, and clearer API errors.
+10. Configured Bob to use Gemini 3.5 Flash after older Gemini models were unavailable to new users.
+11. Added a 404 page with construction-themed styling, light red gradient 404 text, centered headings and message, and a Back to Home button.
+12. Protected all admin routes. Guests and regular users who access admin pages, including /dashboard, now see the 404 page.
+13. Added a catch-all route so unknown URLs display the 404 page.
+14. Updated logout behavior so both regular users and admins are redirected to the login page.
+15. Rebuilt and verified the frontend after the route, 404, and layout changes.
