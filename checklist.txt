@@ -75,4 +75,4 @@ ADDITIONAL/OPTIONAL:
 7. Make registers send you to the login page and not home page ✅
 8. Make reviews restricted to only people that bought the products ✅
 9. Make admin reviews page, search the product id and then view all of the comments on the products ✅ 
-10. Add a category section on the header
+10. Add a category section on the header ✅ 
