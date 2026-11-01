@@ -145,10 +145,21 @@ const UsersList = () => {
                                 <Typography color="text.secondary" sx={{ mt: 2 }}>Loading users...</Typography>
                             </Stack>
                         ) : (
-                            <TableContainer sx={{ maxHeight: 600 }}>
+                            <TableContainer sx={{ maxHeight: 600, position: 'relative' }}>
                                 <Table stickyHeader>
                                     <TableHead>
-                                        <TableRow sx={{ '& th': { bgcolor: 'rgba(0, 0, 0, 0.02)', fontWeight: 700 } }}>
+                                        <TableRow
+                                            sx={{
+                                                '& th': {
+                                                    backgroundColor: '#fff',
+                                                    fontWeight: 700,
+                                                    position: 'sticky',
+                                                    top: 0,
+                                                    zIndex: 2,
+                                                    boxShadow: '0 1px 0 rgba(0, 0, 0, 0.12)'
+                                                }
+                                            }}
+                                        >
                                             <TableCell>User</TableCell>
                                             <TableCell>Email</TableCell>
                                             <TableCell>Role</TableCell>
