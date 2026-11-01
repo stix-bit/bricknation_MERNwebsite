@@ -97,7 +97,12 @@ const Login = () => {
             const idToken = await result.user.getIdToken()
             dispatch(firebaseLogin(idToken))
         } catch (error) {
-            if (error.code !== 'auth/popup-closed-by-user') {
+            const isPopupDismissed = [
+                'auth/popup-closed-by-user',
+                'auth/cancelled-popup-request'
+            ].includes(error.code)
+
+            if (!isPopupDismissed) {
                 toast.error(error.message || 'Social login failed', {
                     position: 'bottom-right',
                 })

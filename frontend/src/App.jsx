@@ -38,7 +38,6 @@ import NewProduct from './Components/Admin/NewProduct';
 import OrdersList from './Components/Admin/OrdersList';
 import ProcessOrder from './Components/Admin/ProcessOrder';
 import UsersList from './Components/Admin/UsersList';
-import UpdateUser from './Components/Admin/UpdateUser';
 import ProtectedRoute from './Components/Route/ProtectedRoute';
 import NotFound from './Components/Route/NotFound';
 import ProductReviews from './Components/Admin/ProductReviews';
@@ -179,14 +178,6 @@ function App() {
                 <UsersList />
               </ProtectedRoute>
             } />
-          <Route
-            path="/admin/user/:id"
-            element={
-              <ProtectedRoute isAdmin={true}>
-                <UpdateUser />
-              </ProtectedRoute>
-            } />
-
           <Route
             path="/admin/products"
             element={

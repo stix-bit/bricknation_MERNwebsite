@@ -31,16 +31,17 @@ unit 2 20pts
  # user interface design css and bootstrap components 15pts
 user interface design css and Material UI (MUI) or similar library components 20pts ✅
 
-quiz 2 15pts ✅
+quiz 1 15pts ✅
 sales charts with date range filter.  line or bar chart 15pts
 
-quiz 3 ✅
- # pagination on products list on homepage. 10pts
+quiz 2 15pts ✅
 infinite scroll on products list on homepage. 15pts
 
-quiz 4 -> ✅
-facebook or gmail login 15pts react-facebook-login or similar packages.
+quiz 3 15 pts✅
 facebook or gmail login using firebase|supabase|clerk 15pts
+
+quiz 4 15 pts ✅
+use Redux for state management
 
 term test LEC ✅
 functional requirements completeness 10pts
