@@ -105,7 +105,8 @@ export const productDetailsReducer = (state = { product: {} }, action) => {
         case PRODUCT_DETAILS_REQUEST:
             return {
                 ...state,
-                loading: true
+                loading: true,
+                product: {}
             }
 
         case PRODUCT_DETAILS_SUCCESS:

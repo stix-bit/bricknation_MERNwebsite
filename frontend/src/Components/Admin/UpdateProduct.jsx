@@ -15,6 +15,7 @@ import {
     InputLabel,
     MenuItem,
     Paper,
+    FormHelperText,
     Select,
     Stack,
     TextField,
@@ -26,7 +27,7 @@ import * as Yup from 'yup'
 
 const UpdateProduct = () => {
     const dispatch = useDispatch()
-    const { product } = useSelector(state => state.productDetails);
+    const { product, loading: productLoading } = useSelector(state => state.productDetails);
     const { loading, error: updateError, isUpdated } = useSelector(state => state.product);
     const [name, setName] = useState('');
     const [price, setPrice] = useState(0);
@@ -37,6 +38,8 @@ const UpdateProduct = () => {
     const [images, setImages] = useState([]);
     const [oldImages, setOldImages] = useState([]);
     const [imagesPreview, setImagesPreview] = useState([])
+    const [imageError, setImageError] = useState('')
+    const MAX_FILE_SIZE = 10 * 1024 * 1024
     // const [error, setError] = useState('')
     // const [product, setProduct] = useState({})
     // const [loading, setLoading] = useState(true)
@@ -57,13 +60,13 @@ const UpdateProduct = () => {
         initialValues: { name: '', price: 0, description: '', category: '', stock: 0, seller: '' },
         validationSchema: Yup.object({
             name: Yup.string().trim().required('Product name is required'),
-            price: Yup.number().min(0).required('Price is required'),
+            price: Yup.number().min(0, 'Price cannot be negative').required('Price is required'),
             description: Yup.string().trim().required('Description is required'),
             category: Yup.string().required('Category is required'),
-            stock: Yup.number().integer().min(0).required('Stock is required'),
+            stock: Yup.number().integer().min(0, 'Stock cannot be negative').required('Stock is required'),
             seller: Yup.string().trim().required('Seller name is required')
         }),
-        onSubmit: () => submitHandler()
+        onSubmit: values => submitHandler(values)
     })
 
     // const getProductDetails = async (id) => {
@@ -95,12 +98,14 @@ const UpdateProduct = () => {
 
     //     }
     // }
-    /* Form state is populated when the asynchronously loaded product changes. */
+    useEffect(() => {
+        dispatch(getProductDetails(id))
+    }, [dispatch, id])
+
+    /* Form state is populated when the freshly loaded product changes. */
     /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
     useEffect(() => {
-        if (!product?._id || product._id !== id) {
-            dispatch(getProductDetails(id))
-        } else if (!isUpdated) {
+        if (!productLoading && product?._id === id && !isUpdated) {
             setName(product.name);
             setPrice(product.price);
             setDescription(product.description);
@@ -128,17 +133,22 @@ const UpdateProduct = () => {
             dispatch({ type: UPDATE_PRODUCT_RESET })
 
         }
-    }, [dispatch, isUpdated, updateError, product, id, navigate])
+    }, [dispatch, isUpdated, updateError, product, productLoading, id, navigate])
     /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
 
-    const submitHandler = () => {
+    const submitHandler = values => {
+        if (imageError) {
+            errMsg(imageError)
+            return
+        }
+
         const formData = new FormData();
-        formData.set('name', name);
-        formData.set('price', price);
-        formData.set('description', description);
-        formData.set('category', category);
-        formData.set('stock', stock);
-        formData.set('seller', seller);
+        formData.set('name', values.name);
+        formData.set('price', values.price);
+        formData.set('description', values.description);
+        formData.set('category', values.category);
+        formData.set('stock', values.stock);
+        formData.set('seller', values.seller);
         images.forEach(image => {
             formData.append('images', image)
         })
@@ -146,6 +156,19 @@ const UpdateProduct = () => {
     }
     const onChange = e => {
         const files = Array.from(e.target.files)
+
+        const oversizedFile = files.find(file => file.size > MAX_FILE_SIZE)
+        if (oversizedFile) {
+            const message = 'Product image file size must be 10MB or less'
+            setImageError(message)
+            errMsg(message)
+            e.target.value = ''
+            setImagesPreview([])
+            setImages([])
+            return
+        }
+
+        setImageError('')
         setImagesPreview([]);
         setImages([])
         setOldImages([])
@@ -189,6 +212,9 @@ const UpdateProduct = () => {
                                 label="Product name"
                                 value={name}
                                 onChange={(e) => { setName(e.target.value); formik.setFieldValue('name', e.target.value) }}
+                                onBlur={formik.handleBlur}
+                                error={Boolean(formik.touched.name && formik.errors.name)}
+                                helperText={formik.touched.name && formik.errors.name ? formik.errors.name : ' '}
                                 required
                                 fullWidth
                             />
@@ -199,6 +225,9 @@ const UpdateProduct = () => {
                                     type="number"
                                     value={price}
                                     onChange={(e) => { setPrice(e.target.value); formik.setFieldValue('price', e.target.value) }}
+                                    onBlur={formik.handleBlur}
+                                    error={Boolean(formik.touched.price && formik.errors.price)}
+                                    helperText={formik.touched.price && formik.errors.price ? formik.errors.price : ' '}
                                     inputProps={{ min: 0, step: '0.01' }}
                                     required
                                     fullWidth
@@ -209,7 +238,10 @@ const UpdateProduct = () => {
                                     type="number"
                                     value={stock}
                                     onChange={(e) => { setStock(e.target.value); formik.setFieldValue('stock', e.target.value) }}
-                                    inputProps={{ min: 0 }}
+                                    onBlur={formik.handleBlur}
+                                    error={Boolean(formik.touched.stock && formik.errors.stock)}
+                                    helperText={formik.touched.stock && formik.errors.stock ? formik.errors.stock : ' '}
+                                    inputProps={{ min: 0, step: '1' }}
                                     required
                                     fullWidth
                                 />
@@ -219,10 +251,13 @@ const UpdateProduct = () => {
                                 label="Seller name"
                                 value={seller}
                                 onChange={(e) => { setSeller(e.target.value); formik.setFieldValue('seller', e.target.value) }}
+                                onBlur={formik.handleBlur}
+                                error={Boolean(formik.touched.seller && formik.errors.seller)}
+                                helperText={formik.touched.seller && formik.errors.seller ? formik.errors.seller : ' '}
                                 required
                                 fullWidth
                             />
-                            <FormControl fullWidth required>
+                            <FormControl fullWidth required error={Boolean(formik.touched.category && formik.errors.category)}>
                                 <InputLabel id="category-label">Category</InputLabel>
                                 <Select
                                     labelId="category-label"
@@ -230,6 +265,7 @@ const UpdateProduct = () => {
                                     value={category}
                                     label="Category"
                                     onChange={(e) => { setCategory(e.target.value); formik.setFieldValue('category', e.target.value) }}
+                                    onBlur={formik.handleBlur}
                                 >
                                     {categories.map(categoryOption => (
                                         <MenuItem key={categoryOption} value={categoryOption}>
@@ -237,12 +273,18 @@ const UpdateProduct = () => {
                                         </MenuItem>
                                     ))}
                                 </Select>
+                                <FormHelperText>
+                                    {formik.touched.category && formik.errors.category ? formik.errors.category : ' '}
+                                </FormHelperText>
                             </FormControl>
                             <TextField
                                 id="description_field"
                                 label="Description"
                                 value={description}
                                 onChange={(e) => { setDescription(e.target.value); formik.setFieldValue('description', e.target.value) }}
+                                onBlur={formik.handleBlur}
+                                error={Boolean(formik.touched.description && formik.errors.description)}
+                                helperText={formik.touched.description && formik.errors.description ? formik.errors.description : ' '}
                                 multiline
                                 minRows={6}
                                 required
@@ -265,6 +307,9 @@ const UpdateProduct = () => {
                                         hidden
                                     />
                                 </Button>
+                                {imageError && (
+                                    <FormHelperText error>{imageError}</FormHelperText>
+                                )}
                                 <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
                                     Select one or more images to replace the current images.
                                 </Typography>
@@ -295,7 +340,7 @@ const UpdateProduct = () => {
                                 type="submit"
                                 variant="contained"
                                 size="large"
-                                disabled={loading}
+                                disabled={loading || !!imageError}
                                 sx={{ alignSelf: { xs: 'stretch', sm: 'flex-end' }, px: 5, py: 1.25 }}
                             >
                                 {loading ? 'Updating...' : 'Update product'}

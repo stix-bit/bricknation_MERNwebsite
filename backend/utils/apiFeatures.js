@@ -28,13 +28,15 @@ class APIFeatures {
         removeFields.forEach(el => delete queryCopy[el]);
 
         let priceFilter = {};
-        if (queryCopy['price[gte]'] || queryCopy['price[lte]']) {
+        const priceGte = queryCopy['price[gte]'] || queryCopy.price?.gte;
+        const priceLte = queryCopy['price[lte]'] || queryCopy.price?.lte;
+        if (priceGte || priceLte) {
             priceFilter.price = {};
-            if (queryCopy['price[gte]']) {
-                priceFilter.price.$gte = Number(queryCopy['price[gte]']);
+            if (priceGte) {
+                priceFilter.price.$gte = Number(priceGte);
             }
-            if (queryCopy['price[lte]']) {
-                priceFilter.price.$lte = Number(queryCopy['price[lte]']);
+            if (priceLte) {
+                priceFilter.price.$lte = Number(priceLte);
             }
             // priceFilter {
             //     price: {
@@ -44,6 +46,7 @@ class APIFeatures {
             // }
             delete queryCopy['price[gte]'];
             delete queryCopy['price[lte]'];
+            delete queryCopy.price;
         }
 
         if (queryCopy.category) {
@@ -53,14 +56,18 @@ class APIFeatures {
             delete queryCopy.category;
         }
 
-        if (queryCopy['rating[gte]']) {
-            queryCopy.ratings = { $gte: Number(queryCopy['rating[gte]']) };
+        const ratingGte = queryCopy['rating[gte]'] || queryCopy.rating?.gte;
+        if (ratingGte) {
+            queryCopy.ratings = { $gte: Number(ratingGte) };
             delete queryCopy['rating[gte]'];
+            delete queryCopy.rating;
         }
 
-        if (queryCopy['numOfReviews[gte]']) {
-            queryCopy.numOfReviews = { $gte: Number(queryCopy['numOfReviews[gte]']) };
+        const reviewsGte = queryCopy['numOfReviews[gte]'] || queryCopy.numOfReviews?.gte;
+        if (reviewsGte) {
             delete queryCopy['numOfReviews[gte]'];
+            delete queryCopy.numOfReviews;
+            queryCopy.numOfReviews = { $gte: Number(reviewsGte) };
         }
 
         delete queryCopy['price[gte]'];

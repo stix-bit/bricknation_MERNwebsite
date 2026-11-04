@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
 import {
     Alert,
     Avatar,
@@ -26,7 +28,6 @@ import {
     TableHead,
     TableRow,
     TextField,
-    Tooltip,
     Typography
 } from '@mui/material'
 import MetaData from '../Layout/MetaData'
@@ -46,7 +47,28 @@ const UsersList = () => {
     const [editingUser, setEditingUser] = useState(null)
     const [userToDelete, setUserToDelete] = useState(null)
     const [deleteMode, setDeleteMode] = useState('soft')
-    const [form, setForm] = useState({ name: '', email: '', role: 'user' })
+
+    const formik = useFormik({
+        enableReinitialize: true,
+        initialValues: {
+            name: editingUser?.name || '',
+            email: editingUser?.email || '',
+            role: editingUser?.role || 'user'
+        },
+        validationSchema: Yup.object({
+            name: Yup.string().trim().required('Name is required'),
+            email: Yup.string().email('Enter a valid email').required('Email is required'),
+            role: Yup.string().oneOf(['user', 'admin']).required('Role is required')
+        }),
+        onSubmit: async (values, { setSubmitting }) => {
+            const updated = await dispatch(updateAdminUser(editingUser._id, values))
+            if (updated) {
+                setEditingUser(null)
+                dispatch(getAllUsers())
+            }
+            setSubmitting(false)
+        }
+    })
 
     useEffect(() => {
         dispatch(getAllUsers())
@@ -54,16 +76,6 @@ const UsersList = () => {
 
     const openEditDialog = user => {
         setEditingUser(user)
-        setForm({ name: user.name, email: user.email, role: user.role })
-    }
-
-    const submitEdit = async event => {
-        event.preventDefault()
-        const updated = await dispatch(updateAdminUser(editingUser._id, form))
-        if (updated) {
-            setEditingUser(null)
-            dispatch(getAllUsers())
-        }
     }
 
     const confirmDelete = async () => {
@@ -133,10 +145,21 @@ const UsersList = () => {
                                 <Typography color="text.secondary" sx={{ mt: 2 }}>Loading users...</Typography>
                             </Stack>
                         ) : (
-                            <TableContainer sx={{ maxHeight: 600 }}>
+                            <TableContainer sx={{ maxHeight: 600, position: 'relative' }}>
                                 <Table stickyHeader>
                                     <TableHead>
-                                        <TableRow sx={{ '& th': { bgcolor: 'rgba(0, 0, 0, 0.02)', fontWeight: 700 } }}>
+                                        <TableRow
+                                            sx={{
+                                                '& th': {
+                                                    backgroundColor: '#fff',
+                                                    fontWeight: 700,
+                                                    position: 'sticky',
+                                                    top: 0,
+                                                    zIndex: 2,
+                                                    boxShadow: '0 1px 0 rgba(0, 0, 0, 0.12)'
+                                                }
+                                            }}
+                                        >
                                             <TableCell>User</TableCell>
                                             <TableCell>Email</TableCell>
                                             <TableCell>Role</TableCell>
@@ -248,35 +271,42 @@ const UsersList = () => {
                 <DialogTitle sx={{ fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif" }}>
                     Modify User Details
                 </DialogTitle>
-                <Box component="form" onSubmit={submitEdit}>
+                <Box component="form" onSubmit={formik.handleSubmit} noValidate>
                     <DialogContent>
                         <Stack spacing={2.5} sx={{ pt: 1 }}>
                             <TextField
                                 label="Full Name"
-                                value={form.name}
-                                required
+                                {...formik.getFieldProps('name')}
+                                error={formik.touched.name && Boolean(formik.errors.name)}
+                                helperText={formik.touched.name && formik.errors.name}
                                 fullWidth
-                                onChange={event => setForm({ ...form, name: event.target.value })}
                             />
                             <TextField
                                 label="Email Address"
                                 type="email"
-                                value={form.email}
-                                required
+                                {...formik.getFieldProps('email')}
+                                error={formik.touched.email && Boolean(formik.errors.email)}
+                                helperText={formik.touched.email && formik.errors.email}
                                 fullWidth
-                                onChange={event => setForm({ ...form, email: event.target.value })}
                             />
-                            <FormControl fullWidth>
+                            <FormControl
+                                fullWidth
+                                error={formik.touched.role && Boolean(formik.errors.role)}
+                            >
                                 <InputLabel id="role-select-label">Account Role</InputLabel>
                                 <Select
                                     labelId="role-select-label"
-                                    value={form.role}
+                                    {...formik.getFieldProps('role')}
                                     label="Account Role"
-                                    onChange={event => setForm({ ...form, role: event.target.value })}
                                 >
                                     <MenuItem value="user">User</MenuItem>
                                     <MenuItem value="admin">Administrator</MenuItem>
                                 </Select>
+                                {formik.touched.role && formik.errors.role && (
+                                    <Typography color="error" variant="caption" sx={{ mt: 0.5, ml: 1.75 }}>
+                                        {formik.errors.role}
+                                    </Typography>
+                                )}
                             </FormControl>
                         </Stack>
                     </DialogContent>
@@ -287,7 +317,7 @@ const UsersList = () => {
                         <Button
                             type="submit"
                             variant="contained"
-                            disabled={actionLoading}
+                            disabled={actionLoading || formik.isSubmitting}
                             sx={{
                                 textTransform: 'none',
                                 fontWeight: 600,

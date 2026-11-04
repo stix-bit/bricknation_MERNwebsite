@@ -31,6 +31,8 @@ const NewProduct = () => {
     const { error, success } = useSelector(state => state.newProduct)
     const [images, setImages] = useState([]);
     const [imagesPreview, setImagesPreview] = useState([])
+    const [imageError, setImageError] = useState('')
+    const MAX_FILE_SIZE = 10 * 1024 * 1024
     // const [error, setError] = useState('')
     // const [loading, setLoading] = useState(true)
     // const [success, setSuccess] = useState('')
@@ -50,16 +52,20 @@ const NewProduct = () => {
         initialValues: { name: '', price: 0, description: '', category: 'Materials', stock: 0, seller: '' },
         validationSchema: Yup.object({
             name: Yup.string().trim().required('Product name is required'),
-            price: Yup.number().min(0).required('Price is required'),
+            price: Yup.number().min(0, 'Price cannot be negative').required('Price is required'),
             description: Yup.string().trim().required('Description is required'),
             category: Yup.string().required('Category is required'),
-            stock: Yup.number().integer().min(0).required('Stock is required'),
+            stock: Yup.number().integer().min(0, 'Stock cannot be negative').required('Stock is required'),
             seller: Yup.string().trim().required('Seller name is required')
         }),
         onSubmit: values => submitHandler(values)
     })
 
     const submitHandler = (values) => {
+        if (imageError) {
+            toast.error(imageError, { position: 'bottom-right' })
+            return
+        }
 
         const formData = new FormData();
         formData.set('name', values.name);
@@ -78,6 +84,19 @@ const NewProduct = () => {
 
     const onChange = e => {
         const files = Array.from(e.target.files)
+        const oversizedFile = files.find(file => file.size > MAX_FILE_SIZE)
+
+        if (oversizedFile) {
+            const message = 'Product image file size must be 10MB or less'
+            setImageError(message)
+            toast.error(message, { position: 'bottom-right' })
+            e.target.value = ''
+            setImagesPreview([])
+            setImages([])
+            return
+        }
+
+        setImageError('')
         setImagesPreview([]);
         setImages([])
         files.forEach(file => {
@@ -256,6 +275,9 @@ const NewProduct = () => {
                                         multiple
                                     />
                                 </Button>
+                                {imageError && (
+                                    <FormHelperText error>{imageError}</FormHelperText>
+                                )}
                                 <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mt: 2 }}>
                                     {imagesPreview.map(img => (
                                         <Box
@@ -269,7 +291,7 @@ const NewProduct = () => {
                                 </Stack>
                             </Box>
 
-                            <Button type="submit" variant="contained" size="large" fullWidth>
+                            <Button type="submit" variant="contained" size="large" fullWidth disabled={!!imageError}>
                                 Create product
                             </Button>
                         </Stack>
