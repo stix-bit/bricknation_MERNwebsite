@@ -58,6 +58,30 @@ const SalesChart = ({ orders = [] }) => {
         setEndDate(toInputDate(new Date()))
     }
 
+    const handleStartDateChange = event => {
+        const nextStartDate = event.target.value
+        if (!nextStartDate) {
+            return
+        }
+
+        setStartDate(nextStartDate)
+        if (nextStartDate > endDate) {
+            setEndDate(nextStartDate)
+        }
+    }
+
+    const handleEndDateChange = event => {
+        const nextEndDate = event.target.value
+        if (!nextEndDate) {
+            return
+        }
+
+        setEndDate(nextEndDate)
+        if (nextEndDate < startDate) {
+            setStartDate(nextEndDate)
+        }
+    }
+
     return (
         <div className="card sales-chart-card">
             <div className="card-body">
@@ -82,7 +106,7 @@ const SalesChart = ({ orders = [] }) => {
                                 className="form-control form-control-sm"
                                 value={startDate}
                                 max={endDate}
-                                onChange={event => setStartDate(event.target.value)}
+                                onChange={handleStartDateChange}
                             />
                         </label>
                         <label className="mb-0">
@@ -93,7 +117,7 @@ const SalesChart = ({ orders = [] }) => {
                                 value={endDate}
                                 min={startDate}
                                 max={toInputDate(new Date())}
-                                onChange={event => setEndDate(event.target.value)}
+                                onChange={handleEndDateChange}
                             />
                         </label>
                     </div>
