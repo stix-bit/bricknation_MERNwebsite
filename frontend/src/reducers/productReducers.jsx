@@ -59,17 +59,24 @@ export const productsReducer = (state = { products: [] }, action) => {
 
 
         case ALL_PRODUCTS_SUCCESS:
-            return {
-                ...state,
-                loading: false,
-                products: action.meta?.append
+            {
+                const loadedProducts = action.meta?.append
                     ? [...state.products, ...action.payload.products.filter(product =>
                         !state.products.some(existingProduct => existingProduct._id === product._id)
                     )]
-                    : action.payload.products,
+                    : action.payload.products
+                const hasMore = loadedProducts.length < action.payload.filteredProductsCount &&
+                    action.payload.products.length === action.payload.resPerPage
+
+            return {
+                ...state,
+                loading: false,
+                products: loadedProducts,
                 productsCount: action.payload.productsCount,
                 resPerPage: action.payload.resPerPage,
-                filteredProductsCount: action.payload.filteredProductsCount
+                filteredProductsCount: action.payload.filteredProductsCount,
+                hasMore
+            }
             }
 
         case ADMIN_PRODUCTS_SUCCESS:

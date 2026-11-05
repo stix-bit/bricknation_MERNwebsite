@@ -88,7 +88,7 @@ const Home = () => {
     }
 
     const dispatch = useDispatch();
-    const { loading, products, filteredProductsCount } = useSelector(state => state.products);
+    const { loading, products, filteredProductsCount, hasMore } = useSelector(state => state.products);
     const loadMoreRef = useRef(null)
     // console.log(products)
     // const getProducts = async (keyword = '', price, page = 1) => {
@@ -175,14 +175,14 @@ const Home = () => {
 
     useEffect(() => {
         const loadMore = entries => {
-            if (entries[0].isIntersecting && !loading && products.length < filteredProductsCount) {
+            if (entries[0].isIntersecting && !loading && hasMore) {
                 setCurrentPage(page => page + 1)
             }
         }
         const observer = new IntersectionObserver(loadMore, { rootMargin: '300px' })
         if (loadMoreRef.current) observer.observe(loadMoreRef.current)
         return () => observer.disconnect()
-    }, [filteredProductsCount, loading, products.length])
+    }, [hasMore, loading])
 
     const resetFilters = () => {
         setPrice([0, 100000])
@@ -397,12 +397,12 @@ const Home = () => {
                                 )}
 
                             </div>
-                            {products.length < filteredProductsCount && (
+                            {hasMore && (
                                 <div ref={loadMoreRef} className="d-flex justify-content-center mt-5" style={{ minHeight: 48 }}>
                                     {loading && <CircularProgress size={32} />}
                                 </div>
                             )}
-                            {!loading && filteredProductsCount > 0 && products.length >= filteredProductsCount && (
+                            {!loading && filteredProductsCount > 0 && !hasMore && (
                                 <Typography
                                     component="p"
                                     align="center"
