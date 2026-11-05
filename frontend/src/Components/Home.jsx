@@ -194,7 +194,6 @@ const Home = () => {
         setCurrentPage(1)
     }
 
-
     return (
         <>
             <MetaData title={'BrickNation'} />
@@ -402,6 +401,16 @@ const Home = () => {
                                 <div ref={loadMoreRef} className="d-flex justify-content-center mt-5" style={{ minHeight: 48 }}>
                                     {loading && <CircularProgress size={32} />}
                                 </div>
+                            )}
+                            {!loading && filteredProductsCount > 0 && products.length >= filteredProductsCount && (
+                                <Typography
+                                    component="p"
+                                    align="center"
+                                    color="text.secondary"
+                                    sx={{ mt: 5, mb: 2 }}
+                                >
+                                    You've reached the end of the list
+                                </Typography>
                             )}
                         </section>
                     </div>
