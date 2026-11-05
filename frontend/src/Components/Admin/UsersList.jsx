@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import {
@@ -35,6 +36,7 @@ import Sidebar from './SideBar'
 import {
     deleteAdminUser,
     getAllUsers,
+    logout,
     softDeleteAdminUser,
     restoreAdminUser,
     updateAdminUser
@@ -42,7 +44,9 @@ import {
 
 const UsersList = () => {
     const dispatch = useDispatch()
+    const navigate = useNavigate()
     const { users = [], loading, actionLoading, error } = useSelector(state => state.allUsers)
+    const { user: currentUser } = useSelector(state => state.auth)
     const [searchTerm, setSearchTerm] = useState('')
     const [editingUser, setEditingUser] = useState(null)
     const [userToDelete, setUserToDelete] = useState(null)
@@ -64,7 +68,12 @@ const UsersList = () => {
             const updated = await dispatch(updateAdminUser(editingUser._id, values))
             if (updated) {
                 setEditingUser(null)
-                dispatch(getAllUsers())
+                if (editingUser._id === currentUser?._id) {
+                    await dispatch(logout())
+                    navigate('/login')
+                } else {
+                    dispatch(getAllUsers())
+                }
             }
             setSubmitting(false)
         }

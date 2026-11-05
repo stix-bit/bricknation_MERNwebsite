@@ -293,7 +293,9 @@ const ProcessOrder = () => {
                                             label="Select Status"
                                             onChange={(e) => setStatus(e.target.value)}
                                         >
-                                            <MenuItem value="Processing">Processing</MenuItem>
+                                            <MenuItem value="Processing" disabled={orderStatus === 'Shipped'}>
+                                                Processing
+                                            </MenuItem>
                                             <MenuItem value="Shipped">Shipped</MenuItem>
                                             <MenuItem value="Delivered">Delivered</MenuItem>
                                         </Select>

@@ -1,0 +1,8259 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+3 0 obj
+<< /Length 3978 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F1 7.2 Tf
+(Feature Checklist Implementation Report) Tj
+0 -11 Td
+/F1 7.2 Tf
+(Repository: react_test) Tj
+0 -11 Td
+/F1 7.2 Tf
+(Generated from the current workspace source files) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(This report maps each checklist requirement to the files and exact line ranges that implement it. The) Tj
+0 -11 Td
+/F1 7.2 Tf
+(excerpts are read directly from the repository during generation.) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(=========================================================================================================) Tj
+0 -11 Td
+/F1 7.2 Tf
+(MP1 - Product CRUD, multiple photos, and bulk checkbox actions) Tj
+0 -11 Td
+/F1 7.2 Tf
+(Admins can create, view, update, and delete products. Product creation and updates accept multiple) Tj
+0 -11 Td
+/F1 7.2 Tf
+(images, while the admin product table tracks selected IDs for bulk actions.) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/routes/product.js \(lines 24-32\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  24: router.get\('/product/:id', getSingleProduct\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  25: router.get\('/products', getProducts\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  26: router.put\('/admin/product/:id', isAuthenticatedUser, authorizeRoles\('admin'\), upload.array\('images', 10\), up) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      dateProduct\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  27: router.delete\('/admin/product/:id', isAuthenticatedUser, authorizeRoles\('admin'\), deleteProduct\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  28: router.delete\('/admin/products/bulk', isAuthenticatedUser, authorizeRoles\('admin'\), bulkDeleteProducts\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  29: router.patch\('/admin/products/bulk/archive', isAuthenticatedUser, authorizeRoles\('admin'\), bulkArchiveProduct) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      s\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  30: router.patch\('/admin/products/bulk/unarchive', isAuthenticatedUser, authorizeRoles\('admin'\), bulkUnarchivePro) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      ducts\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  31: router.get\('/admin/products', isAuthenticatedUser, authorizeRoles\('admin'\), getAdminProducts\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  32: router.post\('/admin/product/new', isAuthenticatedUser, upload.array\('images', 10\), newProduct\);) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/controllers/product.js \(lines 25-82\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  25: exports.newProduct = async \(req, res, next\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  26:     let images = []) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  27:     // if \(typeof req.files === 'string'\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  28:     //     images.push\(req.files\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  29:     // } else {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  30:     //     images = req.files) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  31:     // }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  32: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  33:     if \(typeof req.body.images === 'string'\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  34:         images.push\(req.body.images\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  35:     } else {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  36:         images = req.body.images || []) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  37:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  38: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  39:     let imagesLinks = [];) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  40: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  41:     for \(let i = 0; i < images.length; i++\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  42:         try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  43:             // const result = await cloudinary.v2.uploader.upload\(images[i].path, {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  44:             //     folder: 'products',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  45:             //     width: 150,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  46:             //     crop: "scale",) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  47:             // }\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  48: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  49:             const result = await cloudinary.v2.uploader.upload\(images[i], {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  50:                 folder: 'products',) Tj
+0 -11 Td
+ET
+endstream
+endobj
+4 0 obj
+<< /Length 3236 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  51:                 width: 150,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  52:                 crop: "scale",) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  53:             }\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  54: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  55:             imagesLinks.push\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  56:                 public_id: result.public_id,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  57:                 url: result.secure_url) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  58:             }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  59: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  60:         } catch \(error\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  61:             console.log\(error\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  62:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  63: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  64:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  65: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  66:     const category = await resolveCategoryId\(req.body.category_id, req.body.category\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  67:     if \(!category\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  68:         return res.status\(400\).json\({ success: false, message: 'Please select a valid category' }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  69:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  70: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  71:     const product = await Product.create\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  72:         ...req.body,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  73:         images: imagesLinks,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  74:         category_id: category._id,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  75:         category: undefined,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  76:         user: undefined) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  77:     }\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  78: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  79:     if \(!product\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  80:         return res.status\(400\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  81:             success: false,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  82:             message: 'Product not created') Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/controllers/product.js \(lines 166-218\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 166: exports.updateProduct = async \(req, res, next\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 167:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 168:         let product = await Product.findById\(req.params.id\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 169:         if \(!product\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 170:             return res.status\(404\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 171:                 success: false,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 172:                 message: `Product with ID ${req.params.id} was not found`) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 173:             }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 174:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 175: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 176:         const images = req.body.images) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 177:             ? \(Array.isArray\(req.body.images\) ? req.body.images : [req.body.images]\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 178:             : []) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 179:         let imagesLinks = product.images) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 180: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 181:         if \(images.length > 0\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 182:             imagesLinks = []) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 183:             for \(const image of images\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 184:                 try {) Tj
+0 -11 Td
+ET
+endstream
+endobj
+5 0 obj
+<< /Length 3452 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+( 185:                     const result = await cloudinary.v2.uploader.upload\(image, {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 186:                         folder: 'products',) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 187:                         width: 150,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 188:                         crop: "scale",) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 189:                     }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 190:                     imagesLinks.push\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 191:                         public_id: result.public_id,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 192:                         url: result.secure_url) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 193:                     }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 194:                 } catch \(error\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 195:                     return res.status\(502\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 196:                         success: false,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 197:                         message: `Product image upload failed: ${error.message}`) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 198:                     }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 199:                 }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 200:             }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 201:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 202: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 203:         const category = await resolveCategoryId\(req.body.category_id, req.body.category\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 204:         if \(!category\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 205:             return res.status\(400\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 206:                 success: false,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 207:                 message: 'Product update failed: provide a valid category name or category ID') Tj
+0 -11 Td
+/F2 7.2 Tf
+( 208:             }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 209:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 210: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 211:         product = await Product.findByIdAndUpdate\(req.params.id, {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 212:             ...req.body,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 213:             images: imagesLinks,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 214:             category_id: category._id,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 215:             category: undefined,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 216:             user: undefined) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 217:         }, {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 218:             new: true,) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/controllers/product.js \(lines 231-310\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 231: exports.deleteProduct = async \(req, res, next\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 232:     const product = await Product.findByIdAndDelete\(req.params.id\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 233:     if \(!product\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 234:         return res.status\(404\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 235:             success: false,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 236:             message: 'Product not found') Tj
+0 -11 Td
+/F2 7.2 Tf
+( 237:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 238:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 239: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 240:     return res.status\(200\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 241:         success: true,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 242:         message: 'Product deleted') Tj
+0 -11 Td
+/F2 7.2 Tf
+( 243:     }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 244: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 245: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 246: function getProductIds\(req, res\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 247:     const { ids } = req.body || {}) Tj
+0 -11 Td
+ET
+endstream
+endobj
+6 0 obj
+<< /Length 3306 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+( 248:     if \(!Array.isArray\(ids\) || ids.length === 0 || ids.some\(id => !mongoose.isValidObjectId\(id\)\)\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 249:         res.status\(400\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 250:             success: false,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 251:             message: 'Please provide a non-empty array of valid product IDs') Tj
+0 -11 Td
+/F2 7.2 Tf
+( 252:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 253:         return null) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 254:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 255:     return [...new Set\(ids.map\(id => id.toString\(\)\)\)]) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 256: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 257: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 258: exports.bulkDeleteProducts = async \(req, res, next\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 259:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 260:         const ids = getProductIds\(req, res\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 261:         if \(!ids\) return) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 262: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 263:         await Promise.all\([) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 264:             Review.deleteMany\({ product_id: { $in: ids } }\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 265:             Blueprint.updateMany\() Tj
+0 -11 Td
+/F2 7.2 Tf
+( 266:                 { extracted_materials: { $in: ids } },) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 267:                 { $pull: { extracted_materials: { $in: ids } } }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 268:             \)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 269:         ]\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 270:         const result = await Product.deleteMany\({ _id: { $in: ids } }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 271: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 272:         return res.status\(200\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 273:             success: true,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 274:             deletedCount: result.deletedCount) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 275:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 276:     } catch \(error\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 277:         return next\(error\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 278:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 279: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 280: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 281: exports.bulkArchiveProducts = async \(req, res, next\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 282:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 283:         const ids = getProductIds\(req, res\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 284:         if \(!ids\) return) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 285: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 286:         const result = await Product.updateMany\() Tj
+0 -11 Td
+/F2 7.2 Tf
+( 287:             { _id: { $in: ids }, isArchived: { $ne: true } },) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 288:             { $set: { isArchived: true } }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 289:         \)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 290: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 291:         return res.status\(200\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 292:             success: true,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 293:             archivedCount: result.modifiedCount) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 294:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 295:     } catch \(error\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 296:         return next\(error\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 297:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 298: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 299: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 300: exports.bulkUnarchiveProducts = async \(req, res, next\) => {) Tj
+0 -11 Td
+ET
+endstream
+endobj
+7 0 obj
+<< /Length 3283 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+( 301:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 302:         const ids = getProductIds\(req, res\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 303:         if \(!ids\) return) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 304: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 305:         const result = await Product.updateMany\() Tj
+0 -11 Td
+/F2 7.2 Tf
+( 306:             { _id: { $in: ids }, isArchived: true },) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 307:             { $set: { isArchived: false } }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 308:         \)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 309: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 310:         return res.status\(200\).json\({) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/actions/productActions.jsx \(lines 107-223\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 107: export const newProduct = \(productData\) => async \(dispatch\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 108:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 109:         dispatch\({ type: NEW_PRODUCT_REQUEST }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 110:         const config = {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 111:             headers: {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 112:                 'Content-Type': 'application/json') Tj
+0 -11 Td
+/F2 7.2 Tf
+( 113:             },) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 114:             withCredentials: true //correct) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 115:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 116:         const { data } = await axios.post\(`${import.meta.env.VITE_API}/admin/product/new`, productData, confi) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      g\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 117:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 118:             type: NEW_PRODUCT_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 119:             payload: data) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 120:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 121:     } catch \(error\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 122:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 123:             type: NEW_PRODUCT_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 124:             payload: error.response.data.message) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 125:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 126:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 127: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 128: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 129: export const getAdminProducts = \(\) => async \(dispatch\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 130:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 131:         dispatch\({ type: ADMIN_PRODUCTS_REQUEST }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 132:         const { data } = await axios.get\(`${import.meta.env.VITE_API}/admin/products`, {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 133:             //AxiosRequestConfig parameter) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 134:             withCredentials: true //correct) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 135:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 136:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 137:             type: ADMIN_PRODUCTS_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 138:             payload: data.products) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 139:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 140:     } catch \(error\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 141:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 142:             type: ADMIN_PRODUCTS_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 143:             payload: error.response.data.message) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 144:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 145:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 146: }) Tj
+0 -11 Td
+ET
+endstream
+endobj
+8 0 obj
+<< /Length 3377 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+( 147: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 148: export const updateProduct = \(id, productData\) => async \(dispatch\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 149:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 150:         dispatch\({ type: UPDATE_PRODUCT_REQUEST }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 151:         const config = {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 152:             withCredentials: true //correct) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 153:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 154:         const { data } = await axios.put\(`${import.meta.env.VITE_API}/admin/product/${id}`, productData, conf) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      ig\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 155:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 156:             type: UPDATE_PRODUCT_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 157:             payload: data) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 158:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 159:     } catch \(error\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 160:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 161:             type: UPDATE_PRODUCT_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 162:             payload: error.response?.data?.message || error.message || 'Unable to update product') Tj
+0 -11 Td
+/F2 7.2 Tf
+( 163:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 164:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 165: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 166: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 167: export const deleteProduct = \(id\) => async \(dispatch\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 168:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 169: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 170:         dispatch\({ type: DELETE_PRODUCT_REQUEST }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 171: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 172:         const { data } = await axios.delete\(`${import.meta.env.VITE_API}/admin/product/${id}`, {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 173:             withCredentials: true) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 174:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 175: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 176:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 177:             type: DELETE_PRODUCT_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 178:             payload: data.success) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 179:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 180: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 181:     } catch \(error\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 182:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 183:             type: DELETE_PRODUCT_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 184:             payload: error.response?.data?.message || error.message || 'Unable to delete product') Tj
+0 -11 Td
+/F2 7.2 Tf
+( 185:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 186:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 187: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 188: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 189: export const bulkDeleteProducts = \(ids\) => async \(dispatch\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 190:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 191:         dispatch\({ type: BULK_DELETE_PRODUCTS_REQUEST }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 192:         const { data } = await axios.delete\(`${import.meta.env.VITE_API}/admin/products/bulk`, {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 193:             data: { ids },) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 194:             withCredentials: true) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 195:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 196:         dispatch\({ type: BULK_DELETE_PRODUCTS_SUCCESS, payload: data.deletedCount }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 197:     } catch \(error\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 198:         dispatch\({) Tj
+0 -11 Td
+ET
+endstream
+endobj
+9 0 obj
+<< /Length 4008 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+( 199:             type: BULK_DELETE_PRODUCTS_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 200:             payload: error.response?.data?.message || error.message || 'Unable to delete products') Tj
+0 -11 Td
+/F2 7.2 Tf
+( 201:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 202:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 203: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 204: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 205: export const bulkArchiveProducts = \(ids\) => async \(dispatch\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 206:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 207:         dispatch\({ type: BULK_ARCHIVE_PRODUCTS_REQUEST }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 208:         const { data } = await axios.patch\(`${import.meta.env.VITE_API}/admin/products/bulk/archive`, { ids }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      , {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 209:             withCredentials: true) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 210:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 211:         dispatch\({ type: BULK_ARCHIVE_PRODUCTS_SUCCESS, payload: data.archivedCount }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 212:     } catch \(error\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 213:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 214:             type: BULK_ARCHIVE_PRODUCTS_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 215:             payload: error.response?.data?.message || error.message || 'Unable to archive products') Tj
+0 -11 Td
+/F2 7.2 Tf
+( 216:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 217:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 218: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 219: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 220: export const bulkUnarchiveProducts = \(ids\) => async \(dispatch\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 221:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 222:         dispatch\({ type: BULK_UNARCHIVE_PRODUCTS_REQUEST }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 223:         const { data } = await axios.patch\(`${import.meta.env.VITE_API}/admin/products/bulk/unarchive`, { ids) Tj
+0 -11 Td
+/F2 7.2 Tf
+(       }, {) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/Admin/NewProduct.jsx \(lines 51-82\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  51:     const formik = useFormik\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  52:         initialValues: { name: '', price: 0, description: '', category: 'Materials', stock: 0, seller: '' },) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  53:         validationSchema: Yup.object\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  54:             name: Yup.string\(\).trim\(\).required\('Product name is required'\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  55:             price: Yup.number\(\).min\(0, 'Price cannot be negative'\).required\('Price is required'\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  56:             description: Yup.string\(\).trim\(\).required\('Description is required'\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  57:             category: Yup.string\(\).required\('Category is required'\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  58:             stock: Yup.number\(\).integer\(\).min\(0, 'Stock cannot be negative'\).required\('Stock is required'\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  59:             seller: Yup.string\(\).trim\(\).required\('Seller name is required'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  60:         }\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  61:         onSubmit: values => submitHandler\(values\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  62:     }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  63: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  64:     const submitHandler = \(values\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  65:         if \(imageError\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  66:             toast.error\(imageError, { position: 'bottom-right' }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  67:             return) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  68:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  69: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  70:         const formData = new FormData\(\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  71:         formData.set\('name', values.name\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  72:         formData.set\('price', values.price\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  73:         formData.set\('description', values.description\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  74:         formData.set\('category', values.category\);) Tj
+0 -11 Td
+ET
+endstream
+endobj
+10 0 obj
+<< /Length 3626 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  75:         formData.set\('stock', values.stock\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  76:         formData.set\('seller', values.seller\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  77: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  78:         images.forEach\(image => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  79:             formData.append\('images', image\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  80:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  81: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  82:         dispatch\(newProduct\(formData\)\)) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/Admin/ProductsList.jsx \(lines 27-88\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  27: import MetaData from '../Layout/MetaData') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  28: import Sidebar from './SideBar') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  29: import {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  30:     getAdminProducts,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  31:     bulkDeleteProducts,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  32:     bulkArchiveProducts,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  33:     bulkUnarchiveProducts,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  34:     clearErrors,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  35: } from '../../actions/productActions') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  36: import { BULK_PRODUCTS_RESET } from '../../constants/productConstants') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  37: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  38: const ProductsList = \(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  39:     const dispatch = useDispatch\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  40:     const { loading, error, products = [] } = useSelector\(state => state.products\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  41:     const { error: deleteError, isBulkActionComplete, affectedCount, loading: actionLoading } = useSelector\(s) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      tate => state.product\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  42:     const [selectedIds, setSelectedIds] = useState\([]\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  43:     const [confirmation, setConfirmation] = useState\(null\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  44:     const [searchTerm, setSearchTerm] = useState\(''\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  45: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  46:     const selectedProducts = products.filter\(product => selectedIds.includes\(product._id\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  47:     const allSelectedProductsArchived = selectedProducts.length > 0 && selectedProducts.every\(product => prod) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      uct.isArchived\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  48: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  49:     useEffect\(\(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  50:         if \(error\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  51:             toast.error\(error, { position: 'bottom-right' }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  52:             dispatch\(clearErrors\(\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  53:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  54: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  55:         if \(deleteError\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  56:             toast.error\(deleteError, { position: 'bottom-right' }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  57:             dispatch\(clearErrors\(\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  58:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  59: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  60:         if \(isBulkActionComplete\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  61:             toast.success\(`${affectedCount} product${affectedCount === 1 ? '' : 's'} processed successfully`,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(       {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  62:                 position: 'bottom-right') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  63:             }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  64:             dispatch\(getAdminProducts\(\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  65:             dispatch\({ type: BULK_PRODUCTS_RESET }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  66:         }) Tj
+0 -11 Td
+ET
+endstream
+endobj
+11 0 obj
+<< /Length 3459 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  67:     }, [dispatch, error, deleteError, isBulkActionComplete, affectedCount]\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  68: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  69:     useEffect\(\(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  70:         dispatch\(getAdminProducts\(\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  71:     }, [dispatch]\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  72: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  73:     const bulkActionHandler = \(action, ids = selectedIds, productName = ''\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  74:         setConfirmation\({ action, ids, productName }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  75:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  76: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  77:     const confirmAction = \(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  78:         if \(!confirmation\) return) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  79:         const { action, ids } = confirmation) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  80:         setConfirmation\(null\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  81:         setSelectedIds\([]\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  82:         dispatch\() Tj
+0 -11 Td
+/F2 7.2 Tf
+(  83:             action === 'delete') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  84:                 ? bulkDeleteProducts\(ids\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  85:                 : action === 'archive') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  86:                     ? bulkArchiveProducts\(ids\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  87:                     : bulkUnarchiveProducts\(ids\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  88:         \)) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(=========================================================================================================) Tj
+0 -11 Td
+/F1 7.2 Tf
+(MP2 - Product filter functions) Tj
+0 -11 Td
+/F1 7.2 Tf
+(The frontend serializes price, category, rating, review-count, keyword, and page filters into the) Tj
+0 -11 Td
+/F1 7.2 Tf
+(products request. The backend translates them into MongoDB conditions and pagination.) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/actions/productActions.jsx \(lines 45-80\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  45: export const getProducts = \() Tj
+0 -11 Td
+/F2 7.2 Tf
+(  46:     currentPage = 1,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  47:     keyword = '',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  48:     price = [0, 100000],) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  49:     category = '',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  50:     rating = '',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  51:     reviews = '',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  52:     append = false) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  53: \) => async \(dispatch\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  54:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  55:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  56:             type: ALL_PRODUCTS_REQUEST,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  57:             append) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  58:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  59: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  60:         const params = new URLSearchParams\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  61:             page: currentPage.toString\(\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  62:             limit: '8',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  63:             keyword,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  64:             'price[lte]': price[1].toString\(\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  65:             'price[gte]': price[0].toString\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  66:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  67:         if \(Array.isArray\(category\)\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  68:             category.forEach\(categoryId => params.append\('category', categoryId\)\)) Tj
+0 -11 Td
+ET
+endstream
+endobj
+12 0 obj
+<< /Length 3744 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  69:         } else if \(category\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  70:             params.set\('category', category\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  71:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  72:         if \(rating\) params.set\('rating[gte]', rating.toString\(\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  73:         if \(reviews\) params.set\('numOfReviews[gte]', reviews.toString\(\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  74:         const link = `${import.meta.env.VITE_API}/products?${params.toString\(\)}`) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  75:         const { data } = await axios.get\(link\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  76:         console.log\(data\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  77:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  78:             type: ALL_PRODUCTS_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  79:             payload: data,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  80:             meta: { append }) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/Home.jsx \(lines 151-185\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 151:         return \(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 152:             isMounted = false) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 153:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 154:     }, []\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 155: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 156:     useEffect\(\(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 157:         if \(queryCategory\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 158:             if \(queryCategory === 'all'\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 159:                 setCategory\([]\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 160:             } else if \(categories.length > 0\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 161:                 const matched = categories.find\() Tj
+0 -11 Td
+/F2 7.2 Tf
+( 162:                     c => c._id === queryCategory || c.name.toLowerCase\(\) === queryCategory.toLowerCase\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 163:                 \)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 164:                 setCategory\(matched ? [matched._id] : [queryCategory]\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 165:             } else {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 166:                 setCategory\([queryCategory]\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 167:             }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 168:             setCurrentPage\(1\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 169:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 170:     }, [queryCategory, categories]\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 171: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 172:     useEffect\(\(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 173:         dispatch\(getProducts\(currentPage, keyword, price, category, rating, reviews, currentPage > 1\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 174:     }, [currentPage, keyword, price, category, rating, reviews, dispatch]\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 175: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 176:     useEffect\(\(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 177:         const loadMore = entries => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 178:             if \(entries[0].isIntersecting && !loading && products.length < filteredProductsCount\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 179:                 setCurrentPage\(page => page + 1\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 180:             }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 181:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 182:         const observer = new IntersectionObserver\(loadMore, { rootMargin: '300px' }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 183:         if \(loadMoreRef.current\) observer.observe\(loadMoreRef.current\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 184:         return \(\) => observer.disconnect\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 185:     }, [filteredProductsCount, loading, products.length]\)) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/utils/apiFeatures.js \(lines 14-91\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  14:                 $options: 'i') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  15:             }) Tj
+0 -11 Td
+ET
+endstream
+endobj
+13 0 obj
+<< /Length 3619 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  16:         } : {}) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  17:         // console.log\(this.query, this.queryStr\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  18:         this.query = this.query.find\({ ...keyword }\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  19:         return this;) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  20:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  21: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  22:     filter\(\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  23:         // { 'price[gte]': '100', 'price[lte]': '1000' }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  24:         const queryCopy = { ...this.queryStr };) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  25:         // console.log\(queryCopy\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  26:         // Removing fields from the query) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  27:         const removeFields = ['keyword', 'page', 'limit']) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  28:         removeFields.forEach\(el => delete queryCopy[el]\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  29: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  30:         let priceFilter = {};) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  31:         const priceGte = queryCopy['price[gte]'] || queryCopy.price?.gte;) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  32:         const priceLte = queryCopy['price[lte]'] || queryCopy.price?.lte;) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  33:         if \(priceGte || priceLte\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  34:             priceFilter.price = {};) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  35:             if \(priceGte\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  36:                 priceFilter.price.$gte = Number\(priceGte\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  37:             }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  38:             if \(priceLte\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  39:                 priceFilter.price.$lte = Number\(priceLte\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  40:             }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  41:             // priceFilter {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  42:             //     price: {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  43:             //         $gte: 100,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  44:             //         $lte: 1000) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  45:             //     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  46:             // }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  47:             delete queryCopy['price[gte]'];) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  48:             delete queryCopy['price[lte]'];) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  49:             delete queryCopy.price;) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  50:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  51: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  52:         if \(queryCopy.category\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  53:             queryCopy.category_id = Array.isArray\(queryCopy.category\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  54:                 ? { $in: queryCopy.category }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  55:                 : queryCopy.category;) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  56:             delete queryCopy.category;) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  57:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  58: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  59:         const ratingGte = queryCopy['rating[gte]'] || queryCopy.rating?.gte;) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  60:         if \(ratingGte\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  61:             queryCopy.ratings = { $gte: Number\(ratingGte\) };) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  62:             delete queryCopy['rating[gte]'];) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  63:             delete queryCopy.rating;) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  64:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  65: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  66:         const reviewsGte = queryCopy['numOfReviews[gte]'] || queryCopy.numOfReviews?.gte;) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  67:         if \(reviewsGte\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  68:             delete queryCopy['numOfReviews[gte]'];) Tj
+0 -11 Td
+ET
+endstream
+endobj
+14 0 obj
+<< /Length 3404 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  69:             delete queryCopy.numOfReviews;) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  70:             queryCopy.numOfReviews = { $gte: Number\(reviewsGte\) };) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  71:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  72: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  73:         delete queryCopy['price[gte]'];) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  74:         delete queryCopy['price[lte]'];) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  75:         delete queryCopy.isArchived;) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  76: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  77:         // console.log\(queryCopy\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  78: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  79:         this.query = this.query.find\({ ...priceFilter, ...queryCopy }\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  80:         return this;) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  81:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  82: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  83:     pagination\(resPerPage\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  84:         const currentPage = Number\(this.queryStr.page\) || 1;) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  85:         const skip = resPerPage * \(currentPage - 1\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  86: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  87:         this.query = this.query.limit\(resPerPage\).skip\(skip\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  88:         return this;) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  89:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  90: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  91: module.exports = APIFeatures) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/controllers/product.js \(lines 107-145\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 107:         name: review.user_id?.name,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 108:         avatar: review.user_id?.avatar) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 109:     }\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 110:     return res.status\(200\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 111:         success: true,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 112:         product: productResponse) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 113:     }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 114: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 115: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 116: exports.getProducts = async \(req, res\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 117: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 118:     const resPerPage = Number\(req.query.limit\) || 8;) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 119:     const productsCount = await Product.countDocuments\({ isArchived: { $ne: true } }\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 120: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 121:    // const products = await Product.find\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 122:     const apiFeatures = new APIFeatures\(Product.find\({ isArchived: { $ne: true } }\), req.query\).search\(\).filt) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      er\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 123: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 124:     const filteredProductsCount = await Product.countDocuments\(apiFeatures.query.getFilter\(\)\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 125: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 126:     apiFeatures.query = apiFeatures.query.sort\({ createdAt: -1 }\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 127:     apiFeatures.pagination\(resPerPage\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 128:     const products = await apiFeatures.query.populate\('category_id'\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 129: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 130:     if \(!products\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 131:         return res.status\(400\).json\({ message: 'error loading products' }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 132:     return res.status\(200\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 133:         success: true,) Tj
+0 -11 Td
+ET
+endstream
+endobj
+15 0 obj
+<< /Length 3606 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+( 134:         products,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 135:         filteredProductsCount,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 136:         resPerPage,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 137:         productsCount,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 138: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 139:     }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 140:     // if \(!products\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 141:     //     return res.status\(400\).json\({ message: 'error loading products' }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 142: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 143:     // return res.status\(200\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 144:     //     success: true,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 145:     //     products,) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(=========================================================================================================) Tj
+0 -11 Td
+/F1 7.2 Tf
+(MP3 - Reviews and ratings) Tj
+0 -11 Td
+/F1 7.2 Tf
+(A logged-in customer can submit or update one review after receiving the product. The backend uses an) Tj
+0 -11 Td
+/F1 7.2 Tf
+(upsert, recalculates the product average/count, and restricts deletion to admins.) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/Product/ProductDetails.jsx \(lines 25-45\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  25:     const decreaseQty = \(\) => setQuantity\(current => Math.max\(current - 1, 1\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  26:     const addToCart = \(\) => dispatch\(addItemToCart\(id, quantity\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  27: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  28:     const openReviewDialog = \(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  29:         setRating\(review?.rating || 0\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  30:         setComment\(review?.comment || ''\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  31:         setReviewDialogOpen\(true\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  32:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  33: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  34:     const reviewHandler = async \(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  35:         if \(rating < 1 || !comment.trim\(\)\) return) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  36:         const saved = await dispatch\(newReview\({ rating, comment: comment.trim\(\), productId: id }\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  37:         if \(!saved\) return) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  38:         setReviewDialogOpen\(false\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  39:         dispatch\(getProductDetails\(id\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  40:         dispatch\(getMyProductReview\(id\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  41:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  42: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  43:     useEffect\(\(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  44:         dispatch\(getProductDetails\(id\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  45:     }, [dispatch, id]\)) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/actions/productActions.jsx \(lines 235-305\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 235: export const newReview = \(reviewData\) => async \(dispatch\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 236:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 237:         dispatch\({ type: NEW_REVIEW_REQUEST }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 238:         const { data } = await axios.put\(`${import.meta.env.VITE_API}/review`, reviewData, {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 239:             headers: { 'Content-Type': 'application/json' },) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 240:             withCredentials: true) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 241:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 242:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 243:             type: NEW_REVIEW_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 244:             payload: data) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 245:         }\)) Tj
+0 -11 Td
+ET
+endstream
+endobj
+16 0 obj
+<< /Length 3560 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+( 246:         return true) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 247:     } catch \(error\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 248:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 249:             type: NEW_REVIEW_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 250:             payload: error.response?.data?.message || error.message || 'Unable to save review') Tj
+0 -11 Td
+/F2 7.2 Tf
+( 251:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 252:         return false) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 253:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 254: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 255: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 256: export const getMyProductReview = \(productId\) => async \(dispatch\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 257:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 258:         dispatch\({ type: MY_REVIEW_REQUEST }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 259:         const { data } = await axios.get\(`${import.meta.env.VITE_API}/review?productId=${productId}`, {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 260:             withCredentials: true) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 261:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 262:         dispatch\({ type: MY_REVIEW_SUCCESS, payload: data }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 263:     } catch \(error\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 264:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 265:             type: MY_REVIEW_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 266:             payload: error.response?.data?.message || error.message || 'Unable to load review status') Tj
+0 -11 Td
+/F2 7.2 Tf
+( 267:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 268:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 269: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 270: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 271: export const getProductReviews = \(productId\) => async \(dispatch\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 272:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 273:         dispatch\({ type: GET_REVIEWS_REQUEST }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 274:         const { data } = await axios.get\(`${import.meta.env.VITE_API}/reviews?id=${encodeURIComponent\(product) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      Id\)}`, {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 275:             withCredentials: true) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 276:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 277:         dispatch\({ type: GET_REVIEWS_SUCCESS, payload: data.reviews }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 278:     } catch \(error\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 279:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 280:             type: GET_REVIEWS_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 281:             payload: error.response?.data?.message || error.message || 'Unable to load reviews') Tj
+0 -11 Td
+/F2 7.2 Tf
+( 282:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 283:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 284: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 285: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 286: export const deleteReview = \(reviewId, productId\) => async \(dispatch\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 287:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 288:         dispatch\({ type: DELETE_REVIEW_REQUEST }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 289:         await axios.delete\() Tj
+0 -11 Td
+/F2 7.2 Tf
+( 290:             `${import.meta.env.VITE_API}/reviews?id=${encodeURIComponent\(reviewId\)}&productId=${encodeURIComp) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      onent\(productId\)}`,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 291:             { withCredentials: true }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 292:         \)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 293:         dispatch\({ type: DELETE_REVIEW_SUCCESS, payload: reviewId }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 294:         return true) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 295:     } catch \(error\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 296:         dispatch\({) Tj
+0 -11 Td
+ET
+endstream
+endobj
+17 0 obj
+<< /Length 3831 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+( 297:             type: DELETE_REVIEW_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 298:             payload: error.response?.data?.message || error.message || 'Unable to delete review') Tj
+0 -11 Td
+/F2 7.2 Tf
+( 299:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 300:         return false) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 301:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 302: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 303: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 304: export const clearErrors = \(\) => async \(dispatch\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 305:     dispatch\({) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/routes/product.js \(lines 33-36\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  33: router.put\('/review', isAuthenticatedUser, createProductReview\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  34: router.get\('/review', isAuthenticatedUser, getMyProductReview\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  35: router.get\('/reviews', isAuthenticatedUser, getProductReviews\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  36: router.delete\('/reviews', isAuthenticatedUser, authorizeRoles\('admin'\), deleteReview\)) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/controllers/product.js \(lines 319-423\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 319: exports.createProductReview = async \(req, res, next\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 320:     const { rating, comment, productId } = req.body;) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 321:     const numericRating = Number\(rating\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 322:     const filteredComment = filterComment\(comment\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 323:     if \(!Number.isInteger\(numericRating\) || numericRating < 1 || numericRating > 5 || !filteredComment\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 324:         return res.status\(400\).json\({ success: false, message: 'Please provide a rating from 1 to 5 and a rev) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      iew' }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 325:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 326:     const product = await Product.findById\(productId\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 327:     if \(!product\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 328:         return res.status\(404\).json\({ success: false, message: 'Product not found' }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 329:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 330: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 331:     const hasPurchased = await Order.exists\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 332:         user: req.user._id,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 333:         orderStatus: 'Delivered',) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 334:         'orderItems.product': product._id) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 335:     }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 336:     if \(!hasPurchased\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 337:         return res.status\(403\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 338:             success: false,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 339:             message: 'You can review a product only after purchasing and receiving it') Tj
+0 -11 Td
+/F2 7.2 Tf
+( 340:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 341:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 342: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 343:     await Review.findOneAndUpdate\() Tj
+0 -11 Td
+/F2 7.2 Tf
+( 344:         { user_id: req.user._id, product_id: productId },) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 345:         { rating: numericRating, comment: filteredComment },) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 346:         { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 347:     \)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 348:     const stats = await Review.aggregate\([) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 349:         { $match: { product_id: product._id } },) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 350:         { $group: { _id: null, average: { $avg: '$rating' }, count: { $sum: 1 } } }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 351:     ]\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 352:     await Product.findByIdAndUpdate\(productId, {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 353:         ratings: stats[0]?.average || 0,) Tj
+0 -11 Td
+ET
+endstream
+endobj
+18 0 obj
+<< /Length 3455 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+( 354:         numOfReviews: stats[0]?.count || 0) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 355:     }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 356:     return res.status\(200\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 357:         success: true,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 358:         message: 'Review saved successfully') Tj
+0 -11 Td
+/F2 7.2 Tf
+( 359:     }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 360: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 361: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 362: exports.getMyProductReview = async \(req, res, next\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 363:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 364:         const product = await Product.findById\(req.query.productId\).select\('_id'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 365:         if \(!product\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 366:             return res.status\(404\).json\({ success: false, message: 'Product not found' }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 367:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 368: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 369:         const hasPurchased = await Order.exists\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 370:             user: req.user._id,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 371:             orderStatus: 'Delivered',) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 372:             'orderItems.product': product._id) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 373:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 374:         if \(!hasPurchased\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 375:             return res.status\(200\).json\({ success: true, canReview: false, review: null }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 376:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 377: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 378:         const review = await Review.findOne\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 379:             user_id: req.user._id,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 380:             product_id: product._id) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 381:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 382:         return res.status\(200\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 383:             success: true,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 384:             canReview: true,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 385:             review: review) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 386:                 ? { ...review.toObject\(\), comment: filterComment\(review.comment\) }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 387:                 : null) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 388:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 389:     } catch \(error\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 390:         return next\(error\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 391:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 392: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 393: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 394: exports.getProductReviews = async \(req, res, next\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 395:     const reviews = await Review.find\({ product_id: req.query.id }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 396:         .populate\('user_id', 'name avatar'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 397:         .sort\({ createdAt: -1 }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 398:     res.status\(200\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 399:         success: true,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 400:         reviews: reviews.map\(review => \({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 401:             ...review.toObject\(\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 402:             comment: filterComment\(review.comment\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 403:             user: review.user_id?._id,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 404:             name: review.user_id?.name,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 405:             avatar: review.user_id?.avatar) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 406:         }\)\)) Tj
+0 -11 Td
+ET
+endstream
+endobj
+19 0 obj
+<< /Length 3200 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+( 407:     }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 408: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 409: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 410: exports.deleteReview = async \(req, res, next\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 411:     await Review.findByIdAndDelete\(req.query.id\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 412:     const stats = await Review.aggregate\([) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 413:         { $match: { product_id: new mongoose.Types.ObjectId\(req.query.productId\) } },) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 414:         { $group: { _id: null, average: { $avg: '$rating' }, count: { $sum: 1 } } }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 415:     ]\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 416:     await Product.findByIdAndUpdate\(req.query.productId, {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 417:         ratings: stats[0]?.average || 0,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 418:         numOfReviews: stats[0]?.count || 0) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 419:     }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 420: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 421:     return res.status\(200\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 422:         success: true) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 423:     }\)) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(=========================================================================================================) Tj
+0 -11 Td
+/F1 7.2 Tf
+(Term test lab - Completed transactions, status updates, email, and PDF receipt) Tj
+0 -11 Td
+/F1 7.2 Tf
+(Orders reserve stock and are saved as completed transactions. Admin status changes are persisted, then) Tj
+0 -11 Td
+/F1 7.2 Tf
+(the customer receives an email containing order items, subtotal, shipping, tax, grand total, and a) Tj
+0 -11 Td
+/F1 7.2 Tf
+(generated PDF receipt attachment.) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/actions/orderActions.jsx \(lines 1-45\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   1: import axios from 'axios') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   2: import {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   3:     CREATE_ORDER_REQUEST,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   4:     CREATE_ORDER_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   5:     CREATE_ORDER_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   6:     MY_ORDERS_REQUEST,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   7:     MY_ORDERS_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   8:     MY_ORDERS_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   9:     ORDER_DETAILS_REQUEST,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  10: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  11:     ORDER_DETAILS_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  12: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  13:     ORDER_DETAILS_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  14:     ALL_ORDERS_REQUEST,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  15: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  16:     ALL_ORDERS_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  17: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  18:     ALL_ORDERS_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  19:     UPDATE_ORDER_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  20: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  21:     UPDATE_ORDER_REQUEST,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  22: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  23:     UPDATE_ORDER_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  24:     DELETE_ORDER_REQUEST,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  25:     DELETE_ORDER_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  26:     DELETE_ORDER_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  27:     CLEAR_ERRORS) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  28: ) Tj
+0 -11 Td
+ET
+endstream
+endobj
+20 0 obj
+<< /Length 3590 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  29: } from '../constants/orderConstants') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  30: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  31: export const createOrder = \(order\) => async \(dispatch\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  32:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  33:         dispatch\({ type: CREATE_ORDER_REQUEST }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  34:         const config = {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  35:             headers: {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  36:                 'Content-Type': 'application/json') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  37:             }, ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  38:             withCredentials: true) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  39:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  40:         const { data } = await axios.post\(`${import.meta.env.VITE_API}/order/new`, order, config\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  41:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  42:             type: CREATE_ORDER_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  43:             payload: data) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  44:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  45:         return data) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/routes/order.js \(lines 17-26\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  17: router.post\('/order/new', isAuthenticatedUser, newOrder\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  18: router.get\('/orders/me', isAuthenticatedUser, myOrders\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  19: router.route\('/order/:id'\).get\(isAuthenticatedUser, getSingleOrder\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  20: router.get\('/admin/orders/', isAuthenticatedUser, authorizeRoles\('admin'\), allOrders\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  21: // router.route\('/admin/order/:id'\).delete\(isAuthenticatedUser, deleteOrder\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  22: router.route\('/admin/order/:id'\).put\(isAuthenticatedUser, updateOrder\).delete\(isAuthenticatedUser, deleteOrde) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      r\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  23: router.get\('/admin/total-orders', totalOrders\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  24: router.get\('/admin/total-sales', totalSales\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  25: router.get\('/admin/customer-sales', customerSales\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  26: router.get\('/admin/sales-per-month', salesPerMonth\);) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/controllers/order.js \(lines 9-78\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   9: exports.newOrder = async \(req, res, next\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  10:     const {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  11:         orderItems,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  12:         shippingInfo,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  13:         itemsPrice,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  14:         taxPrice,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  15:         shippingPrice,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  16:         totalPrice,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  17:         paymentInfo) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  18: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  19:     } = req.body;) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  20: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  21:     const session = await mongoose.startSession\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  22: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  23:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  24:         session.startTransaction\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  25: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  26:         for \(const item of orderItems\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  27:             const product = await Product.findOneAndUpdate\() Tj
+0 -11 Td
+/F2 7.2 Tf
+(  28:                 { _id: item.product, stock: { $gte: item.quantity }, isArchived: { $ne: true } },) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  29:                 { $inc: { stock: -item.quantity } },) Tj
+0 -11 Td
+ET
+endstream
+endobj
+21 0 obj
+<< /Length 3299 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  30:                 { new: true, session }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  31:             \)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  32: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  33:             if \(!product\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  34:                 const error = new Error\(`Insufficient stock or unavailable product: ${item.name}`\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  35:                 error.statusCode = 400) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  36:                 throw error) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  37:             }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  38:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  39: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  40:         const [order] = await Order.create\([{) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  41:             orderItems,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  42:             shippingInfo,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  43:             itemsPrice,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  44:             taxPrice,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  45:             shippingPrice,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  46:             totalPrice,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  47:             paymentInfo,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  48:             paidAt: Date.now\(\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  49:             user: req.user._id) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  50:         }], { session }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  51: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  52:         await session.commitTransaction\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  53: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  54:         const orderForEmail = await Order.findById\(order._id\).populate\('user', 'name email'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  55:         let emailSent = true) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  56:         try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  57:             await sendOrderEmail\() Tj
+0 -11 Td
+/F2 7.2 Tf
+(  58:                 orderForEmail,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  59:                 'Your BrickNation order confirmation',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  60:                 'Thank you for your order!') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  61:             \)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  62:         } catch \(emailError\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  63:             emailSent = false) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  64:             console.error\('Order confirmation email failed:', emailError.message\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  65:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  66: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  67:         return res.status\(200\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  68:             success: true,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  69:             order,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  70:             emailSent) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  71:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  72:     } catch \(error\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  73:         if \(session.inTransaction\(\)\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  74:             await session.abortTransaction\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  75:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  76:         return next\(error\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  77:     } finally {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  78:         await session.endSession\(\)) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/controllers/order.js \(lines 137-171\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 137: exports.updateOrder = async \(req, res, next\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 138:     const order = await Order.findById\(req.params.id\)) Tj
+0 -11 Td
+ET
+endstream
+endobj
+22 0 obj
+<< /Length 3196 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+( 139:     if \(!order\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 140:         return res.status\(404\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 141:             message: 'No Order found with this ID') Tj
+0 -11 Td
+/F2 7.2 Tf
+( 142:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 143:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 144: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 145:     if \(order.orderStatus === 'Delivered'\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 146:         return res.status\(400\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 147:             message: 'You have already delivered this order',) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 148:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 149:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 150: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 151:     order.orderStatus = req.body.status) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 152:     order.deliveredAt = Date.now\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 153:     await order.save\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 154: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 155:     let emailSent = true) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 156:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 157:         const orderForEmail = await Order.findById\(order._id\).populate\('user', 'name email'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 158:         await sendOrderEmail\() Tj
+0 -11 Td
+/F2 7.2 Tf
+( 159:             orderForEmail,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 160:             `Your BrickNation order status is now ${order.orderStatus}`,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 161:             `Your order status has been updated to ${order.orderStatus}.`) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 162:         \)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 163:     } catch \(emailError\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 164:         emailSent = false) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 165:         console.error\('Order status email failed:', emailError.message\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 166:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 167: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 168:     return res.status\(200\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 169:         success: true,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 170:         emailSent) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 171:     }\)) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/utils/orderEmail.js \(lines 1-91\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   1: const PDFDocument = require\('pdfkit'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   2: const sendEmail = require\('./sendEmail'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   3: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   4: const money = value => `$${Number\(value || 0\).toFixed\(2\)}`) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   5: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   6: const escapeHtml = value => String\(value || ''\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   7:     .replace\(/&/g, '&amp;'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   8:     .replace\(/</g, '&lt;'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   9:     .replace\(/>/g, '&gt;'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  10:     .replace\(/"/g, '&quot;'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  11:     .replace\(/'/g, '&#039;'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  12: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  13: const downloadImage = async url => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  14:     if \(!url || !/^https?:\\/\\//i.test\(url\)\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  15:         return null) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  16:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  17: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  18:     try {) Tj
+0 -11 Td
+ET
+endstream
+endobj
+23 0 obj
+<< /Length 3788 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  19:         const response = await fetch\(url, {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  20:             signal: AbortSignal.timeout\(10000\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  21:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  22:         if \(!response.ok\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  23:             return null) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  24:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  25:         return Buffer.from\(await response.arrayBuffer\(\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  26:     } catch \(error\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  27:         console.error\(`Unable to download product image: ${url}`, error.message\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  28:         return null) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  29:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  30: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  31: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  32: const prepareImages = async orderItems => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  33:     const images = await Promise.all\(orderItems.map\(async \(item, index\) => \({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  34:         index,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  35:         buffer: await downloadImage\(item.image\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  36:     }\)\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  37: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  38:     return images.filter\(image => image.buffer\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  39: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  40: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  41: const createReceipt = async \(order, productImages\) => new Promise\(\(resolve, reject\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  42:     const document = new PDFDocument\({ margin: 50 }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  43:     const chunks = []) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  44: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  45:     document.on\('data', chunk => chunks.push\(chunk\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  46:     document.on\('end', \(\) => resolve\(Buffer.concat\(chunks\)\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  47:     document.on\('error', reject\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  48: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  49:     document.fillColor\('#1f2937'\).fontSize\(22\).text\('BrickNation', { align: 'center' }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  50:     document.fontSize\(16\).text\('Official Order Receipt', { align: 'center' }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  51:     document.moveDown\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  52:     document.strokeColor\('#d1d5db'\).moveTo\(50, document.y\).lineTo\(545, document.y\).stroke\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  53:     document.moveDown\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  54:     document.fillColor\('#374151'\).fontSize\(10\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  55:     document.text\(`Order ID: ${order._id}`\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  56:     document.text\(`Order date: ${new Date\(order.createdAt || Date.now\(\)\).toLocaleString\(\)}`\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  57:     document.text\(`Order status: ${order.orderStatus}`\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  58:     document.moveDown\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  59:     document.fillColor\('#111827'\).fontSize\(14\).text\('Order details'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  60:     document.moveDown\(0.5\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  61: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  62:     order.orderItems.forEach\(\(item, index\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  63:         const image = productImages.find\(productImage => productImage.index === index\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  64:         const rowTop = document.y) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  65: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  66:         if \(image\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  67:             document.image\(image.buffer, 50, rowTop, { fit: [58, 58] }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  68:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  69: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  70:         document.fillColor\('#111827'\).fontSize\(10\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  71:             .text\(item.name, 120, rowTop, { width: 240 }\)) Tj
+0 -11 Td
+ET
+endstream
+endobj
+24 0 obj
+<< /Length 4529 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  72:         document.fillColor\('#4b5563'\).fontSize\(9\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  73:             .text\(`${item.quantity} x ${money\(item.price\)}`, 120, rowTop + 17\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  74:         document.fillColor\('#111827'\).fontSize\(10\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  75:             .text\(money\(item.quantity * item.price\), 430, rowTop + 8, { width: 100, align: 'right' }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  76:         document.y = Math.max\(rowTop + 68, document.y + 10\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  77:     }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  78: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  79:     document.moveDown\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  80:     document.strokeColor\('#d1d5db'\).moveTo\(300, document.y\).lineTo\(545, document.y\).stroke\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  81:     document.moveDown\(0.5\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  82:     document.fillColor\('#374151'\).fontSize\(10\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  83:         .text\(`Subtotal: ${money\(order.itemsPrice\)}`, 330, document.y, { width: 215, align: 'right' }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  84:         .text\(`Shipping: ${money\(order.shippingPrice\)}`, 330, document.y, { width: 215, align: 'right' }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  85:         .text\(`Tax: ${money\(order.taxPrice\)}`, 330, document.y, { width: 215, align: 'right' }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  86:     document.fillColor\('#111827'\).fontSize\(13\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  87:         .text\(`Grand total: ${money\(order.totalPrice\)}`, 300, document.y + 6, { width: 245, align: 'right' }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  88:     document.end\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  89: }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  90: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  91: const sendOrderEmail = async \(order, subject, intro\) => {) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/utils/orderEmail.js \(lines 105-166\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 105: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 106:         return `) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 107:             <tr>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 108:                 <td style="padding:14px 8px; border-bottom:1px solid #e5e7eb;">${imageMarkup}</td>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 109:                 <td style="padding:14px 8px; border-bottom:1px solid #e5e7eb; color:#111827;">${escapeHtml\(it) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      em.name\)}</td>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 110:                 <td style="padding:14px 8px; border-bottom:1px solid #e5e7eb; text-align:center; color:#4b556) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      3;">${item.quantity}</td>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 111:                 <td style="padding:14px 8px; border-bottom:1px solid #e5e7eb; text-align:right; color:#4b5563) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      ;">${money\(item.price\)}</td>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 112:                 <td style="padding:14px 8px; border-bottom:1px solid #e5e7eb; text-align:right; font-weight:6) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      00; color:#111827;">${money\(item.quantity * item.price\)}</td>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 113:             </tr>`) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 114:     }\).join\(''\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 115: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 116:     await sendEmail\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 117:         email: order.user.email,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 118:         subject,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 119:         html: `) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 120:             <div style="margin:0; padding:32px 12px; background:#f3f4f6; font-family:Arial,Helvetica,sans-ser) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      if; color:#374151;">) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 121:                 <div style="max-width:680px; margin:0 auto; background:#ffffff; border:1px solid #e5e7eb; bor) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      der-radius:12px; overflow:hidden;">) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 122:                     <div style="padding:28px 32px; background:#1f2937; color:#ffffff;">) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 123:                         <div style="font-size:24px; font-weight:700; letter-spacing:.3px;">BrickNation</div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 124:                         <div style="margin-top:6px; font-size:13px; color:#d1d5db;">${escapeHtml\(intro\)}</div) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      >) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 125:                     </div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 126:                     <div style="padding:28px 32px;">) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 127:                         <p style="margin:0 0 18px; font-size:15px;">Dear ${escapeHtml\(order.user.name || 'Cus) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      tomer'\)},</p>) Tj
+0 -11 Td
+ET
+endstream
+endobj
+25 0 obj
+<< /Length 4835 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+( 128:                         <p style="margin:0 0 22px; line-height:1.6;">Thank you for choosing BrickNation. Belo) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      w are the details of your order.</p>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 129:                         <div style="padding:14px 16px; background:#f9fafb; border-left:4px solid #2563eb; mar) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      gin-bottom:24px;">) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 130:                             <div style="font-size:13px; color:#6b7280;">Order reference</div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 131:                             <div style="margin-top:4px; font-weight:700; color:#111827;">${escapeHtml\(order._) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      id\)}</div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 132:                             <div style="margin-top:8px; font-size:13px; color:#6b7280;">Status: <strong style) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      ="color:#111827;">${escapeHtml\(order.orderStatus\)}</strong></div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 133:                         </div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 134:                         <table style="width:100%; border-collapse:collapse; font-size:13px;">) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 135:                             <thead>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 136:                                 <tr style="background:#f9fafb; color:#6b7280; text-align:left;">) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 137:                                     <th style="padding:10px 8px;">Image</th><th style="padding:10px 8px;">Pro) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      duct</th><th style="padding:10px 8px; text-align:center;">Qty</th><th style="padding:10px 8px; text-align:right;">P) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      rice</th><th style="padding:10px 8px; text-align:right;">Total</th>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 138:                                 </tr>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 139:                             </thead>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 140:                             <tbody>${itemsHtml}</tbody>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 141:                         </table>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 142:                         <div style="margin:24px 0 0 auto; max-width:280px; font-size:14px;">) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 143:                             <div style="display:flex; justify-content:space-between; padding:5px 0;">Subtotal) Tj
+0 -11 Td
+/F2 7.2 Tf
+(       <strong>${money\(order.itemsPrice\)}</strong></div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 144:                             <div style="display:flex; justify-content:space-between; padding:5px 0;">Shipping) Tj
+0 -11 Td
+/F2 7.2 Tf
+(       <strong>${money\(order.shippingPrice\)}</strong></div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 145:                             <div style="display:flex; justify-content:space-between; padding:5px 0;">Tax <str) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      ong>${money\(order.taxPrice\)}</strong></div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 146:                             <div style="display:flex; justify-content:space-between; border-top:2px solid #11) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      1827; margin-top:8px; padding:12px 0 0; font-size:17px; color:#111827;">Grand total <strong>${money\(order.totalPric) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      e\)}</strong></div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 147:                         </div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 148:                         <p style="margin:28px 0 0; font-size:13px; line-height:1.6; color:#6b7280;">A formal ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      PDF receipt is attached for your records. If you have any questions, please contact our support team.</p>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 149:                         <p style="margin:24px 0 0;">Sincerely,<br><strong>The BrickNation Team</strong></p>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 150:                     </div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 151:                     <div style="padding:18px 32px; background:#f9fafb; color:#9ca3af; font-size:11px; text-al) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      ign:center;">This is an automated message. Please do not reply directly to this email.</div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 152:                 </div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 153:             </div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 154:         `,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 155:         attachments: [) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 156:             ...imageAttachments,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 157:             {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 158:                 filename: `order-${order._id}.pdf`,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 159:                 content: receipt,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 160:                 contentType: 'application/pdf') Tj
+0 -11 Td
+/F2 7.2 Tf
+( 161:             }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 162:         ]) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 163:     }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 164: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 165: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 166: module.exports = { sendOrderEmail }) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+ET
+endstream
+endobj
+26 0 obj
+<< /Length 3848 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F1 7.2 Tf
+(=========================================================================================================) Tj
+0 -11 Td
+/F1 7.2 Tf
+(Unit 1 - Bad-word filtering and form validation) Tj
+0 -11 Td
+/F1 7.2 Tf
+(Review comments are cleaned with the bad-words package before saving and before being returned. React) Tj
+0 -11 Td
+/F1 7.2 Tf
+(forms use Formik and Yup schemas for product, login, registration, shipping, payment, and user) Tj
+0 -11 Td
+/F1 7.2 Tf
+(validation.) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/utils/contentFilter.js \(lines 1-7\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   1: const { Filter } = require\('bad-words'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   2: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   3: const filter = new Filter\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   4: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   5: const filterComment = comment => filter.clean\(String\(comment || ''\).trim\(\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   6: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   7: module.exports = { filterComment }) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/controllers/product.js \(lines 319-325\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 319: exports.createProductReview = async \(req, res, next\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 320:     const { rating, comment, productId } = req.body;) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 321:     const numericRating = Number\(rating\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 322:     const filteredComment = filterComment\(comment\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 323:     if \(!Number.isInteger\(numericRating\) || numericRating < 1 || numericRating > 5 || !filteredComment\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 324:         return res.status\(400\).json\({ success: false, message: 'Please provide a rating from 1 to 5 and a rev) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      iew' }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 325:     }) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/controllers/product.js \(lines 394-408\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 394: exports.getProductReviews = async \(req, res, next\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 395:     const reviews = await Review.find\({ product_id: req.query.id }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 396:         .populate\('user_id', 'name avatar'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 397:         .sort\({ createdAt: -1 }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 398:     res.status\(200\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 399:         success: true,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 400:         reviews: reviews.map\(review => \({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 401:             ...review.toObject\(\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 402:             comment: filterComment\(review.comment\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 403:             user: review.user_id?._id,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 404:             name: review.user_id?.name,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 405:             avatar: review.user_id?.avatar) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 406:         }\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 407:     }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 408: }) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/Admin/NewProduct.jsx \(lines 1-67\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   1: import { useState, useEffect } from 'react') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   2: import { useNavigate } from 'react-router-dom') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   3: import MetaData from '../Layout/MetaData') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   4: import Sidebar from './SideBar') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   5: // import { getToken } from '../../Utils/helpers';) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   6: // import axios from 'axios') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   7: import { toast } from 'react-toastify';) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   8: import 'react-toastify/dist/ReactToastify.css';) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   9: import { useDispatch, useSelector } from 'react-redux') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  10: import { newProduct, clearErrors } from '../../actions/productActions') Tj
+0 -11 Td
+ET
+endstream
+endobj
+27 0 obj
+<< /Length 3587 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  11: import { NEW_PRODUCT_RESET } from '../../constants/productConstants') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  12: import { useFormik } from 'formik') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  13: import * as Yup from 'yup') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  14: import {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  15:     Box,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  16:     Button,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  17:     Container,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  18:     FormControl,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  19:     FormHelperText,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  20:     InputLabel,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  21:     MenuItem,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  22:     Paper,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  23:     Select,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  24:     Stack,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  25:     TextField,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  26:     Typography) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  27: } from '@mui/material') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  28: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  29: const NewProduct = \(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  30:     const dispatch = useDispatch\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  31:     const { error, success } = useSelector\(state => state.newProduct\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  32:     const [images, setImages] = useState\([]\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  33:     const [imagesPreview, setImagesPreview] = useState\([]\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  34:     const [imageError, setImageError] = useState\(''\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  35:     const MAX_FILE_SIZE = 10 * 1024 * 1024) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  36:     // const [error, setError] = useState\(''\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  37:     // const [loading, setLoading] = useState\(true\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  38:     // const [success, setSuccess] = useState\(''\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  39:     // const [product, setProduct] = useState\({}\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  40: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  41:     const categories = [) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  42:         'Materials',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  43:         'Tools',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  44:         'Equipment',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  45:         'Design',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  46:         'Consumables',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  47:         'Electrical') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  48:     ]) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  49: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  50:     let navigate = useNavigate\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  51:     const formik = useFormik\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  52:         initialValues: { name: '', price: 0, description: '', category: 'Materials', stock: 0, seller: '' },) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  53:         validationSchema: Yup.object\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  54:             name: Yup.string\(\).trim\(\).required\('Product name is required'\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  55:             price: Yup.number\(\).min\(0, 'Price cannot be negative'\).required\('Price is required'\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  56:             description: Yup.string\(\).trim\(\).required\('Description is required'\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  57:             category: Yup.string\(\).required\('Category is required'\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  58:             stock: Yup.number\(\).integer\(\).min\(0, 'Stock cannot be negative'\).required\('Stock is required'\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  59:             seller: Yup.string\(\).trim\(\).required\('Seller name is required'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  60:         }\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  61:         onSubmit: values => submitHandler\(values\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  62:     }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  63: ) Tj
+0 -11 Td
+ET
+endstream
+endobj
+28 0 obj
+<< /Length 3335 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  64:     const submitHandler = \(values\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  65:         if \(imageError\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  66:             toast.error\(imageError, { position: 'bottom-right' }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  67:             return) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/User/Login.jsx \(lines 20-75\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  20: import { useDispatch, useSelector } from 'react-redux') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  21: import { useFormik } from 'formik') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  22: import * as Yup from 'yup') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  23: import { login, firebaseLogin, clearErrors } from '../../actions/userActions') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  24: import {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  25:     signInWithFacebook,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  26:     signInWithGoogle,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  27: } from '../../Utils/firebaseAuth') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  28: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  29: const Login = \(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  30:     const { isAuthenticated, error, loading } = useSelector\(state => state.auth\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  31: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  32:     const [isLocked, setIsLocked] = useState\(false\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  33:     const [lockSecondsRemaining, setLockSecondsRemaining] = useState\(0\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  34: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  35:     const timerRef = useRef\(null\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  36:     const loginAttemptRef = useRef\(false\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  37:     const navigate = useNavigate\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  38:     const location = useLocation\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  39:     const dispatch = useDispatch\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  40: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  41:     const startLockout = \(seconds = 60\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  42:         setIsLocked\(true\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  43:         setLockSecondsRemaining\(seconds\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  44:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  45: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  46:     useEffect\(\(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  47:         if \(!isLocked\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  48:             return undefined) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  49:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  50: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  51:         timerRef.current = setInterval\(\(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  52:             setLockSecondsRemaining\(current => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  53:                 if \(current <= 1\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  54:                     clearInterval\(timerRef.current\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  55:                     setIsLocked\(false\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  56:                     return 0) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  57:                 }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  58:                 return current - 1) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  59:             }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  60:         }, 1000\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  61: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  62:         return \(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  63:             if \(timerRef.current\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  64:                 clearInterval\(timerRef.current\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  65:             }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  66:         }) Tj
+0 -11 Td
+ET
+endstream
+endobj
+29 0 obj
+<< /Length 3893 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  67:     }, [isLocked]\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  68: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  69:     const formik = useFormik\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  70:         initialValues: { email: '', password: '' },) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  71:         validationSchema: Yup.object\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  72:             email: Yup.string\(\).email\('Enter a valid email'\).required\('Email is required'\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  73:             password: Yup.string\(\).required\('Password is required'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  74:         }\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  75:         onSubmit: values => {) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/User/Register.jsx \(lines 18-43\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  18: import { useFormik } from 'formik') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  19: import * as Yup from 'yup') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  20: import { toast } from 'react-toastify') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  21: import 'react-toastify/dist/ReactToastify.css') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  22: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  23: const Register = \(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  24:     const [avatar, setAvatar] = useState\(''\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  25:     const [avatarPreview, setAvatarPreview] = useState\('/images/default_avatar.png'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  26:     const [avatarFileName, setAvatarFileName] = useState\('Choose Avatar'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  27:     const [avatarError, setAvatarError] = useState\(''\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  28:     const [loading, setLoading] = useState\(false\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  29: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  30:     const navigate = useNavigate\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  31:     const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB in bytes) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  32: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  33:     const formik = useFormik\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  34:         initialValues: { name: '', email: '', password: '' },) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  35:         validationSchema: Yup.object\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  36:             name: Yup.string\(\).trim\(\).min\(2, 'Name must be at least 2 characters'\).required\('Name is required) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      '\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  37:             email: Yup.string\(\).email\('Enter a valid email'\).required\('Email is required'\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  38:             password: Yup.string\(\).min\(6, 'Password must be at least 6 characters'\).required\('Password is req) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      uired'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  39:         }\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  40:         onSubmit: values => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  41:             if \(avatarError\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  42:                 toast.error\(avatarError, { position: 'bottom-right' }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  43:                 return) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/Cart/Shipping.jsx \(lines 7-30\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   7: import { useFormik } from 'formik') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   8: import * as Yup from 'yup') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   9: import { Button, Container, FormControl, InputLabel, MenuItem, Paper, Select, Stack, TextField, Typography } ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      from '@mui/material') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  10: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  11: const Shipping = \(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  12:     const dispatch = useDispatch\(\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  13:     const { shippingInfo } = useSelector\(state => state.cart\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  14:     const countriesList = Object.values\(countries\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  15:     const formik = useFormik\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  16:         initialValues: {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  17:             address: shippingInfo.address || '',) Tj
+0 -11 Td
+ET
+endstream
+endobj
+30 0 obj
+<< /Length 4769 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  18:             city: shippingInfo.city || '',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  19:             postalCode: shippingInfo.postalCode || '',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  20:             phoneNo: shippingInfo.phoneNo || '',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  21:             country: shippingInfo.country || '') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  22:         },) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  23:         validationSchema: Yup.object\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  24:             address: Yup.string\(\).trim\(\).required\('Address is required'\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  25:             city: Yup.string\(\).trim\(\).required\('City is required'\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  26:             postalCode: Yup.string\(\).trim\(\).required\('Postal code is required'\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  27:             phoneNo: Yup.string\(\).matches\(/^[0-9+\\-\\s\(\)]{7,20}$/, 'Enter a valid phone number'\).required\('Pho) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      ne number is required'\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  28:             country: Yup.string\(\).required\('Country is required'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  29:         }\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  30:         onSubmit: values => {) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(=========================================================================================================) Tj
+0 -11 Td
+/F1 7.2 Tf
+(Unit 2 - User interface design with MUI) Tj
+0 -11 Td
+/F1 7.2 Tf
+(The selected 20-point implementation uses Material UI components such as Box, Paper, Button, Typography,) Tj
+0 -11 Td
+/F1 7.2 Tf
+(DataGrid, Rating, Dialog, and Stack, combined with the existing CSS and Bootstrap styles.) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/Product/ProductDetails.jsx \(lines 3-8\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   3: import { Carousel } from 'react-bootstrap') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   4: import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Paper, R) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      ating, Stack, TextField, Typography } from '@mui/material') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   5: import { useDispatch, useSelector } from 'react-redux') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   6: import MetaData from '../Layout/MetaData') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   7: import ListReviews from '../Review/ListReviews') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   8: import { getMyProductReview, getProductDetails, newReview } from '../../actions/productActions') Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/Product/ProductDetails.jsx \(lines 55-75\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  55:                 <div className="col-12 col-lg-5 img-fluid" id="product_image">) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  56:                     <Paper elevation={3} sx={{ p: 2, borderRadius: 2 }}>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  57:                         <Carousel pause="hover" className="product-carousel">) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  58:                             {product.images && product.images.map\(image => \() Tj
+0 -11 Td
+/F2 7.2 Tf
+(  59:                                 <Carousel.Item key={image.public_id}>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  60:                                     <img className="d-block w-100" src={image.url} alt={product.name} />) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  61:                                 </Carousel.Item>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  62:                             \)\)}) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  63:                         </Carousel>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  64:                     </Paper>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  65:                 </div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  66:                 <div className="col-12 col-lg-5 mt-5">) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  67:                     <Paper elevation={2} sx={{ p: 3, textAlign: 'left', borderRadius: 2 }}>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  68:                         <Typography variant="h4" component="h1" sx={{ fontWeight: 600 }}>{product.name}</Typo) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      graphy>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  69:                         <Divider sx={{ my: 2 }} />) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  70:                         <Stack direction="row" alignItems="center" spacing={1.5}>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  71:                             <Rating value={product.ratings || 0} precision={0.5} readOnly size="small" />) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  72:                             <Typography variant="body2" color="text.secondary">) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  73:                                 {Number\(product.ratings || 0\).toFixed\(1\)} \({product.numOfReviews || 0} review) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      s\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  74:                             </Typography>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  75:                         </Stack>) Tj
+0 -11 Td
+ET
+endstream
+endobj
+31 0 obj
+<< /Length 3237 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/Admin/ProductsList.jsx \(lines 1-15\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   1: import { useEffect, useState } from 'react') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   2: import { Link } from 'react-router-dom') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   3: import { useDispatch, useSelector } from 'react-redux') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   4: import { formatPeso } from '../../Utils/helpers') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   5: import {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   6:     Alert,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   7:     Box,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   8:     Button,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   9:     Chip,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  10:     CircularProgress,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  11:     Dialog,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  12:     DialogActions,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  13:     DialogContent,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  14:     DialogTitle,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  15:     IconButton,) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/Admin/OrdersList.jsx \(lines 4-20\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   4: import { formatPeso } from '../../Utils/helpers') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   5: import {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   6:     Alert,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   7:     Box,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   8:     Button,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   9:     Chip,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  10:     CircularProgress,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  11:     Dialog,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  12:     DialogActions,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  13:     DialogContent,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  14:     DialogTitle,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  15:     IconButton,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  16:     Paper,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  17:     Stack,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  18:     Tooltip,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  19:     Typography) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  20: } from '@mui/material') Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/Admin/OrdersList.jsx \(lines 182-226\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 182:                 <Box component="main" sx={{ flex: 1, minWidth: 0 }}>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 183:                     <Box sx={{ mb: 3 }}>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 184:                         <Typography variant="h4" fontWeight={700} sx={{ fontFamily: "'Space Grotesk', sans-se) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      rif" }}>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 185:                             All Orders) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 186:                         </Typography>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 187:                         <Typography color="text.secondary" variant="body2">) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 188:                             Monitor customer purchases, shipping statuses, and order records) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 189:                         </Typography>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 190:                     </Box>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 191: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 192:                     {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 193: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 194:                     <Paper elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 3, ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      p: 2 }}>) Tj
+0 -11 Td
+ET
+endstream
+endobj
+32 0 obj
+<< /Length 4146 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+( 195:                         {loading ? \() Tj
+0 -11 Td
+/F2 7.2 Tf
+( 196:                             <Stack alignItems="center" sx={{ py: 8 }}>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 197:                                 <CircularProgress sx={{ color: 'var\(--red, #e30620\)' }} />) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 198:                                 <Typography color="text.secondary" sx={{ mt: 2 }}>Loading orders...</Typograp) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      hy>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 199:                             </Stack>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 200:                         \) : \() Tj
+0 -11 Td
+/F2 7.2 Tf
+( 201:                             <div style={{ width: '100%', minHeight: 450 }}>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 202:                                 <DataGrid) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 203:                                     initialState={{) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 204:                                         sorting: {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 205:                                             sortModel: [{ field: 'id', sort: 'desc' }],) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 206:                                         },) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 207:                                         pagination: {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 208:                                             paginationModel: { pageSize: 10, page: 0 }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 209:                                         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 210:                                     }}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 211:                                     pageSizeOptions={[5, 10, 25, 50]}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 212:                                     rows={rows}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 213:                                     columns={columns}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 214:                                     disableRowSelectionOnClick) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 215:                                     getRowId={\(row\) => row.id}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 216:                                     sx={{) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 217:                                         border: 'none',) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 218:                                         '& .MuiDataGrid-cell': {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 219:                                             display: 'flex',) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 220:                                             alignItems: 'center') Tj
+0 -11 Td
+/F2 7.2 Tf
+( 221:                                         },) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 222:                                         '& .MuiDataGrid-columnHeaders': {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 223:                                             bgcolor: 'rgba\(0, 0, 0, 0.02\)',) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 224:                                             borderRadius: 2) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 225:                                         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 226:                                     }}) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(=========================================================================================================) Tj
+0 -11 Td
+/F1 7.2 Tf
+(Quiz 1 - Sales charts with date-range filters) Tj
+0 -11 Td
+/F1 7.2 Tf
+(The dashboard renders Recharts line and bar charts. Sales and products sold are calculated for a) Tj
+0 -11 Td
+/F1 7.2 Tf
+(selectable date range, with Last 7 days and Last 30 days presets.) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/Admin/SalesChart.jsx \(lines 1-53\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   1: import { useMemo, useState } from 'react') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   2: import {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   3:     LineChart,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   4:     Line,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   5:     CartesianGrid,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   6:     XAxis,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   7:     YAxis,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   8:     Tooltip,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   9:     ResponsiveContainer) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  10: } from 'recharts') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  11: import {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  12:     daysAgo,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  13:     eachDateKey,) Tj
+0 -11 Td
+ET
+endstream
+endobj
+33 0 obj
+<< /Length 3561 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  14:     formatChartLabel,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  15:     isOrderInRange,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  16:     resolveDateRange,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  17:     toInputDate) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  18: } from '../../Utils/chartDates') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  19: import { formatPeso } from '../../Utils/helpers') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  20: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  21: const buildDailySales = \(orders, startDate, endDate\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  22:     const { start, end } = resolveDateRange\(startDate, endDate\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  23:     const totals = new Map\(eachDateKey\(start, end\).map\(date => [date, 0]\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  24: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  25:     orders.forEach\(order => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  26:         if \(!isOrderInRange\(order, start, end\)\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  27:             return) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  28:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  29: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  30:         const key = toInputDate\(order.paidAt || order.createdAt\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  31:         if \(!totals.has\(key\)\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  32:             return) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  33:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  34: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  35:         totals.set\(key, totals.get\(key\) + Number\(order.totalPrice || 0\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  36:     }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  37: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  38:     return Array.from\(totals.entries\(\)\).map\(\([date, total]\) => \({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  39:         date,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  40:         total: Number\(total.toFixed\(2\)\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  41:         label: formatChartLabel\(date\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  42:     }\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  43: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  44: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  45: const SalesChart = \({ orders = [] }\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  46:     const [startDate, setStartDate] = useState\(\(\) => toInputDate\(daysAgo\(29\)\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  47:     const [endDate, setEndDate] = useState\(\(\) => toInputDate\(new Date\(\)\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  48: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  49:     const sales = useMemo\() Tj
+0 -11 Td
+/F2 7.2 Tf
+(  50:         \(\) => buildDailySales\(orders, startDate, endDate\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  51:         [orders, startDate, endDate]) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  52:     \)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  53: ) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/Admin/SalesChart.jsx \(lines 88-145\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  88:                 <div className="sales-chart-header">) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  89:                     <div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  90:                         <h4 className="mb-1">Sales</h4>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  91:                         <p className="text-muted mb-0">) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  92:                             Total in range: <b>?{formatPeso\(rangeTotal\)}</b>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  93:                         </p>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  94:                     </div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  95:                     <div className="sales-chart-filters">) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  96:                         <button type="button" className="btn btn-sm btn-outline-secondary" onClick={\(\) => app) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      lyPreset\(7\)}>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  97:                             Last 7 days) Tj
+0 -11 Td
+ET
+endstream
+endobj
+34 0 obj
+<< /Length 4421 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  98:                         </button>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  99:                         <button type="button" className="btn btn-sm btn-outline-secondary" onClick={\(\) => app) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      lyPreset\(30\)}>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 100:                             Last 30 days) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 101:                         </button>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 102:                         <label className="mb-0">) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 103:                             From) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 104:                             <input) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 105:                                 type="date") Tj
+0 -11 Td
+/F2 7.2 Tf
+( 106:                                 className="form-control form-control-sm") Tj
+0 -11 Td
+/F2 7.2 Tf
+( 107:                                 value={startDate}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 108:                                 max={endDate}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 109:                                 onChange={handleStartDateChange}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 110:                             />) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 111:                         </label>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 112:                         <label className="mb-0">) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 113:                             To) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 114:                             <input) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 115:                                 type="date") Tj
+0 -11 Td
+/F2 7.2 Tf
+( 116:                                 className="form-control form-control-sm") Tj
+0 -11 Td
+/F2 7.2 Tf
+( 117:                                 value={endDate}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 118:                                 min={startDate}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 119:                                 max={toInputDate\(new Date\(\)\)}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 120:                                 onChange={handleEndDateChange}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 121:                             />) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 122:                         </label>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 123:                     </div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 124:                 </div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 125: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 126:                 {sales.length === 0 ? \() Tj
+0 -11 Td
+/F2 7.2 Tf
+( 127:                     <p className="text-center text-muted mt-4 mb-0">No sales in this date range.</p>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 128:                 \) : \() Tj
+0 -11 Td
+/F2 7.2 Tf
+( 129:                     <div className="sales-chart-wrap">) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 130:                         <ResponsiveContainer width="100%" height={360}>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 131:                             <LineChart data={sales} margin={{ top: 16, right: 16, bottom: 8, left: 0 }}>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 132:                                 <CartesianGrid stroke="#eee7df" strokeDasharray="4 4" />) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 133:                                 <XAxis dataKey="label" tick={{ fontSize: 12 }} interval="preserveStartEnd" />) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 134:                                 <YAxis) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 135:                                     tick={{ fontSize: 12 }}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 136:                                     tickFormatter={value => `?${Number\(value\).toLocaleString\('en-PH', { maxim) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      umFractionDigits: 0 }\)}`}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 137:                                 />) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 138:                                 <Tooltip) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 139:                                     formatter={value => [`?${formatPeso\(value\)}`, 'Sales']}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 140:                                     labelFormatter={\(_, payload\) => payload?.[0]?.payload?.date || ''}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 141:                                 />) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 142:                                 <Line type="monotone" dataKey="total" stroke="#e30620" strokeWidth={2} dot={f) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      alse} />) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 143:                             </LineChart>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 144:                         </ResponsiveContainer>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 145:                     </div>) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/Admin/ProductsSoldChart.jsx \(lines 1-55\)) Tj
+0 -11 Td
+ET
+endstream
+endobj
+35 0 obj
+<< /Length 3221 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(   1: import { useMemo, useState } from 'react') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   2: import {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   3:     BarChart,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   4:     Bar,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   5:     CartesianGrid,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   6:     XAxis,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   7:     YAxis,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   8:     Tooltip,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   9:     ResponsiveContainer) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  10: } from 'recharts') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  11: import {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  12:     daysAgo,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  13:     eachDateKey,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  14:     formatChartLabel,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  15:     isOrderInRange,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  16:     resolveDateRange,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  17:     toInputDate) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  18: } from '../../Utils/chartDates') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  19: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  20: const orderQuantity = order =>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  21:     \(order.orderItems || []\).reduce\(\(sum, item\) => sum + Number\(item.quantity || 0\), 0\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  22: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  23: const buildDailyQuantities = \(orders, startDate, endDate\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  24:     const { start, end } = resolveDateRange\(startDate, endDate\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  25:     const totals = new Map\(eachDateKey\(start, end\).map\(date => [date, 0]\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  26: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  27:     orders.forEach\(order => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  28:         if \(!isOrderInRange\(order, start, end\)\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  29:             return) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  30:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  31: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  32:         const key = toInputDate\(order.paidAt || order.createdAt\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  33:         if \(!totals.has\(key\)\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  34:             return) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  35:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  36: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  37:         totals.set\(key, totals.get\(key\) + orderQuantity\(order\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  38:     }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  39: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  40:     return Array.from\(totals.entries\(\)\).map\(\([date, sold]\) => \({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  41:         date,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  42:         sold,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  43:         label: formatChartLabel\(date\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  44:     }\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  45: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  46: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  47: const ProductsSoldChart = \({ orders = [] }\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  48:     const [startDate, setStartDate] = useState\(\(\) => toInputDate\(daysAgo\(29\)\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  49:     const [endDate, setEndDate] = useState\(\(\) => toInputDate\(new Date\(\)\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  50: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  51:     const productsSold = useMemo\() Tj
+0 -11 Td
+/F2 7.2 Tf
+(  52:         \(\) => buildDailyQuantities\(orders, startDate, endDate\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  53:         [orders, startDate, endDate]) Tj
+0 -11 Td
+ET
+endstream
+endobj
+36 0 obj
+<< /Length 4206 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  54:     \)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  55: ) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/Admin/ProductsSoldChart.jsx \(lines 90-146\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  90:                 <div className="sales-chart-header">) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  91:                     <div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  92:                         <h4 className="mb-1">Products sold</h4>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  93:                         <p className="text-muted mb-0">) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  94:                             Total in range: <b>{rangeTotal}</b>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  95:                         </p>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  96:                     </div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  97:                     <div className="sales-chart-filters">) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  98:                         <button type="button" className="btn btn-sm btn-outline-secondary" onClick={\(\) => app) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      lyPreset\(7\)}>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  99:                             Last 7 days) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 100:                         </button>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 101:                         <button type="button" className="btn btn-sm btn-outline-secondary" onClick={\(\) => app) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      lyPreset\(30\)}>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 102:                             Last 30 days) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 103:                         </button>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 104:                         <label className="mb-0">) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 105:                             From) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 106:                             <input) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 107:                                 type="date") Tj
+0 -11 Td
+/F2 7.2 Tf
+( 108:                                 className="form-control form-control-sm") Tj
+0 -11 Td
+/F2 7.2 Tf
+( 109:                                 value={startDate}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 110:                                 max={endDate}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 111:                                 onChange={handleStartDateChange}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 112:                             />) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 113:                         </label>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 114:                         <label className="mb-0">) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 115:                             To) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 116:                             <input) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 117:                                 type="date") Tj
+0 -11 Td
+/F2 7.2 Tf
+( 118:                                 className="form-control form-control-sm") Tj
+0 -11 Td
+/F2 7.2 Tf
+( 119:                                 value={endDate}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 120:                                 min={startDate}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 121:                                 max={toInputDate\(new Date\(\)\)}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 122:                                 onChange={handleEndDateChange}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 123:                             />) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 124:                         </label>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 125:                     </div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 126:                 </div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 127: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 128:                 {rangeTotal === 0 ? \() Tj
+0 -11 Td
+/F2 7.2 Tf
+( 129:                     <p className="text-center text-muted mt-4 mb-0">No products sold in this date range.</p>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 130:                 \) : \() Tj
+0 -11 Td
+/F2 7.2 Tf
+( 131:                     <div className="sales-chart-wrap">) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 132:                         <ResponsiveContainer width="100%" height={360}>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 133:                             <BarChart data={productsSold} margin={{ top: 16, right: 16, bottom: 8, left: 0 }}) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      >) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 134:                                 <CartesianGrid stroke="#eee7df" strokeDasharray="4 4" />) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 135:                                 <XAxis dataKey="label" tick={{ fontSize: 12 }} interval="preserveStartEnd" />) Tj
+0 -11 Td
+ET
+endstream
+endobj
+37 0 obj
+<< /Length 3417 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+( 136:                                 <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 137:                                 <Tooltip) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 138:                                     formatter={value => [value, 'Products sold']}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 139:                                     labelFormatter={\(_, payload\) => payload?.[0]?.payload?.date || ''}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 140:                                 />) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 141:                                 <Bar dataKey="sold" fill="#c39a3b" radius={[4, 4, 0, 0]} />) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 142:                             </BarChart>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 143:                         </ResponsiveContainer>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 144:                     </div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 145:                 \)}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 146:             </div>) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Utils/chartDates.js \(lines 1-76\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   1: export const toInputDate = date => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   2:     const value = new Date\(date\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   3:     if \(Number.isNaN\(value.getTime\(\)\)\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   4:         return '') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   5:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   6: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   7:     const year = value.getFullYear\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   8:     const month = String\(value.getMonth\(\) + 1\).padStart\(2, '0'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   9:     const day = String\(value.getDate\(\)\).padStart\(2, '0'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  10:     return `${year}-${month}-${day}`) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  11: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  12: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  13: export const daysAgo = days => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  14:     const date = new Date\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  15:     date.setDate\(date.getDate\(\) - days\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  16:     return date) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  17: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  18: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  19: export const startOfDay = dateStr => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  20:     if \(!dateStr\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  21:         return new Date\(NaN\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  22:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  23: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  24:     const [year, month, day] = dateStr.split\('-'\).map\(Number\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  25:     return new Date\(year, month - 1, day, 0, 0, 0, 0\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  26: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  27: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  28: export const endOfDay = dateStr => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  29:     if \(!dateStr\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  30:         return new Date\(NaN\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  31:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  32: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  33:     const [year, month, day] = dateStr.split\('-'\).map\(Number\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  34:     return new Date\(year, month - 1, day, 23, 59, 59, 999\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  35: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  36: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  37: export const resolveDateRange = \(startDate, endDate\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  38:     let start = startOfDay\(startDate\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  39:     let end = endOfDay\(endDate\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  40: ) Tj
+0 -11 Td
+ET
+endstream
+endobj
+38 0 obj
+<< /Length 3266 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  41:     if \(Number.isNaN\(start.getTime\(\)\) || Number.isNaN\(end.getTime\(\)\)\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  42:         return { start: new Date\(NaN\), end: new Date\(NaN\) }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  43:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  44: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  45:     if \(start > end\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  46:         start = startOfDay\(endDate\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  47:         end = endOfDay\(startDate\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  48:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  49: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  50:     return { start, end }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  51: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  52: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  53: export const eachDateKey = \(start, end\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  54:     const keys = []) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  55:     const cursor = new Date\(start\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  56: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  57:     if \(Number.isNaN\(cursor.getTime\(\)\) || Number.isNaN\(end.getTime\(\)\)\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  58:         return keys) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  59:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  60: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  61:     while \(cursor <= end\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  62:         keys.push\(toInputDate\(cursor\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  63:         cursor.setDate\(cursor.getDate\(\) + 1\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  64:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  65: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  66:     return keys) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  67: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  68: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  69: export const formatChartLabel = date =>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  70:     new Date\(`${date}T00:00:00`\).toLocaleDateString\(undefined, {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  71:         month: 'short',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  72:         day: 'numeric') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  73:     }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  74: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  75: export const isOrderInRange = \(order, start, end\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  76:     const rawDate = order.paidAt || order.createdAt) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/Admin/MonthlySalesChart.jsx \(lines 1-45\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   1: import React, { useState, useEffect } from 'react') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   2: import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   3: import { getToken } from "../../Utils/helpers";) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   4: import axios from "axios";) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   5: import Loader from '../Layout/Loader';) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   6: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   7: export default function MonthlySalesChart\(\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   8:     const [sales, setSales] = useState\([]\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   9:     const [loading, setLoading] = useState\(true\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  10:     const [error, setError] = useState\(''\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  11:     const monthlySales = async \(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  12:         try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  13:             const config = {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  14:                 headers: {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  15: ) Tj
+0 -11 Td
+ET
+endstream
+endobj
+39 0 obj
+<< /Length 3449 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  16:                     'Authorization': `Bearer ${getToken\(\)}`) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  17:                 }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  18:             }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  19: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  20:             const { data } = await axios.get\(`${import.meta.env.VITE_API}/admin/sales-per-month`, config\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  21:             setSales\(data.salesPerMonth\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  22:             // console.log\(data.salesPerMonth\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  23:             setLoading\(false\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  24: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  25:         } catch \(error\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  26:             setError\(error.response.data.message\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  27:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  28:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  29:     useEffect\(\(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  30:         monthlySales\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  31: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  32:     }, []\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  33: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  34:     return \() Tj
+0 -11 Td
+/F2 7.2 Tf
+(  35:         <ResponsiveContainer width="90%" height={600}>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  36:             <LineChart width={600} height={300} data={sales} margin={{ top: 5, right: 20, bottom: 5, left: 0 ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      }}>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  37:                 <Line type="monotone" dataKey="total" stroke="#8884d8" />) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  38:                 <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  39:                 <XAxis dataKey="month" />) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  40:                 <YAxis />) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  41:                 <Tooltip />) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  42:             </LineChart>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  43:         </ResponsiveContainer>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  44:     \);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  45: }) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/routes/order.js \(lines 23-26\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  23: router.get\('/admin/total-orders', totalOrders\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  24: router.get\('/admin/total-sales', totalSales\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  25: router.get\('/admin/customer-sales', customerSales\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  26: router.get\('/admin/sales-per-month', salesPerMonth\);) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/controllers/order.js \(lines 279-327\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 279: exports.salesPerMonth = async \(req, res, next\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 280:     const salesPerMonth = await Order.aggregate\([) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 281:         // Select ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 282:         // FROM ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 283:         // GROUP BY month\(paidAt\), year\(paidAt\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 284:         {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 285:             $group: {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 286:                 // _id: {month: { $month: "$paidAt" } },) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 287:                 _id: {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 288:                     year: { $year: "$paidAt" },) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 289:                     month: { $month: "$paidAt" }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 290:                 },) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 291:                 total: { $sum: "$totalPrice" },) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 292:             },) Tj
+0 -11 Td
+ET
+endstream
+endobj
+40 0 obj
+<< /Length 3386 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+( 293:         },) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 294: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 295:         {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 296:             $addFields: {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 297:                 month: {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 298:                     $let: {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 299:                         vars: {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 300:                             monthsInString: [, 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept') Tj
+0 -11 Td
+/F2 7.2 Tf
+(      , 'Oct', 'Nov', 'Dec']) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 301:                         },) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 302:                         in: {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 303:                             $arrayElemAt: ['$$monthsInString', "$_id.month"]) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 304:                         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 305:                     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 306:                 }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 307:             }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 308:         },) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 309:         { $sort: { "_id.month": 1 } },) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 310:         {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 311:             $project: {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 312:                 _id: false,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 313:                 month: true,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 314:                 total: true,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 315:             }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 316:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 317: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 318:     ]\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 319:     if \(!salesPerMonth\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 320:         return res.status\(404\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 321:             message: 'error sales per month',) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 322:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 323:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 324:     // return console.log\(customerSales\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 325:     res.status\(200\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 326:         success: true,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 327:         salesPerMonth) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(=========================================================================================================) Tj
+0 -11 Td
+/F1 7.2 Tf
+(Quiz 2 - Infinite scroll on the homepage) Tj
+0 -11 Td
+/F1 7.2 Tf
+(The homepage observes a sentinel element with IntersectionObserver. When it enters the viewport and more) Tj
+0 -11 Td
+/F1 7.2 Tf
+(products exist, the page number increments; the action appends the next page instead of replacing) Tj
+0 -11 Td
+/F1 7.2 Tf
+(existing products.) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/Home.jsx \(lines 90-94\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  90:     const dispatch = useDispatch\(\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  91:     const { loading, products, filteredProductsCount } = useSelector\(state => state.products\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  92:     const loadMoreRef = useRef\(null\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  93:     // console.log\(products\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  94:     // const getProducts = async \(keyword = '', price, page = 1\) => {) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/Home.jsx \(lines 169-185\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 169:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 170:     }, [queryCategory, categories]\)) Tj
+0 -11 Td
+ET
+endstream
+endobj
+41 0 obj
+<< /Length 3668 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+( 171: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 172:     useEffect\(\(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 173:         dispatch\(getProducts\(currentPage, keyword, price, category, rating, reviews, currentPage > 1\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 174:     }, [currentPage, keyword, price, category, rating, reviews, dispatch]\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 175: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 176:     useEffect\(\(\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 177:         const loadMore = entries => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 178:             if \(entries[0].isIntersecting && !loading && products.length < filteredProductsCount\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 179:                 setCurrentPage\(page => page + 1\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 180:             }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 181:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 182:         const observer = new IntersectionObserver\(loadMore, { rootMargin: '300px' }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 183:         if \(loadMoreRef.current\) observer.observe\(loadMoreRef.current\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 184:         return \(\) => observer.disconnect\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 185:     }, [filteredProductsCount, loading, products.length]\)) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/Home.jsx \(lines 398-404\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 398:                                 \)}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 399: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 400:                             </div>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 401:                             {products.length < filteredProductsCount && \() Tj
+0 -11 Td
+/F2 7.2 Tf
+( 402:                                 <div ref={loadMoreRef} className="d-flex justify-content-center mt-5" style={) Tj
+0 -11 Td
+/F2 7.2 Tf
+(      { minHeight: 48 }}>) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 403:                                     {loading && <CircularProgress size={32} />}) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 404:                                 </div>) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/actions/productActions.jsx \(lines 45-80\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  45: export const getProducts = \() Tj
+0 -11 Td
+/F2 7.2 Tf
+(  46:     currentPage = 1,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  47:     keyword = '',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  48:     price = [0, 100000],) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  49:     category = '',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  50:     rating = '',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  51:     reviews = '',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  52:     append = false) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  53: \) => async \(dispatch\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  54:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  55:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  56:             type: ALL_PRODUCTS_REQUEST,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  57:             append) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  58:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  59: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  60:         const params = new URLSearchParams\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  61:             page: currentPage.toString\(\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  62:             limit: '8',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  63:             keyword,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  64:             'price[lte]': price[1].toString\(\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  65:             'price[gte]': price[0].toString\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  66:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  67:         if \(Array.isArray\(category\)\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  68:             category.forEach\(categoryId => params.append\('category', categoryId\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  69:         } else if \(category\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  70:             params.set\('category', category\)) Tj
+0 -11 Td
+ET
+endstream
+endobj
+42 0 obj
+<< /Length 3410 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  71:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  72:         if \(rating\) params.set\('rating[gte]', rating.toString\(\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  73:         if \(reviews\) params.set\('numOfReviews[gte]', reviews.toString\(\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  74:         const link = `${import.meta.env.VITE_API}/products?${params.toString\(\)}`) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  75:         const { data } = await axios.get\(link\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  76:         console.log\(data\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  77:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  78:             type: ALL_PRODUCTS_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  79:             payload: data,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  80:             meta: { append }) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/reducers/productReducers.jsx \(lines 43-69\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  43:     GET_REVIEWS_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  44:     DELETE_REVIEW_REQUEST,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  45:     DELETE_REVIEW_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  46:     DELETE_REVIEW_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  47:     CLEAR_ERRORS) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  48: } from '../constants/productConstants') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  49: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  50: export const productsReducer = \(state = { products: [] }, action\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  51:     switch \(action.type\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  52:         case ADMIN_PRODUCTS_REQUEST:) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  53:         case ALL_PRODUCTS_REQUEST:) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  54:             return {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  55:                 ...state,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  56:                 loading: true,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  57:                 products: action.append ? state.products : []) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  58:             }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  59: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  60: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  61:         case ALL_PRODUCTS_SUCCESS:) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  62:             return {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  63:                 ...state,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  64:                 loading: false,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  65:                 products: action.meta?.append) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  66:                     ? [...state.products, ...action.payload.products.filter\(product =>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  67:                         !state.products.some\(existingProduct => existingProduct._id === product._id\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  68:                     \)]) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  69:                     : action.payload.products,) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/utils/apiFeatures.js \(lines 80-90\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  80:         return this;) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  81:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  82: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  83:     pagination\(resPerPage\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  84:         const currentPage = Number\(this.queryStr.page\) || 1;) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  85:         const skip = resPerPage * \(currentPage - 1\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  86: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  87:         this.query = this.query.limit\(resPerPage\).skip\(skip\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  88:         return this;) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  89:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  90: }) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+ET
+endstream
+endobj
+43 0 obj
+<< /Length 3407 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F1 7.2 Tf
+(=========================================================================================================) Tj
+0 -11 Td
+/F1 7.2 Tf
+(Quiz 3 - Google/Facebook login with Firebase) Tj
+0 -11 Td
+/F1 7.2 Tf
+(Firebase handles the Google or Facebook popup in the browser. The resulting Firebase ID token is sent to) Tj
+0 -11 Td
+/F1 7.2 Tf
+(the backend, where Firebase Admin verifies it and the backend creates a normal application session) Tj
+0 -11 Td
+/F1 7.2 Tf
+(cookie.) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/firebase.js \(lines 1-15\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   1: import { initializeApp } from 'firebase/app') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   2: import { getAuth } from 'firebase/auth') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   3: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   4: const firebaseConfig = {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   5:     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   6:     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   7:     projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   8:     storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   9:     messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  10:     appId: import.meta.env.VITE_FIREBASE_APP_ID,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  11: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  12: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  13: const app = initializeApp\(firebaseConfig\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  14: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  15: export const firebaseAuth = getAuth\(app\)) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Utils/firebaseAuth.jsx \(lines 1-20\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   1: import {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   2:     FacebookAuthProvider,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   3:     GoogleAuthProvider,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   4:     signInWithPopup,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   5: } from 'firebase/auth') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   6: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   7: import { firebaseAuth } from '../firebase') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   8: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   9: const googleProvider = new GoogleAuthProvider\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  10: const facebookProvider = new FacebookAuthProvider\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  11: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  12: googleProvider.setCustomParameters\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  13:     prompt: 'select_account',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  14: }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  15: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  16: export const signInWithGoogle = \(\) =>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  17:     signInWithPopup\(firebaseAuth, googleProvider\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  18: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  19: export const signInWithFacebook = \(\) =>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  20:     signInWithPopup\(firebaseAuth, facebookProvider\)) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/Components/User/Login.jsx \(lines 91-103\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  91:             }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  92:             return) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  93:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  94: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  95:         try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  96:             const result = await providerLogin\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  97:             const idToken = await result.user.getIdToken\(\)) Tj
+0 -11 Td
+ET
+endstream
+endobj
+44 0 obj
+<< /Length 3266 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  98:             dispatch\(firebaseLogin\(idToken\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  99:         } catch \(error\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 100:             const isPopupDismissed = [) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 101:                 'auth/popup-closed-by-user',) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 102:                 'auth/cancelled-popup-request') Tj
+0 -11 Td
+/F2 7.2 Tf
+( 103:             ].includes\(error.code\)) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/actions/userActions.jsx \(lines 164-184\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 164: export const firebaseLogin = \(idToken\) => async \(dispatch\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 165:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 166:         dispatch\({ type: LOGIN_REQUEST }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 167: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 168:         const { data } = await axios.post\() Tj
+0 -11 Td
+/F2 7.2 Tf
+( 169:             `${import.meta.env.VITE_API}/firebase-login`,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 170:             { idToken },) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 171:             { withCredentials: true }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 172:         \)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 173: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 174:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 175:             type: LOGIN_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 176:             payload: data.user) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 177:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 178:     } catch \(error\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 179:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 180:             type: LOGIN_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 181:             payload: error.response?.data?.message ||) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 182:                 error.message ||) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 183:                 'Social login failed') Tj
+0 -11 Td
+/F2 7.2 Tf
+( 184:         }\)) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/routes/auth.js \(lines 20-28\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  20:     logout) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  21: } = require\('../controllers/auth'\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  22: const { isAuthenticatedUser, authorizeRoles } = require\('../middlewares/auth'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  23: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  24: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  25: router.post\('/register', upload.single\("avatar"\), registerUser\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  26: router.post\('/login', loginUser\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  27: router.post\('/firebase-login', firebaseLogin\);) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  28: router.post\('/password/forgot', forgotPassword\);) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/controllers/auth.js \(lines 67-117\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  67: exports.firebaseLogin = async \(req, res\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  68:     const { idToken } = req.body) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  69: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  70:     if \(!idToken\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  71:         return res.status\(400\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  72:             success: false,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  73:             message: 'Firebase ID token is required') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  74:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  75:     }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  76: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  77:     try {) Tj
+0 -11 Td
+ET
+endstream
+endobj
+45 0 obj
+<< /Length 3411 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  78:         const firebaseAdmin = require\('../config/firebaseAdmin'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  79:         const decodedToken = await firebaseAdmin.auth.verifyIdToken\(idToken\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  80:         const email = decodedToken.email) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  81: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  82:         if \(!email\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  83:             return res.status\(400\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  84:                 success: false,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  85:                 message: 'This social account does not provide an email address') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  86:             }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  87:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  88: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  89:         const provider = decodedToken.firebase?.sign_in_provider) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  90:         if \(!['google.com', 'facebook.com'].includes\(provider\)\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  91:             return res.status\(400\).json\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  92:                 success: false,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  93:                 message: 'Only Google and Facebook accounts are supported') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  94:             }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  95:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  96: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  97:         let user = await User.findOne\({ email }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  98:         const profile = {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  99:             name: decodedToken.name || email.split\('@'\)[0],) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 100:             firebaseUid: decodedToken.uid,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 101:             authProvider: provider,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 102:             ...\(decodedToken.picture && {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 103:                 avatar: {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 104:                     public_id: 'avatars/default',) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 105:                     url: decodedToken.picture) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 106:                 }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 107:             }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 108:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 109: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 110:         if \(!user\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 111:             user = await User.create\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 112:                 email,) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 113:                 ...profile) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 114:             }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 115:         } else {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 116:             if \(user.isDeleted\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+( 117:                 return res.status\(403\).json\({) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(backend/config/firebaseAdmin.js \(lines 1-30\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   1: const { getApps, initializeApp, cert } = require\('firebase-admin/app'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   2: const { getAuth } = require\('firebase-admin/auth'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   3: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   4: const {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   5:     FIREBASE_PROJECT_ID,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   6:     FIREBASE_CLIENT_EMAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   7:     FIREBASE_PRIVATE_KEY,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   8: } = process.env) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   9: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  10: if \(!FIREBASE_PROJECT_ID ||) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  11:     !FIREBASE_CLIENT_EMAIL ||) Tj
+0 -11 Td
+ET
+endstream
+endobj
+46 0 obj
+<< /Length 3166 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  12:     !FIREBASE_PRIVATE_KEY\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  13:     throw new Error\() Tj
+0 -11 Td
+/F2 7.2 Tf
+(  14:         'Missing FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, or FIREBASE_PRIVATE_KEY') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  15:     \)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  16: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  17: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  18: const firebaseApp = getApps\(\).length) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  19:     ? getApps\(\)[0]) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  20:     : initializeApp\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  21:         credential: cert\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  22:             projectId: FIREBASE_PROJECT_ID,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  23:             clientEmail: FIREBASE_CLIENT_EMAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  24:             privateKey: FIREBASE_PRIVATE_KEY.replace\(/\\\\n/g, '\\n'\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  25:         }\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  26:     }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  27: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  28: module.exports = {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  29:     auth: getAuth\(firebaseApp\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  30: }) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(=========================================================================================================) Tj
+0 -11 Td
+/F1 7.2 Tf
+(Quiz 4 - Redux state management) Tj
+0 -11 Td
+/F1 7.2 Tf
+(Redux combines feature reducers into one store, uses thunk middleware for asynchronous Axios actions, and) Tj
+0 -11 Td
+/F1 7.2 Tf
+(exposes the store to React through the Provider.) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/store.js \(lines 1-71\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   1: import { legacy_createStore as createStore, combineReducers, applyMiddleware } from 'redux';) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   2: import { thunk } from 'redux-thunk';) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   3: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   4: import {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   5:     productsReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   6:     productDetailsReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   7:     newProductReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   8:     productReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   9:     newReviewReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  10:     adminReviewsReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  11: } from './reducers/productReducers') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  12: import {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  13:     authReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  14:     userReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  15:     allUsersReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  16:     forgotPasswordReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  17:     // allUsersReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  18:     // userDetailsReducer, ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  19: } from './reducers/userReducers') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  20: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  21: import { cartReducer } from './reducers/cartReducers';) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  22: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  23: import { newOrderReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  24:     myOrdersReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  25:     orderDetailsReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  26:     allOrdersReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  27:     orderReducer,) Tj
+0 -11 Td
+ET
+endstream
+endobj
+47 0 obj
+<< /Length 3168 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(  28:  } from './reducers/orderReducers';) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  29: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  30: let initialState = {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  31:     cart: {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  32:         cartItems: localStorage.getItem\('cartItems'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  33:             ? JSON.parse\(localStorage.getItem\('cartItems'\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  34:             : [],) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  35:         shippingInfo: localStorage.getItem\('shippingInfo'\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  36:             ? JSON.parse\(localStorage.getItem\('shippingInfo'\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  37:             : {}) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  38:     },) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  39:     user: {},) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  40:     auth: {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  41:         user: null,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  42:         loading: true,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  43:         isAuthenticated: false) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  44:     },) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  45: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  46: }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  47: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  48: const reducer = combineReducers\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  49:     products: productsReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  50:     productDetails: productDetailsReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  51:     auth: authReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  52:     user: userReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  53:     allUsers: allUsersReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  54:     forgotPassword: forgotPasswordReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  55:     newProduct: newProductReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  56:     cart: cartReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  57:     newOrder: newOrderReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  58:     myOrders: myOrdersReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  59:     orderDetails: orderDetailsReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  60:     product: productReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  61:     newReview: newReviewReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  62:     adminReviews: adminReviewsReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  63:     allOrders: allOrdersReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  64:     order: orderReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  65:     // allUsers: allUsersReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  66:     // userDetails: userDetailsReducer,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  67: }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  68: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  69: const middlware = [thunk]) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  70: const store = createStore\(reducer, initialState, applyMiddleware\(...middlware\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  71: export default store;) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/main.jsx \(lines 1-12\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   1: import { StrictMode } from 'react') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   2: import { createRoot } from 'react-dom/client') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   3: import './index.css') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   4: import App from './App.jsx') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   5: import { Provider } from 'react-redux') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   6: import store from './store') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   7: ) Tj
+0 -11 Td
+ET
+endstream
+endobj
+48 0 obj
+<< /Length 3258 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(   8: createRoot\(document.getElementById\('root'\)\).render\() Tj
+0 -11 Td
+/F2 7.2 Tf
+(   9:     <Provider store={store}>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  10:         <App />) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  11:     </Provider>) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  12: \)) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/actions/productActions.jsx \(lines 45-82\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  45: export const getProducts = \() Tj
+0 -11 Td
+/F2 7.2 Tf
+(  46:     currentPage = 1,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  47:     keyword = '',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  48:     price = [0, 100000],) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  49:     category = '',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  50:     rating = '',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  51:     reviews = '',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  52:     append = false) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  53: \) => async \(dispatch\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  54:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  55:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  56:             type: ALL_PRODUCTS_REQUEST,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  57:             append) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  58:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  59: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  60:         const params = new URLSearchParams\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  61:             page: currentPage.toString\(\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  62:             limit: '8',) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  63:             keyword,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  64:             'price[lte]': price[1].toString\(\),) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  65:             'price[gte]': price[0].toString\(\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  66:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  67:         if \(Array.isArray\(category\)\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  68:             category.forEach\(categoryId => params.append\('category', categoryId\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  69:         } else if \(category\) {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  70:             params.set\('category', category\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  71:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  72:         if \(rating\) params.set\('rating[gte]', rating.toString\(\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  73:         if \(reviews\) params.set\('numOfReviews[gte]', reviews.toString\(\)\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  74:         const link = `${import.meta.env.VITE_API}/products?${params.toString\(\)}`) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  75:         const { data } = await axios.get\(link\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  76:         console.log\(data\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  77:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  78:             type: ALL_PRODUCTS_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  79:             payload: data,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  80:             meta: { append }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  81:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  82: ) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+/F1 7.2 Tf
+(frontend/src/actions/orderActions.jsx \(lines 1-45\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   1: import axios from 'axios') Tj
+0 -11 Td
+/F2 7.2 Tf
+(   2: import {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   3:     CREATE_ORDER_REQUEST,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   4:     CREATE_ORDER_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   5:     CREATE_ORDER_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   6:     MY_ORDERS_REQUEST,) Tj
+0 -11 Td
+ET
+endstream
+endobj
+49 0 obj
+<< /Length 2212 >>
+stream
+BT
+/F1 16 Tf
+50 750 Td
+(Feature Checklist Report) Tj
+/F1 9 Tf
+0 -18 Td
+/F2 7.2 Tf
+(   7:     MY_ORDERS_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   8:     MY_ORDERS_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(   9:     ORDER_DETAILS_REQUEST,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  10: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  11:     ORDER_DETAILS_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  12: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  13:     ORDER_DETAILS_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  14:     ALL_ORDERS_REQUEST,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  15: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  16:     ALL_ORDERS_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  17: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  18:     ALL_ORDERS_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  19:     UPDATE_ORDER_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  20: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  21:     UPDATE_ORDER_REQUEST,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  22: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  23:     UPDATE_ORDER_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  24:     DELETE_ORDER_REQUEST,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  25:     DELETE_ORDER_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  26:     DELETE_ORDER_FAIL,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  27:     CLEAR_ERRORS) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  28: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  29: } from '../constants/orderConstants') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  30: ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  31: export const createOrder = \(order\) => async \(dispatch\) => {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  32:     try {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  33:         dispatch\({ type: CREATE_ORDER_REQUEST }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  34:         const config = {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  35:             headers: {) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  36:                 'Content-Type': 'application/json') Tj
+0 -11 Td
+/F2 7.2 Tf
+(  37:             }, ) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  38:             withCredentials: true) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  39:         }) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  40:         const { data } = await axios.post\(`${import.meta.env.VITE_API}/order/new`, order, config\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  41:         dispatch\({) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  42:             type: CREATE_ORDER_SUCCESS,) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  43:             payload: data) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  44:         }\)) Tj
+0 -11 Td
+/F2 7.2 Tf
+(  45:         return data) Tj
+0 -11 Td
+/F1 7.2 Tf
+() Tj
+0 -11 Td
+ET
+endstream
+endobj
+50 0 obj
+<< /Type /Pages /Kids [51 0 R 52 0 R 53 0 R 54 0 R 55 0 R 56 0 R 57 0 R 58 0 R 59 0 R 60 0 R 61 0 R 62 0 R 63 0 R 64 0 R 65 0 R 66 0 R 67 0 R 68 0 R 69 0 R 70 0 R 71 0 R 72 0 R 73 0 R 74 0 R 75 0 R 76 0 R 77 0 R 78 0 R 79 0 R 80 0 R 81 0 R 82 0 R 83 0 R 84 0 R 85 0 R 86 0 R 87 0 R 88 0 R 89 0 R 90 0 R 91 0 R 92 0 R 93 0 R 94 0 R 95 0 R 96 0 R 97 0 R] /Count 47 >>
+endobj
+51 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 3 0 R >>
+endobj
+52 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 4 0 R >>
+endobj
+53 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 5 0 R >>
+endobj
+54 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 6 0 R >>
+endobj
+55 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 7 0 R >>
+endobj
+56 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 8 0 R >>
+endobj
+57 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 9 0 R >>
+endobj
+58 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 10 0 R >>
+endobj
+59 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 11 0 R >>
+endobj
+60 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 12 0 R >>
+endobj
+61 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 13 0 R >>
+endobj
+62 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 14 0 R >>
+endobj
+63 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 15 0 R >>
+endobj
+64 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 16 0 R >>
+endobj
+65 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 17 0 R >>
+endobj
+66 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 18 0 R >>
+endobj
+67 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 19 0 R >>
+endobj
+68 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 20 0 R >>
+endobj
+69 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 21 0 R >>
+endobj
+70 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 22 0 R >>
+endobj
+71 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 23 0 R >>
+endobj
+72 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 24 0 R >>
+endobj
+73 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 25 0 R >>
+endobj
+74 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 26 0 R >>
+endobj
+75 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 27 0 R >>
+endobj
+76 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 28 0 R >>
+endobj
+77 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 29 0 R >>
+endobj
+78 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 30 0 R >>
+endobj
+79 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 31 0 R >>
+endobj
+80 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 32 0 R >>
+endobj
+81 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 33 0 R >>
+endobj
+82 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 34 0 R >>
+endobj
+83 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 35 0 R >>
+endobj
+84 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 36 0 R >>
+endobj
+85 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 37 0 R >>
+endobj
+86 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 38 0 R >>
+endobj
+87 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 39 0 R >>
+endobj
+88 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 40 0 R >>
+endobj
+89 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 41 0 R >>
+endobj
+90 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 42 0 R >>
+endobj
+91 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 43 0 R >>
+endobj
+92 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 44 0 R >>
+endobj
+93 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 45 0 R >>
+endobj
+94 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 46 0 R >>
+endobj
+95 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 47 0 R >>
+endobj
+96 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 48 0 R >>
+endobj
+97 0 obj
+<< /Type /Page /Parent 50 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 49 0 R >>
+endobj
+98 0 obj
+<< /Type /Catalog /Pages 50 0 R >>
+endobj
+xref
+0 99
+0000000000 65535 f 
+0000000015 00000 n 
+0000000085 00000 n 
+0000000153 00000 n 
+0000004183 00000 n 
+0000007471 00000 n 
+0000010975 00000 n 
+0000014333 00000 n 
+0000017668 00000 n 
+0000021097 00000 n 
+0000025157 00000 n 
+0000028836 00000 n 
+0000032348 00000 n 
+0000036145 00000 n 
+0000039817 00000 n 
+0000043274 00000 n 
+0000046933 00000 n 
+0000050546 00000 n 
+0000054430 00000 n 
+0000057938 00000 n 
+0000061191 00000 n 
+0000064834 00000 n 
+0000068186 00000 n 
+0000071435 00000 n 
+0000075276 00000 n 
+0000079858 00000 n 
+0000084746 00000 n 
+0000088647 00000 n 
+0000092287 00000 n 
+0000095675 00000 n 
+0000099621 00000 n 
+0000104443 00000 n 
+0000107733 00000 n 
+0000111932 00000 n 
+0000115546 00000 n 
+0000120020 00000 n 
+0000123294 00000 n 
+0000127553 00000 n 
+0000131023 00000 n 
+0000134342 00000 n 
+0000137844 00000 n 
+0000141283 00000 n 
+0000145004 00000 n 
+0000148467 00000 n 
+0000151927 00000 n 
+0000155246 00000 n 
+0000158710 00000 n 
+0000161929 00000 n 
+0000165150 00000 n 
+0000168461 00000 n 
+0000170726 00000 n 
+0000171108 00000 n 
+0000171246 00000 n 
+0000171384 00000 n 
+0000171522 00000 n 
+0000171660 00000 n 
+0000171798 00000 n 
+0000171936 00000 n 
+0000172074 00000 n 
+0000172213 00000 n 
+0000172352 00000 n 
+0000172491 00000 n 
+0000172630 00000 n 
+0000172769 00000 n 
+0000172908 00000 n 
+0000173047 00000 n 
+0000173186 00000 n 
+0000173325 00000 n 
+0000173464 00000 n 
+0000173603 00000 n 
+0000173742 00000 n 
+0000173881 00000 n 
+0000174020 00000 n 
+0000174159 00000 n 
+0000174298 00000 n 
+0000174437 00000 n 
+0000174576 00000 n 
+0000174715 00000 n 
+0000174854 00000 n 
+0000174993 00000 n 
+0000175132 00000 n 
+0000175271 00000 n 
+0000175410 00000 n 
+0000175549 00000 n 
+0000175688 00000 n 
+0000175827 00000 n 
+0000175966 00000 n 
+0000176105 00000 n 
+0000176244 00000 n 
+0000176383 00000 n 
+0000176522 00000 n 
+0000176661 00000 n 
+0000176800 00000 n 
+0000176939 00000 n 
+0000177078 00000 n 
+0000177217 00000 n 
+0000177356 00000 n 
+0000177495 00000 n 
+0000177634 00000 n 
+trailer
+<< /Size 99 /Root 98 0 R >>
+startxref
+177685
+%%EOF

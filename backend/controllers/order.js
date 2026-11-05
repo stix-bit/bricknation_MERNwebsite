@@ -148,6 +148,12 @@ exports.updateOrder = async (req, res, next) => {
         })
     }
 
+    if (order.orderStatus === 'Shipped' && req.body.status === 'Processing') {
+        return res.status(400).json({
+            message: 'A shipped order cannot be moved back to processing',
+        })
+    }
+
     order.orderStatus = req.body.status
     order.deliveredAt = Date.now()
     await order.save()
