@@ -45,8 +45,6 @@ let initialState = {
 
 }
 
-
-
 const reducer = combineReducers({
     products: productsReducer,
     productDetails: productDetailsReducer,
@@ -66,8 +64,6 @@ const reducer = combineReducers({
     order: orderReducer,
     // allUsers: allUsersReducer,
     // userDetails: userDetailsReducer,
-
-
 })
 
 const middlware = [thunk]
