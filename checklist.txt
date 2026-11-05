@@ -34,7 +34,6 @@ user interface design css and Material UI (MUI) or similar library components 20
 quiz 1 15pts ✅
 sales charts with date range filter.  line or bar chart 15pts
 
-<<<<<<< HEAD
 quiz 2 ✅
 pagination on products list on homepage. 10pts
 infinite scroll on products list on homepage. 15pts
@@ -44,15 +43,6 @@ facebook or gmail login 15pts react-facebook-login or similar packages.
 facebook or gmail login using firebase|supabase|clerk 15pts
 
 quiz 4 15pts ✅
-=======
-quiz 2 15pts ✅
-infinite scroll on products list on homepage. 15pts
-
-quiz 3 15 pts✅
-facebook or gmail login using firebase|supabase|clerk 15pts
-
-quiz 4 15 pts ✅
->>>>>>> 23cdcda72f7ad9cbc3f47ccc7e60269d233ae960
 use Redux for state management
 
 term test LEC ✅

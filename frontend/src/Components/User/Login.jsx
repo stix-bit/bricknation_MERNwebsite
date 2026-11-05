@@ -309,6 +309,7 @@ const Login = () => {
                                                 py: 1.4,
                                                 fontWeight: 700,
                                                 fontSize: '0.85rem',
+                                                gap: 1,
                                                 backgroundColor: '#dc3545',
                                                 '&:hover': {
                                                     backgroundColor: '#bd2130',
@@ -317,6 +318,12 @@ const Login = () => {
                                                 borderRadius: '4px',
                                             }}
                                         >
+                                            <Box
+                                                component="img"
+                                                src="/images/google.png"
+                                                alt=""
+                                                sx={{ width: 22, height: 22, objectFit: 'contain' }}
+                                            />
                                             CONTINUE WITH GOOGLE
                                         </Button>
 
@@ -330,6 +337,7 @@ const Login = () => {
                                                 py: 1.4,
                                                 fontWeight: 700,
                                                 fontSize: '0.85rem',
+                                                gap: 1,
                                                 backgroundColor: '#0d6efd',
                                                 '&:hover': {
                                                     backgroundColor: '#0b5ed7',
@@ -338,6 +346,12 @@ const Login = () => {
                                                 borderRadius: '4px',
                                             }}
                                         >
+                                            <Box
+                                                component="img"
+                                                src="/images/facebook.png"
+                                                alt=""
+                                                sx={{ width: 22, height: 22, objectFit: 'contain' }}
+                                            />
                                             CONTINUE WITH FACEBOOK
                                         </Button>
                                     </Stack>
