@@ -30,7 +30,7 @@ router.put('/password/reset/:token', resetPassword);
 router.get('/me', isAuthenticatedUser, getUserProfile)
 router.put('/me/update', isAuthenticatedUser, upload.single("avatar"), updateProfile)
 router.put('/password/update', isAuthenticatedUser, updatePassword)
-router.get('/logout', isAuthenticatedUser, logout)
+router.get('/logout', logout)
 router.get('/admin/users', isAuthenticatedUser, authorizeRoles('admin'), allUsers)
 router.patch('/admin/user/:id/soft-delete', isAuthenticatedUser, authorizeRoles('admin'), softDeleteUser)
 router.patch('/admin/user/:id/restore', isAuthenticatedUser, authorizeRoles('admin'), restoreUser)
